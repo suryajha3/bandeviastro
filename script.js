@@ -69,6 +69,57 @@ document.addEventListener("click", (event) => {
   primaryNav.classList.remove("is-open");
 });
 
+function initPremiumSliders() {
+  document.querySelectorAll("[data-premium-slider]").forEach((slider) => {
+    const slides = [...slider.querySelectorAll("[data-slide]")];
+    const dots = [...slider.querySelectorAll("[data-slider-dot]")];
+    const previousButton = slider.querySelector("[data-slider-prev]");
+    const nextButton = slider.querySelector("[data-slider-next]");
+    if (slides.length <= 1) return;
+
+    let currentIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
+    let autoTimer = null;
+
+    const showSlide = (nextIndex) => {
+      currentIndex = (nextIndex + slides.length) % slides.length;
+      slides.forEach((slide, index) => slide.classList.toggle("is-active", index === currentIndex));
+      dots.forEach((dot, index) => dot.classList.toggle("is-active", index === currentIndex));
+    };
+
+    const restartAuto = () => {
+      window.clearInterval(autoTimer);
+      autoTimer = window.setInterval(() => showSlide(currentIndex + 1), 6500);
+    };
+
+    previousButton?.addEventListener("click", () => {
+      showSlide(currentIndex - 1);
+      restartAuto();
+    });
+
+    nextButton?.addEventListener("click", () => {
+      showSlide(currentIndex + 1);
+      restartAuto();
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        showSlide(index);
+        restartAuto();
+      });
+    });
+
+    slider.addEventListener("mouseenter", () => window.clearInterval(autoTimer));
+    slider.addEventListener("mouseleave", restartAuto);
+    slider.addEventListener("focusin", () => window.clearInterval(autoTimer));
+    slider.addEventListener("focusout", restartAuto);
+
+    showSlide(currentIndex);
+    restartAuto();
+  });
+}
+
+initPremiumSliders();
+
 function createSupabaseClient() {
   if (!siteConfig.supabaseUrl || !siteConfig.supabaseAnonKey || !window.supabase?.createClient) {
     return null;
