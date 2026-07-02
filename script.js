@@ -1,4 +1,6 @@
-const businessWhatsApp = "919876543210";
+const siteConfig = window.BANDEVI_CONFIG || {};
+const businessWhatsApp = siteConfig.whatsappNumber || "919876543210";
+const supabaseClient = createSupabaseClient();
 
 const serviceSelect = document.querySelector("#clientService");
 const form = document.querySelector("#bookingForm");
@@ -12,9 +14,12 @@ const trackBookingForm = document.querySelector("#trackBookingForm");
 const adminAccessForm = document.querySelector("#adminAccessForm");
 const adminPanel = document.querySelector("#adminPanel");
 const adminBookingList = document.querySelector("#adminBookingList");
+const customerAuthForm = document.querySelector("#customerAuthForm");
+const authLogoutButton = document.querySelector("#authLogoutButton");
 const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
+let adminBookingsCache = [];
 
 const bookingStatuses = [
   "Enquiry Received",
@@ -50,6 +55,37 @@ if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+function createSupabaseClient() {
+  if (!siteConfig.supabaseUrl || !siteConfig.supabaseAnonKey || !window.supabase?.createClient) {
+    return null;
+  }
+
+  return window.supabase.createClient(siteConfig.supabaseUrl, siteConfig.supabaseAnonKey);
+}
+
+function isCloudEnabled() {
+  return Boolean(supabaseClient);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#039;"
+  }[character]));
+}
+
+function safeExternalUrl(value) {
+  try {
+    const url = new URL(value, window.location.href);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "#";
+  } catch {
+    return "#";
+  }
+}
+
 function readBookings() {
   try {
     return JSON.parse(localStorage.getItem(bookingStorageKey) || "[]");
@@ -59,7 +95,11 @@ function readBookings() {
 }
 
 function writeBookings(bookings) {
-  localStorage.setItem(bookingStorageKey, JSON.stringify(bookings));
+  try {
+    localStorage.setItem(bookingStorageKey, JSON.stringify(bookings));
+  } catch {
+    // Local storage can be unavailable in some private browser modes.
+  }
 }
 
 function generateBookingId() {
@@ -97,6 +137,151 @@ function statusIndex(status) {
   return Math.max(0, bookingStatuses.indexOf(status));
 }
 
+async function getCurrentUser() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error) return null;
+  return data?.user || null;
+}
+
+function toCloudBooking(booking, user) {
+  return {
+    booking_code: booking.id,
+    customer_name: booking.name,
+    phone: booking.phone,
+    email: booking.email || null,
+    country: booking.country || null,
+    service: booking.service,
+    preferred_date: booking.date || null,
+    preferred_time: booking.time || null,
+    mode: booking.mode || null,
+    concern: booking.concern || null,
+    status: booking.status,
+    payment_status: booking.paymentStatus,
+    amount: booking.amount || null,
+    proof_url: booking.proofUrl || null,
+    staff_note: booking.staffNote || null,
+    customer_user_id: user?.id || booking.customerUserId || null,
+    created_at: booking.createdAt,
+    updated_at: booking.updatedAt
+  };
+}
+
+function fromCloudBooking(row) {
+  const preferredTime = row.preferred_time ? String(row.preferred_time).slice(0, 5) : "";
+
+  return {
+    id: row.booking_code || row.id,
+    name: row.customer_name || row.name || "",
+    phone: row.phone || "",
+    email: row.email || "",
+    country: row.country || "",
+    service: row.service || "",
+    date: row.preferred_date || row.date || "",
+    time: preferredTime || row.time || "",
+    mode: row.mode || "",
+    concern: row.concern || "",
+    status: row.status || "Enquiry Received",
+    paymentStatus: row.payment_status || row.paymentStatus || "Not Requested",
+    amount: row.amount || "",
+    proofUrl: row.proof_url || row.proofUrl || "",
+    staffNote: row.staff_note || row.staffNote || "",
+    customerUserId: row.customer_user_id || row.customerUserId || null,
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+    updatedAt: row.updated_at || row.updatedAt || row.created_at || new Date().toISOString(),
+    cloudSynced: true
+  };
+}
+
+async function saveBookingOnline(booking) {
+  saveBooking({ ...booking, cloudSynced: false });
+
+  if (!isCloudEnabled()) {
+    return { savedCloud: false, mode: "local" };
+  }
+
+  try {
+    const user = await getCurrentUser();
+    const cloudBooking = toCloudBooking(booking, user);
+    const { error } = await supabaseClient.from("bookings").insert(cloudBooking);
+    if (error) throw error;
+
+    const syncedBooking = { ...booking, customerUserId: user?.id || null, cloudSynced: true };
+    saveBooking(syncedBooking);
+    return { savedCloud: true, mode: "cloud" };
+  } catch (error) {
+    console.warn("Booking cloud sync failed", error);
+    return { savedCloud: false, mode: "local", error };
+  }
+}
+
+async function findBookingOnline(bookingId, contactValue) {
+  const localBooking = findBooking(bookingId, contactValue);
+  const contact = normalizeContact(contactValue);
+
+  if (!isCloudEnabled() || !contact) {
+    return localBooking || null;
+  }
+
+  try {
+    const { data, error } = await supabaseClient.rpc("lookup_booking", {
+      p_booking_code: (bookingId || "").trim().toUpperCase(),
+      p_contact: contactValue || ""
+    });
+    if (error) throw error;
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return row ? fromCloudBooking(row) : localBooking || null;
+  } catch (error) {
+    console.warn("Booking lookup failed", error);
+    return localBooking || null;
+  }
+}
+
+async function readBookingsOnline() {
+  if (!isCloudEnabled()) {
+    return { bookings: readBookings(), source: "local" };
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("bookings")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return { bookings: (data || []).map(fromCloudBooking), source: "cloud" };
+  } catch (error) {
+    console.warn("Admin cloud read failed", error);
+    return { bookings: readBookings(), source: "local", error };
+  }
+}
+
+async function updateBookingOnline(booking) {
+  booking.updatedAt = new Date().toISOString();
+  saveBooking(booking);
+
+  if (!isCloudEnabled()) {
+    return { savedCloud: false, mode: "local" };
+  }
+
+  const updatePayload = {
+    status: booking.status,
+    payment_status: booking.paymentStatus,
+    amount: booking.amount || null,
+    proof_url: booking.proofUrl || null,
+    staff_note: booking.staffNote || null,
+    updated_at: booking.updatedAt
+  };
+
+  const { error } = await supabaseClient
+    .from("bookings")
+    .update(updatePayload)
+    .eq("booking_code", booking.id);
+
+  if (error) throw error;
+  return { savedCloud: true, mode: "cloud" };
+}
+
 function bookingWhatsAppUrl(booking) {
   const message = [
     "Namaste Pdt. Jyotishya Acharya Kumodanand Jha team,",
@@ -118,12 +303,13 @@ function bookingWhatsAppUrl(booking) {
   return `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
 }
 
-function renderTicket(booking) {
+function renderTicket(booking, syncResult = {}) {
   const ticket = document.querySelector("#portalTicket");
   const ticketId = document.querySelector("#ticketId");
   const ticketSummary = document.querySelector("#ticketSummary");
   const ticketTrackLink = document.querySelector("#ticketTrackLink");
   const ticketWhatsApp = document.querySelector("#ticketWhatsApp");
+  const ticketSyncNote = document.querySelector("#ticketSyncNote");
   if (!ticket || !ticketId || !ticketSummary || !ticketTrackLink || !ticketWhatsApp) return;
 
   ticket.classList.add("is-visible");
@@ -131,6 +317,16 @@ function renderTicket(booking) {
   ticketSummary.textContent = `${booking.service} request received for ${booking.name}. Status: ${booking.status}.`;
   ticketTrackLink.href = `track-booking.html?id=${encodeURIComponent(booking.id)}`;
   ticketWhatsApp.href = bookingWhatsAppUrl(booking);
+
+  if (ticketSyncNote) {
+    if (syncResult.savedCloud) {
+      ticketSyncNote.textContent = "Saved to the secure booking system for staff updates across devices.";
+    } else if (syncResult.error) {
+      ticketSyncNote.textContent = "Booking ID created. Send it on WhatsApp now; the team can confirm and update your status.";
+    } else {
+      ticketSyncNote.textContent = "Booking ID created. Send it on WhatsApp now; secure account tracking will activate shortly.";
+    }
+  }
 }
 
 function renderStatusPanel(booking) {
@@ -143,7 +339,7 @@ function renderStatusPanel(booking) {
 
   if (!booking) {
     statusPanel.classList.add("is-visible");
-    statusMessage.textContent = "No local booking record found for this ID. If you booked on another phone or computer, send the Booking ID on WhatsApp for staff confirmation.";
+    statusMessage.textContent = "No booking record found for this Booking ID and contact. Please check the details or send the Booking ID on WhatsApp for staff confirmation.";
     statusTimeline.innerHTML = "";
     statusMeta.innerHTML = "";
     statusWhatsApp.href = `https://wa.me/${businessWhatsApp}`;
@@ -155,49 +351,67 @@ function renderStatusPanel(booking) {
   statusMessage.textContent = `Booking ${booking.id} is currently: ${booking.status}.`;
   statusTimeline.innerHTML = bookingStatuses.map((status, index) => {
     const stateClass = index < currentIndex ? "is-complete" : index === currentIndex ? "is-current" : "";
-    return `<li class="${stateClass}"><span class="status-dot">${index + 1}</span><div><strong>${status}</strong><p>${index <= currentIndex ? "Updated in your booking flow." : "Next step after staff update."}</p></div></li>`;
+    return `<li class="${stateClass}"><span class="status-dot">${index + 1}</span><div><strong>${escapeHtml(status)}</strong><p>${index <= currentIndex ? "Updated in your booking flow." : "Next step after staff update."}</p></div></li>`;
   }).join("");
-  statusMeta.innerHTML = [
+
+  const metaItems = [
     ["Service", booking.service],
     ["Payment", booking.paymentStatus],
     ["Amount", booking.amount || "Quote pending"],
     ["Preferred date", booking.date || "Flexible"],
     ["Mode", booking.mode],
     ["Updated", new Date(booking.updatedAt).toLocaleString()]
-  ].map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join("");
+  ];
+
+  if (booking.proofUrl) {
+    metaItems.push(["Proof", `<a href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open proof</a>`]);
+  }
+
+  statusMeta.innerHTML = metaItems.map(([label, value]) => {
+    const renderedValue = String(value).startsWith("<a ") ? value : escapeHtml(value);
+    return `<div><span>${escapeHtml(label)}</span><strong>${renderedValue}</strong></div>`;
+  }).join("");
   statusWhatsApp.href = bookingWhatsAppUrl(booking);
 }
 
-function renderAdminBookings() {
+async function renderAdminBookings() {
   if (!adminBookingList) return;
-  const bookings = readBookings();
+  adminBookingList.innerHTML = `<article><h3>Loading bookings</h3><p>Checking the secure booking desk.</p></article>`;
+
+  const result = await readBookingsOnline();
+  const bookings = result.bookings;
+  adminBookingsCache = bookings;
+
   if (!bookings.length) {
-    adminBookingList.innerHTML = `<article><h3>No bookings on this browser yet</h3><p>When a booking is created from this site in this browser, it will appear here. Database sync can be connected in the next backend phase.</p></article>`;
+    const emptyMessage = result.source === "cloud"
+      ? "No bookings found in the secure booking desk yet."
+      : "No secure shared bookings yet. Add shared database settings to make bookings available across staff devices.";
+    adminBookingList.innerHTML = `<article><h3>No bookings yet</h3><p>${emptyMessage}</p></article>`;
     return;
   }
 
   adminBookingList.innerHTML = bookings.map((booking) => {
-    const statusOptions = bookingStatuses.map((status) => `<option value="${status}" ${booking.status === status ? "selected" : ""}>${status}</option>`).join("");
-    const paymentOptions = paymentStatuses.map((status) => `<option value="${status}" ${booking.paymentStatus === status ? "selected" : ""}>${status}</option>`).join("");
+    const statusOptions = bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
+    const paymentOptions = paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
     return `
-      <article data-booking-id="${booking.id}">
+      <article data-booking-id="${escapeHtml(booking.id)}">
         <div class="admin-booking-head">
           <div>
-            <h3>${booking.name}</h3>
-            <p>${booking.id} | ${booking.service} | ${booking.phone}</p>
+            <h3>${escapeHtml(booking.name)}</h3>
+            <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.service)} | ${escapeHtml(booking.phone)}</p>
           </div>
-          <span class="status-pill">${booking.status}</span>
+          <span class="status-pill">${escapeHtml(booking.status)}</span>
         </div>
         <div class="admin-edit-grid">
           <label>Status<select data-field="status">${statusOptions}</select></label>
           <label>Payment<select data-field="paymentStatus">${paymentOptions}</select></label>
-          <label>Amount<input data-field="amount" type="text" value="${booking.amount || ""}" placeholder="Final quote" /></label>
+          <label>Amount<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
         </div>
-        <label>Proof link<input data-field="proofUrl" type="url" value="${booking.proofUrl || ""}" placeholder="Photo/video proof URL" /></label>
-        <label>Staff note<textarea data-field="staffNote" rows="3" placeholder="Internal note or client update">${booking.staffNote || ""}</textarea></label>
+        <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
+        <label>Staff note<textarea data-field="staffNote" rows="3" placeholder="Internal note or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
         <div class="admin-actions">
-          <button class="btn btn-primary" type="button" data-admin-save="${booking.id}">Save update</button>
-          <a class="btn btn-secondary" href="${bookingWhatsAppUrl(booking)}">Open WhatsApp</a>
+          <button class="btn btn-primary" type="button" data-admin-save="${escapeHtml(booking.id)}">Save update</button>
+          <a class="btn btn-secondary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Open WhatsApp</a>
         </div>
       </article>
     `;
@@ -309,7 +523,7 @@ stoneOrderForm?.addEventListener("submit", (event) => {
   window.location.href = `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
 });
 
-portalBookingForm?.addEventListener("submit", (event) => {
+portalBookingForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const booking = {
@@ -332,16 +546,20 @@ portalBookingForm?.addEventListener("submit", (event) => {
     updatedAt: new Date().toISOString()
   };
 
-  saveBooking(booking);
-  renderTicket(booking);
+  const submitButton = portalBookingForm.querySelector("button[type='submit']");
+  if (submitButton) submitButton.textContent = "Creating booking...";
+  const syncResult = await saveBookingOnline(booking);
+  renderTicket(booking, syncResult);
   portalBookingForm.reset();
+  await prefillPortalFromSession();
+  if (submitButton) submitButton.textContent = "Create booking ID";
 });
 
-trackBookingForm?.addEventListener("submit", (event) => {
+trackBookingForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const bookingId = document.querySelector("#trackBookingId").value;
   const contact = document.querySelector("#trackContact").value;
-  renderStatusPanel(findBooking(bookingId, contact));
+  renderStatusPanel(await findBookingOnline(bookingId, contact));
 });
 
 if (trackBookingForm) {
@@ -349,43 +567,267 @@ if (trackBookingForm) {
   if (requestedBookingId) {
     const field = document.querySelector("#trackBookingId");
     if (field) field.value = requestedBookingId.toUpperCase();
-    renderStatusPanel(findBooking(requestedBookingId, ""));
+    findBookingOnline(requestedBookingId, "").then(renderStatusPanel);
   }
 }
 
-adminAccessForm?.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const code = document.querySelector("#adminCode").value.trim();
+function setAdminStatus(message) {
   const status = document.querySelector("#adminAccessStatus");
+  if (status) status.textContent = message;
+}
+
+function updateAdminAccessMode() {
+  const codeField = document.querySelector("#adminCodeField");
+  const cloudFields = document.querySelector("#adminCloudFields");
+
+  if (isCloudEnabled()) {
+    codeField?.classList.add("is-hidden");
+    cloudFields?.classList.remove("is-hidden");
+    setAdminStatus("Secure staff login is active. Use the admin email and password created in the staff system.");
+  } else {
+    cloudFields?.classList.add("is-hidden");
+    codeField?.classList.remove("is-hidden");
+  }
+}
+
+async function currentUserIsAdmin() {
+  if (!isCloudEnabled()) return false;
+  const user = await getCurrentUser();
+  if (!user) return false;
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) return false;
+  return data?.role === "admin";
+}
+
+async function openAdminPanel(message = "Staff dashboard opened.") {
+  sessionStorage.setItem(adminAccessKey, "true");
+  adminPanel?.classList.add("is-visible");
+  setAdminStatus(message);
+  await renderAdminBookings();
+}
+
+adminAccessForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (isCloudEnabled()) {
+    const email = document.querySelector("#adminEmail")?.value.trim();
+    const password = document.querySelector("#adminPassword")?.value;
+
+    if (!email || !password) {
+      setAdminStatus("Enter staff email and password.");
+      return;
+    }
+
+    setAdminStatus("Checking secure staff login...");
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      setAdminStatus(error.message || "Staff login was not accepted.");
+      return;
+    }
+
+    if (!(await currentUserIsAdmin())) {
+      setAdminStatus("This account is not marked as admin staff yet.");
+      return;
+    }
+
+    await openAdminPanel("Secure staff dashboard opened.");
+    return;
+  }
+
+  const code = document.querySelector("#adminCode").value.trim();
   if (code === adminAccessCode) {
-    sessionStorage.setItem(adminAccessKey, "true");
-    adminPanel?.classList.add("is-visible");
-    renderAdminBookings();
-    if (status) status.textContent = "Staff dashboard opened.";
-  } else if (status) {
-    status.textContent = "Access code not accepted.";
+    await openAdminPanel("Staff dashboard opened in local mode.");
+  } else {
+    setAdminStatus("Access code not accepted.");
   }
 });
 
-if (adminPanel && sessionStorage.getItem(adminAccessKey) === "true") {
-  adminPanel.classList.add("is-visible");
-  renderAdminBookings();
+updateAdminAccessMode();
+
+if (adminPanel) {
+  if (isCloudEnabled()) {
+    currentUserIsAdmin().then((isAdmin) => {
+      if (isAdmin) openAdminPanel("Secure staff dashboard opened.");
+    });
+  } else if (sessionStorage.getItem(adminAccessKey) === "true") {
+    openAdminPanel("Staff dashboard opened in local mode.");
+  }
 }
 
-adminBookingList?.addEventListener("click", (event) => {
+adminBookingList?.addEventListener("click", async (event) => {
   const saveButton = event.target.closest("[data-admin-save]");
   if (!saveButton) return;
 
   const bookingId = saveButton.dataset.adminSave;
   const card = saveButton.closest("[data-booking-id]");
-  const bookings = readBookings();
-  const booking = bookings.find((item) => item.id === bookingId);
+  const booking = adminBookingsCache.find((item) => item.id === bookingId);
   if (!booking || !card) return;
 
   card.querySelectorAll("[data-field]").forEach((field) => {
     booking[field.dataset.field] = field.value;
   });
-  booking.updatedAt = new Date().toISOString();
-  writeBookings(bookings);
-  renderAdminBookings();
+
+  saveButton.textContent = "Saving...";
+  try {
+    const result = await updateBookingOnline(booking);
+    setAdminStatus(result.savedCloud ? "Booking update saved to secure cloud." : "Booking update saved locally.");
+    await renderAdminBookings();
+  } catch (error) {
+    console.warn("Booking update failed", error);
+    setAdminStatus(error.message || "Booking update could not be saved.");
+    saveButton.textContent = "Save update";
+  }
 });
+
+async function prefillPortalFromSession() {
+  if (!portalBookingForm || !isCloudEnabled()) return;
+
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  const emailField = document.querySelector("#portalEmail");
+  const nameField = document.querySelector("#portalName");
+  const fullName = user.user_metadata?.full_name || "";
+
+  if (emailField && !emailField.value && user.email) {
+    emailField.value = user.email;
+  }
+
+  if (nameField && !nameField.value && fullName) {
+    nameField.value = fullName;
+  }
+}
+
+function setAuthStatus(message) {
+  const authStatus = document.querySelector("#authStatus");
+  if (authStatus) authStatus.textContent = message;
+}
+
+async function renderAccountBookings() {
+  const accountBookingList = document.querySelector("#accountBookingList");
+  if (!accountBookingList) return;
+
+  if (!isCloudEnabled()) {
+    accountBookingList.innerHTML = `<article><h3>Secure account activation pending</h3><p>Customer login is ready on the website. Track by Booking ID while account history is activated.</p></article>`;
+    return;
+  }
+
+  const user = await getCurrentUser();
+  if (!user) {
+    accountBookingList.innerHTML = `<article><h3>Sign in to view bookings</h3><p>After login, matching bookings will appear here for tracking.</p></article>`;
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("bookings")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+
+    const bookings = (data || []).map(fromCloudBooking);
+    if (!bookings.length) {
+      accountBookingList.innerHTML = `<article><h3>No bookings in this account yet</h3><p>Create a booking with this email, or track an existing Booking ID manually.</p></article>`;
+      return;
+    }
+
+    accountBookingList.innerHTML = bookings.map((booking) => `
+      <article>
+        <div>
+          <h3>${escapeHtml(booking.service)}</h3>
+          <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.status)} | ${escapeHtml(booking.paymentStatus)}</p>
+        </div>
+        <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
+      </article>
+    `).join("");
+  } catch (error) {
+    console.warn("Account booking list failed", error);
+    accountBookingList.innerHTML = `<article><h3>Booking history unavailable</h3><p>Please use Booking ID tracking or WhatsApp support while staff checks the account.</p></article>`;
+  }
+}
+
+async function refreshAuthState() {
+  if (!customerAuthForm && !document.querySelector("#accountBookingList")) return;
+
+  if (!isCloudEnabled()) {
+    setAuthStatus("Secure customer login is ready for activation. For now, track with Booking ID or WhatsApp support.");
+    authLogoutButton?.classList.add("is-hidden");
+    await renderAccountBookings();
+    return;
+  }
+
+  const user = await getCurrentUser();
+  if (user) {
+    setAuthStatus(`Signed in as ${user.email}.`);
+    authLogoutButton?.classList.remove("is-hidden");
+  } else {
+    setAuthStatus("Sign in or create an account to view bookings saved with your email.");
+    authLogoutButton?.classList.add("is-hidden");
+  }
+
+  await renderAccountBookings();
+}
+
+async function handleCustomerAuth(action) {
+  if (!isCloudEnabled()) {
+    setAuthStatus("Secure customer login is being activated. Please track with Booking ID for now.");
+    return;
+  }
+
+  const email = document.querySelector("#authEmail")?.value.trim();
+  const password = document.querySelector("#authPassword")?.value;
+  const fullName = document.querySelector("#authName")?.value.trim();
+
+  if (!email || !password) {
+    setAuthStatus("Enter email and password.");
+    return;
+  }
+
+  setAuthStatus(action === "sign-up" ? "Creating account..." : "Signing in...");
+
+  const response = action === "sign-up"
+    ? await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName || email } }
+    })
+    : await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if (response.error) {
+    setAuthStatus(response.error.message || "Login could not be completed.");
+    return;
+  }
+
+  setAuthStatus(action === "sign-up" ? "Account created. If email confirmation is enabled, please confirm your email." : "Signed in successfully.");
+  await refreshAuthState();
+  await prefillPortalFromSession();
+}
+
+customerAuthForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  handleCustomerAuth("sign-in");
+});
+
+document.querySelectorAll("[data-auth-action]").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    handleCustomerAuth(button.dataset.authAction);
+  });
+});
+
+authLogoutButton?.addEventListener("click", async () => {
+  if (supabaseClient) {
+    await supabaseClient.auth.signOut();
+  }
+  setAuthStatus("Signed out.");
+  await refreshAuthState();
+});
+
+prefillPortalFromSession();
+refreshAuthState();

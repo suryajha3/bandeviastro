@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Track Booking Status | Bandevi Astro</title>
-    <meta name="description" content="Track Bandevi Astro booking status using Booking ID and phone or email for online pooja, hawan, astrology, gemstone and vastu services." />
+    <title>Customer Login | Bandevi Astro</title>
+    <meta name="description" content="Login to Bandevi Astro customer portal to view booking status for online pooja, hawan, astrology, gemstone and hast rekha services." />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -36,47 +36,53 @@
       <section class="portal-hero">
         <div class="portal-hero-inner">
           <a class="breadcrumb" href="book-online.html">Create booking</a>
-          <p class="eyebrow">Customer Portal</p>
-          <h1>Track booking status</h1>
-          <p>Enter the Booking ID and phone or email used during booking to view current status, payment stage and next action. Clients can also use customer login for booking history.</p>
+          <p class="eyebrow">Customer Login</p>
+          <h1>Secure booking account for clients</h1>
+          <p>Sign in to view booking history, track status and keep pooja, astrology or gemstone service updates connected to one account.</p>
         </div>
       </section>
 
-      <section class="portal-shell">
-        <aside class="portal-card">
-          <p class="eyebrow">Booking stages</p>
-          <h2>Simple progress tracking for clients</h2>
+      <section class="portal-shell auth-layout">
+        <form class="portal-form auth-form" id="customerAuthForm">
+          <h2>Login or create account</h2>
+          <label class="full-span">Full name<input id="authName" type="text" autocomplete="name" placeholder="Needed for new account" /></label>
+          <label>Email<input id="authEmail" type="email" autocomplete="email" required /></label>
+          <label>Password<input id="authPassword" type="password" autocomplete="current-password" required /></label>
+          <div class="auth-button-row full-span">
+            <button class="btn btn-primary" type="submit" data-auth-action="sign-in">Sign in</button>
+            <button class="btn btn-secondary" type="button" data-auth-action="sign-up">Create account</button>
+            <button class="btn btn-secondary is-hidden" type="button" id="authLogoutButton">Logout</button>
+          </div>
+          <p class="form-note" id="authStatus" aria-live="polite">Sign in or create an account to view bookings saved with your email.</p>
+        </form>
+
+        <aside class="portal-card auth-side-card">
+          <p class="eyebrow">Premium client portal</p>
+          <h2>Everything connected to one status flow</h2>
           <ul class="portal-list">
-            <li><strong>Enquiry Received:</strong> Request created on website.</li>
-            <li><strong>Quote Sent:</strong> Service amount and schedule shared.</li>
-            <li><strong>Payment Pending:</strong> Awaiting UPI/Razorpay confirmation.</li>
-            <li><strong>Confirmed:</strong> Booking accepted by staff.</li>
-            <li><strong>Completed:</strong> Service done and proof ready.</li>
+            <li><strong>Booking history:</strong> View active requests after secure account activation.</li>
+            <li><strong>Status tracking:</strong> Check quote, payment, schedule and completion stage.</li>
+            <li><strong>Privacy:</strong> Birth details and concerns stay connected to the client account.</li>
+            <li><strong>Support:</strong> WhatsApp remains available for urgent help and confirmation.</li>
           </ul>
           <div class="ticket-actions">
-            <a class="btn btn-secondary" href="login.html">Customer login</a>
-            <a class="btn btn-secondary" href="book-online.html">New booking</a>
+            <a class="btn btn-primary" href="book-online.html">Book service</a>
+            <a class="btn btn-secondary" href="track-booking.html">Track by ID</a>
           </div>
         </aside>
+      </section>
 
-        <form class="portal-form status-lookup" id="trackBookingForm">
-          <label>Booking ID<input id="trackBookingId" type="text" placeholder="BA-20260702-ABCD" required /></label>
-          <label>Phone or email<input id="trackContact" type="text" placeholder="Used during booking" required /></label>
-          <button class="btn btn-primary" type="submit">Track</button>
-          <div class="status-panel" id="statusPanel">
-            <p class="eyebrow">Current booking status</p>
-            <h2 id="statusMessage">Enter booking details to view status.</h2>
-            <div class="status-meta-grid" id="statusMeta"></div>
-            <ol class="status-timeline" id="statusTimeline"></ol>
-            <div class="ticket-actions">
-              <a class="btn btn-primary" id="statusWhatsApp" href="https://wa.me/919876543210">Ask on WhatsApp</a>
-              <a class="btn btn-secondary" href="book-online.html">Create new booking</a>
-            </div>
-          </div>
-        </form>
+      <section class="section account-section" aria-label="Account bookings">
+        <div class="section-heading compact">
+          <p class="eyebrow">My bookings</p>
+          <h2>Booking history and status</h2>
+          <p>Bookings connected to the logged-in email will appear here after secure account activation.</p>
+        </div>
+        <div class="mini-booking-list" id="accountBookingList"></div>
       </section>
     </main>
 
+    <a class="floating-whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp chat">WA</a>
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">

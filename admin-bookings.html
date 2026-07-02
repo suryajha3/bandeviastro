@@ -24,7 +24,7 @@
           <a href="about.html">About</a>
           <a href="gemstone-shop.html">Gemstones</a>
           <a href="track-booking.html">Track</a>
-          <a href="book-online.html">Book</a>
+          <a href="login.html">Login</a>
         </nav>
         <div class="header-actions" aria-label="Quick contact actions">
           <a class="header-action whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
@@ -39,7 +39,7 @@
           <a class="breadcrumb" href="track-booking.html">Customer tracking</a>
           <p class="eyebrow">Staff Desk</p>
           <h1>Update booking status, payment and proof</h1>
-          <p>Use this status desk to manage bookings created in this browser. Secure cloud login and shared database can be connected in the backend phase.</p>
+          <p>Use this status desk to manage booking status, payment stage, proof links and staff notes from one secure staff workflow.</p>
         </div>
       </section>
 
@@ -48,11 +48,15 @@
           <form id="adminAccessForm">
             <p class="eyebrow">Staff access</p>
             <h2>Open dashboard</h2>
-            <label>Access code<input id="adminCode" type="password" placeholder="Staff access code" required /></label>
+            <div id="adminCloudFields" class="cloud-admin-fields is-hidden">
+              <label>Staff email<input id="adminEmail" type="email" autocomplete="email" placeholder="admin@example.com" /></label>
+              <label>Password<input id="adminPassword" type="password" autocomplete="current-password" placeholder="Staff password" /></label>
+            </div>
+            <label id="adminCodeField">Access code<input id="adminCode" type="password" placeholder="Staff access code" /></label>
             <button class="btn btn-primary" type="submit">Open staff desk</button>
-            <p class="form-note" id="adminAccessStatus" aria-live="polite">Temporary staff access is used until secure backend login is connected.</p>
+            <p class="form-note" id="adminAccessStatus" aria-live="polite">Secure staff login activates after the shared database is connected. Local access remains available before that.</p>
           </form>
-          <div class="notice-box">Phase 1 keeps booking records in the browser. Supabase login will make this shared for staff and customers across devices.</div>
+          <div class="notice-box">Staff can update enquiry, quote, payment, schedule, completion and proof status. With the shared database connected, updates become shared across devices.</div>
         </aside>
         <div class="status-panel" id="adminPanel">
           <p class="eyebrow">Bookings</p>
@@ -92,6 +96,7 @@
           <h2>Trust & Policies</h2>
           <a href="about.html">About</a>
           <a href="track-booking.html">Track Booking</a>
+          <a href="login.html">Customer Login</a>
           <a href="terms-and-conditions.html">Terms</a>
           <a href="privacy-policy.html">Privacy</a>
           <a href="cancellation-policy.html">Cancellation</a>
@@ -105,6 +110,8 @@
         <a href="book-online.html">Book online</a>
       </div>
     </footer>
+    <script src="site-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
   </body>
 </html>
