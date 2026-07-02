@@ -519,6 +519,32 @@ document.querySelectorAll("[data-stone]").forEach((button) => {
   button.addEventListener("click", () => setStone(button.dataset.stone));
 });
 
+function setSelectValue(select, value) {
+  if (!select || !value) return;
+  if (![...select.options].some((option) => option.value === value)) {
+    select.add(new Option(value, value));
+  }
+  select.value = value;
+}
+
+function prefillPortalBookingFromUrl() {
+  if (!portalBookingForm) return;
+  const params = new URLSearchParams(window.location.search);
+  const requestedService = params.get("service");
+  const requestedMode = params.get("mode");
+  const requestedConcern = params.get("concern");
+  const portalService = document.querySelector("#portalService");
+  const portalMode = document.querySelector("#portalMode");
+  const portalConcern = document.querySelector("#portalConcern");
+
+  setSelectValue(portalService, requestedService);
+  setSelectValue(portalMode, requestedMode);
+
+  if (portalConcern && requestedConcern && !portalConcern.value) {
+    portalConcern.value = requestedConcern;
+  }
+}
+
 if (stoneSelect) {
   const requestedStone = new URLSearchParams(window.location.search).get("stone");
   if (requestedStone) {
@@ -932,5 +958,6 @@ authLogoutButton?.addEventListener("click", async () => {
   await refreshAuthState();
 });
 
+prefillPortalBookingFromUrl();
 prefillPortalFromSession();
 refreshAuthState();
