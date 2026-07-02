@@ -816,6 +816,85 @@ h3 {
   background: #ffffff;
 }
 
+.gemstone-showcase-section {
+  padding-top: clamp(38px, 6vw, 72px);
+  padding-bottom: clamp(38px, 6vw, 72px);
+  background: #ffffff;
+}
+
+.gemstone-showcase {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.05fr) minmax(280px, 0.95fr);
+  gap: clamp(24px, 5vw, 56px);
+  align-items: center;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.gemstone-showcase-media {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(91, 18, 32, 0.14);
+  border-radius: 8px;
+  background: #fff8ee;
+  box-shadow: var(--shadow);
+}
+
+.gemstone-showcase-media img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.gemstone-showcase-media span,
+.product-photo span {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: #ffffff;
+  background: rgba(32, 16, 22, 0.72);
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.gemstone-showcase-copy p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.showcase-points {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.showcase-points div {
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(15, 118, 110, 0.06);
+}
+
+.showcase-points strong,
+.showcase-points span {
+  display: block;
+}
+
+.showcase-points strong {
+  color: var(--maroon);
+}
+
+.showcase-points span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .assurance-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2300,6 +2379,57 @@ details p {
   font-weight: 950;
 }
 
+.product-photo {
+  position: relative;
+  min-height: 166px;
+  margin: -4px -4px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstone-ring-collection.png");
+  background-repeat: no-repeat;
+  background-size: 310% auto;
+  box-shadow: inset 0 -28px 44px rgba(32, 16, 22, 0.12);
+}
+
+.product-photo-ruby {
+  background-position: 1% 8%;
+}
+
+.product-photo-pearl {
+  background-position: 25% 8%;
+}
+
+.product-photo-coral {
+  background-position: 48% 8%;
+}
+
+.product-photo-emerald {
+  background-position: 70% 8%;
+}
+
+.product-photo-yellow {
+  background-position: 99% 8%;
+}
+
+.product-photo-diamond {
+  background-position: 5% 92%;
+}
+
+.product-photo-blue {
+  background-position: 36% 92%;
+}
+
+.product-photo-hessonite {
+  background-position: 64% 92%;
+}
+
+.product-photo-catseye {
+  background-position: 97% 92%;
+}
+
 .product-spec-list {
   display: grid;
   gap: 8px;
@@ -2329,6 +2459,20 @@ details p {
 }
 
 .product-spec-list dd {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.product-detail-list {
+  margin-bottom: 12px;
+}
+
+.product-ring-list {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 18px;
+  padding-left: 18px;
   color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.45;
@@ -2812,6 +2956,10 @@ details p {
 }
 
 @media (max-width: 980px) {
+  .gemstone-showcase {
+    grid-template-columns: 1fr;
+  }
+
   .premium-slide,
   .premium-proof-panel {
     grid-template-columns: 1fr;
@@ -2828,6 +2976,19 @@ details p {
 }
 
 @media (max-width: 680px) {
+  .gemstone-showcase-section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .showcase-points {
+    grid-template-columns: 1fr;
+  }
+
+  .product-photo {
+    min-height: 154px;
+  }
+
   .premium-slider-section {
     padding-left: 14px;
     padding-right: 14px;

@@ -561,8 +561,11 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     phone: document.querySelector("#stoneClientPhone").value.trim(),
     stone: document.querySelector("#stoneName").value,
     form: document.querySelector("#stoneForm").value,
+    metal: document.querySelector("#stoneMetal").value,
+    ringSize: document.querySelector("#stoneRingSize").value.trim() || "Need staff guidance",
     budget: document.querySelector("#stoneBudget").value.trim() || "Need quote",
     certificate: document.querySelector("#stoneCertificate").value,
+    delivery: document.querySelector("#stoneDelivery").value.trim() || "Need delivery guidance",
     purpose: document.querySelector("#stonePurpose").value.trim() || "Please call me for kundli/gemstone guidance."
   };
 
@@ -575,12 +578,15 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     service: `Gemstone Quote - ${order.stone}`,
     date: "",
     time: "",
-    mode: `${order.form} / gemstone delivery`,
+    mode: `${order.form} / ${order.metal} / gemstone delivery`,
     concern: [
       `Gemstone: ${order.stone}`,
       `Form: ${order.form}`,
+      `Metal preference: ${order.metal}`,
+      `Ring size / finger: ${order.ringSize}`,
       `Budget / carat: ${order.budget}`,
       `Certificate: ${order.certificate}`,
+      `Delivery country: ${order.delivery}`,
       `Purpose / birth details: ${order.purpose}`
     ].join("\n"),
     status: "Enquiry Received",
