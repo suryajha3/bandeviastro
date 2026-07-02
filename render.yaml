@@ -2,7 +2,14 @@ services:
   - type: web
     name: bandeviastro
     runtime: static
-    buildCommand: echo "Static site ready"
+    buildCommand: node scripts/build-config.js
     staticPublishPath: .
     domains:
       - bandeviastro.com
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: WHATSAPP_NUMBER
+        value: "919876543210"
