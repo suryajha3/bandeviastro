@@ -509,6 +509,8 @@ function setStone(stoneName) {
     stoneFormField.value = "Ring";
   } else if (stoneFormField && /pendant/i.test(stoneName)) {
     stoneFormField.value = "Pendant";
+  } else if (stoneFormField && /loose/i.test(stoneName)) {
+    stoneFormField.value = "Loose stone";
   }
   document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
