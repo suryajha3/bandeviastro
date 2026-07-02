@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cancellation Policy | Bandevi Astro</title>
-    <meta name="description" content="Cancellation policy for Bandevi Astro pooja, hawan, consultation and gemstone orders." />
+    <title>Staff Booking Desk | Bandevi Astro</title>
+    <meta name="description" content="Staff booking status desk for Bandevi Astro service enquiries, payment status and pooja completion updates." />
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -16,10 +17,7 @@
       <div class="header-main">
         <a class="brand" href="index.html#top" aria-label="Pdt. Jyotishya Acharya Kumodanand Jha home">
           <span class="brand-mark" aria-hidden="true">PJ</span>
-          <span>
-            <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
-            <small>Bandevi Astro | Pooja, Astrology, Gemstones</small>
-          </span>
+          <span><strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong><small>Bandevi Astro | Pooja, Astrology, Gemstones</small></span>
         </a>
         <nav class="main-nav" aria-label="Primary navigation">
           <a href="index.html#services">Services</a>
@@ -35,58 +33,31 @@
       </div>
     </header>
 
-    <main class="policy-main">
-      <section class="policy-hero">
-        <div class="policy-hero-inner">
-          <a class="breadcrumb" href="index.html#top">Back to home</a>
-          <p class="eyebrow">Legal policy</p>
-          <h1>Cancellation Policy</h1>
-          <p>Last updated: July 2, 2026. This policy explains how cancellations work for consultations, rituals and gemstone orders.</p>
+    <main class="portal-main">
+      <section class="portal-hero">
+        <div class="portal-hero-inner">
+          <a class="breadcrumb" href="track-booking.html">Customer tracking</a>
+          <p class="eyebrow">Staff Desk</p>
+          <h1>Update booking status, payment and proof</h1>
+          <p>Use this status desk to manage bookings created in this browser. Secure cloud login and shared database can be connected in the backend phase.</p>
         </div>
       </section>
 
-      <section class="policy-layout">
-        <nav class="policy-nav" aria-label="Policy navigation">
-          <a href="terms-and-conditions.html">Terms</a>
-          <a href="privacy-policy.html">Privacy</a>
-          <a aria-current="page" href="cancellation-policy.html">Cancellation</a>
-          <a href="refund-policy.html">Refund</a>
-          <a href="shipping-policy.html">Shipping</a>
-          <a href="faq.html">FAQ</a>
-        </nav>
-        <div class="policy-content">
-          <article class="policy-card">
-            <h2>1. Before payment</h2>
-            <p>You may cancel an enquiry at any time before payment or final booking confirmation. No cancellation fee applies before confirmation.</p>
-          </article>
-          <article class="policy-card">
-            <h2>2. Consultations</h2>
-            <ul>
-              <li>Cancel or reschedule at least 12 hours before the confirmed consultation time.</li>
-              <li>If you miss the appointment without notice, the booking may be treated as used.</li>
-              <li>One reasonable reschedule may be offered subject to advisor availability.</li>
-            </ul>
-          </article>
-          <article class="policy-card">
-            <h2>3. Pooja and hawan</h2>
-            <ul>
-              <li>Cancel at least 24 hours before the ritual start time where possible.</li>
-              <li>If samagri, pandit dakshina, travel, temple slot or customized preparation has already been arranged, actual non-recoverable costs may be deducted.</li>
-              <li>Once the ritual has started or been completed, cancellation is not available.</li>
-            </ul>
-          </article>
-          <article class="policy-card">
-            <h2>4. Gemstone orders</h2>
-            <ul>
-              <li>A gemstone enquiry can be cancelled before payment.</li>
-              <li>Paid orders can usually be cancelled before procurement, certification, ring sizing, setting or dispatch begins.</li>
-              <li>Customized rings, pendants, engraving, size work or stones procured specifically for you may not be cancellable once work begins.</li>
-            </ul>
-          </article>
-          <article class="policy-card">
-            <h2>5. How to cancel</h2>
-            <p>Contact us by WhatsApp or email with your name, phone number, booking/order details and reason for cancellation. We will confirm whether cancellation, reschedule or refund is available.</p>
-          </article>
+      <section class="portal-shell admin-layout">
+        <aside class="admin-toolbar">
+          <form id="adminAccessForm">
+            <p class="eyebrow">Staff access</p>
+            <h2>Open dashboard</h2>
+            <label>Access code<input id="adminCode" type="password" placeholder="Staff access code" required /></label>
+            <button class="btn btn-primary" type="submit">Open staff desk</button>
+            <p class="form-note" id="adminAccessStatus" aria-live="polite">Temporary staff access is used until secure backend login is connected.</p>
+          </form>
+          <div class="notice-box">Phase 1 keeps booking records in the browser. Supabase login will make this shared for staff and customers across devices.</div>
+        </aside>
+        <div class="status-panel" id="adminPanel">
+          <p class="eyebrow">Bookings</p>
+          <h2>Service status desk</h2>
+          <div class="admin-booking-list" id="adminBookingList"></div>
         </div>
       </section>
     </main>
@@ -96,11 +67,7 @@
         <div class="footer-brand">
           <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
           <p>Bandevi Astro offers online pooja, hawan, kundli, hast rekha, gemstone guidance, vastu and muhurat support for India and NRI clients.</p>
-          <div class="footer-badges" aria-label="Trust highlights">
-            <span>Private guidance</span>
-            <span>Clear quote</span>
-            <span>Policy backed</span>
-          </div>
+          <div class="footer-badges" aria-label="Trust highlights"><span>Private guidance</span><span>Clear quote</span><span>Policy backed</span></div>
         </div>
         <nav class="footer-column" aria-label="Footer services">
           <h2>Services</h2>

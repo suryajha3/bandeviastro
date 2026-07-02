@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Online | Bandevi Astro</title>
+    <meta name="description" content="Book online pooja, hawan, kundli, hast rekha, gemstone guidance, vastu and muhurat services with a booking ID and status tracking." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Main header">
+      <div class="header-topline">
+        <span>Premium online pooja, astrology, gemstone and hast rekha service</span>
+        <span>Clear quote before payment | India and NRI clients</span>
+      </div>
+      <div class="header-main">
+        <a class="brand" href="index.html#top" aria-label="Pdt. Jyotishya Acharya Kumodanand Jha home">
+          <span class="brand-mark" aria-hidden="true">PJ</span>
+          <span><strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong><small>Bandevi Astro | Pooja, Astrology, Gemstones</small></span>
+        </a>
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="index.html#services">Services</a>
+          <a href="about.html">About</a>
+          <a href="gemstone-shop.html">Gemstones</a>
+          <a href="track-booking.html">Track</a>
+          <a href="book-online.html">Book</a>
+        </nav>
+        <div class="header-actions" aria-label="Quick contact actions">
+          <a class="header-action whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
+          <a class="header-action primary" href="book-online.html"><span>Book</span><strong>Now</strong></a>
+        </div>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <section class="portal-hero">
+        <div class="portal-hero-inner">
+          <a class="breadcrumb" href="index.html#top">Back to home</a>
+          <p class="eyebrow">Booking Portal</p>
+          <h1>Create a booking request and receive a Booking ID</h1>
+          <p>Choose the service, preferred date, country and mode. The system creates a Booking ID so the client can track status from enquiry to completion.</p>
+        </div>
+      </section>
+
+      <section class="portal-status-band" aria-label="Booking status steps">
+        <div><strong>Enquiry</strong><span>Client request received</span></div>
+        <div><strong>Quote</strong><span>Price and schedule shared</span></div>
+        <div><strong>Payment</strong><span>UPI/Razorpay after confirmation</span></div>
+        <div><strong>Scheduled</strong><span>Pooja or consultation planned</span></div>
+        <div><strong>Completed</strong><span>Proof and notes shared</span></div>
+      </section>
+
+      <section class="portal-shell">
+        <aside class="portal-card">
+          <p class="eyebrow">International-ready flow</p>
+          <h2>Built for trust before payment</h2>
+          <p>Clients can book from India or abroad, receive a clear Booking ID, and track the service stage without calling repeatedly.</p>
+          <ul class="portal-list">
+            <li><strong>Booking ID:</strong> Generated immediately after request.</li>
+            <li><strong>Status tracking:</strong> Customer can check progress anytime.</li>
+            <li><strong>Payment clarity:</strong> Amount is quoted before payment collection.</li>
+            <li><strong>Proof ready:</strong> Staff can add proof link after service completion.</li>
+          </ul>
+        </aside>
+
+        <form class="portal-form" id="portalBookingForm">
+          <h2>Book service</h2>
+          <label>Full name<input id="portalName" type="text" autocomplete="name" required /></label>
+          <label>WhatsApp number<input id="portalPhone" type="tel" autocomplete="tel" required /></label>
+          <label>Email<input id="portalEmail" type="email" autocomplete="email" /></label>
+          <label>Country / city<input id="portalCountry" type="text" placeholder="India, USA, UAE..." /></label>
+          <label>
+            Service
+            <select id="portalService" required>
+              <option value="Online Pooja">Online Pooja</option>
+              <option value="Hawan / Havan">Hawan / Havan</option>
+              <option value="Kundli Consultation">Kundli Consultation</option>
+              <option value="Hast Rekha / Palmistry">Hast Rekha / Palmistry</option>
+              <option value="Gemstone Guidance">Gemstone Guidance</option>
+              <option value="Buy Gemstone Online">Buy Gemstone Online</option>
+              <option value="Vastu / Muhurat">Vastu / Muhurat</option>
+              <option value="NRI Online Pooja">NRI Online Pooja</option>
+              <option value="Marriage Guidance">Marriage Guidance</option>
+              <option value="Business Guidance">Business Guidance</option>
+            </select>
+          </label>
+          <label>Preferred date<input id="portalDate" type="date" /></label>
+          <label>Preferred time<input id="portalTime" type="time" /></label>
+          <label>
+            Mode
+            <select id="portalMode">
+              <option value="Online video call">Online video call</option>
+              <option value="Temple pooja with proof">Temple pooja with proof</option>
+              <option value="Home / office visit">Home / office visit</option>
+              <option value="Gemstone delivery">Gemstone delivery</option>
+            </select>
+          </label>
+          <label class="full-span">Concern / requirement<textarea id="portalConcern" rows="4" placeholder="Marriage, business, grah shanti, gemstone, muhurat..."></textarea></label>
+          <label class="checkbox-line full-span">
+            <input type="checkbox" required />
+            <span>I agree to the <a href="terms-and-conditions.html">Terms</a>, <a href="privacy-policy.html">Privacy Policy</a>, <a href="cancellation-policy.html">Cancellation Policy</a> and <a href="refund-policy.html">Refund Policy</a>.</span>
+          </label>
+          <button class="btn btn-primary full-span" type="submit">Create booking ID</button>
+          <p class="form-note">After creating the Booking ID, send it on WhatsApp so the team can confirm quote, payment and schedule.</p>
+          <div class="booking-ticket" id="portalTicket">
+            <p class="eyebrow">Booking created</p>
+            <h3>Your Booking ID</h3>
+            <span class="ticket-id" id="ticketId"></span>
+            <p id="ticketSummary"></p>
+            <div class="ticket-actions">
+              <a class="btn btn-primary" id="ticketTrackLink" href="track-booking.html">Track status</a>
+              <a class="btn btn-secondary" id="ticketWhatsApp" href="https://wa.me/919876543210">Send on WhatsApp</a>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <a class="floating-whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp chat">WA</a>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
+          <p>Bandevi Astro offers online pooja, hawan, kundli, hast rekha, gemstone guidance, vastu and muhurat support for India and NRI clients.</p>
+          <div class="footer-badges" aria-label="Trust highlights"><span>Private guidance</span><span>Clear quote</span><span>Policy backed</span></div>
+        </div>
+        <nav class="footer-column" aria-label="Footer services">
+          <h2>Services</h2>
+          <a href="online-pooja.html">Online Pooja</a>
+          <a href="hawan.html">Hawan</a>
+          <a href="kundli.html">Kundli</a>
+          <a href="hast-rekha.html">Hast Rekha</a>
+          <a href="vastu-muhurat.html">Vastu & Muhurat</a>
+          <a href="nri-pooja.html">NRI Pooja</a>
+          <a href="marriage-problem.html">Marriage Guidance</a>
+          <a href="business-problem.html">Business Guidance</a>
+        </nav>
+        <nav class="footer-column" aria-label="Gemstone links">
+          <h2>Gemstones</h2>
+          <a href="gemstone.html">Gemstone Guidance</a>
+          <a href="gemstone-shop.html?stone=Manik%20%2F%20Ruby">Ruby / Manik</a>
+          <a href="gemstone-shop.html?stone=Panna%20%2F%20Emerald">Emerald / Panna</a>
+          <a href="gemstone-shop.html?stone=Pukhraj%20%2F%20Yellow%20Sapphire">Yellow Sapphire</a>
+          <a href="gemstone-shop.html">All Gemstones</a>
+        </nav>
+        <nav class="footer-column" aria-label="Footer policies">
+          <h2>Trust & Policies</h2>
+          <a href="about.html">About</a>
+          <a href="track-booking.html">Track Booking</a>
+          <a href="terms-and-conditions.html">Terms</a>
+          <a href="privacy-policy.html">Privacy</a>
+          <a href="cancellation-policy.html">Cancellation</a>
+          <a href="refund-policy.html">Refund</a>
+          <a href="shipping-policy.html">Shipping</a>
+          <a href="faq.html">FAQ</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright <span id="year"></span> Bandevi Astro. Spiritual services are faith-based and do not replace professional advice.</p>
+        <a href="book-online.html">Book online</a>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
