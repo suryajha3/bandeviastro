@@ -100,6 +100,8 @@ as $$
   );
 $$;
 
+drop function if exists public.lookup_booking(text, text);
+
 create or replace function public.lookup_booking(p_booking_code text, p_contact text)
 returns table (
   booking_code text,
