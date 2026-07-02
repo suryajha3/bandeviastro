@@ -16,6 +16,8 @@ const adminPanel = document.querySelector("#adminPanel");
 const adminBookingList = document.querySelector("#adminBookingList");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
+const menuToggle = document.querySelector("#menuToggle");
+const primaryNav = document.querySelector("#primaryNav");
 const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
@@ -54,6 +56,18 @@ const serviceStartingPrices = {
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
+
+menuToggle?.addEventListener("click", () => {
+  const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+  menuToggle.setAttribute("aria-expanded", String(!isOpen));
+  primaryNav?.classList.toggle("is-open", !isOpen);
+});
+
+document.addEventListener("click", (event) => {
+  if (!menuToggle || !primaryNav || menuToggle.contains(event.target) || primaryNav.contains(event.target)) return;
+  menuToggle.setAttribute("aria-expanded", "false");
+  primaryNav.classList.remove("is-open");
+});
 
 function createSupabaseClient() {
   if (!siteConfig.supabaseUrl || !siteConfig.supabaseAnonKey || !window.supabase?.createClient) {
@@ -488,7 +502,7 @@ form?.addEventListener("submit", (event) => {
   window.location.href = `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
 });
 
-stoneOrderForm?.addEventListener("submit", (event) => {
+stoneOrderForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const order = {
@@ -501,26 +515,50 @@ stoneOrderForm?.addEventListener("submit", (event) => {
     purpose: document.querySelector("#stonePurpose").value.trim() || "Please call me for kundli/gemstone guidance."
   };
 
-  const message = [
-    "Namaste Pdt. Jyotishya Acharya Kumodanand Jha team,",
-    "",
-    "I want to buy/enquire for gemstone online.",
-    `Name: ${order.name}`,
-    `Phone: ${order.phone}`,
-    `Gemstone: ${order.stone}`,
-    `Form: ${order.form}`,
-    `Budget / carat: ${order.budget}`,
-    `Certificate: ${order.certificate}`,
-    `Purpose / birth details: ${order.purpose}`,
-    "",
-    "Please confirm suitability, certificate, price and payment process."
-  ].join("\n");
+  const booking = {
+    id: generateBookingId(),
+    name: order.name,
+    phone: order.phone,
+    email: "",
+    country: "",
+    service: `Gemstone Quote - ${order.stone}`,
+    date: "",
+    time: "",
+    mode: `${order.form} / gemstone delivery`,
+    concern: [
+      `Gemstone: ${order.stone}`,
+      `Form: ${order.form}`,
+      `Budget / carat: ${order.budget}`,
+      `Certificate: ${order.certificate}`,
+      `Purpose / birth details: ${order.purpose}`
+    ].join("\n"),
+    status: "Enquiry Received",
+    paymentStatus: "Not Requested",
+    amount: "Certificate-based quote pending",
+    proofUrl: "",
+    staffNote: "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  const submitButton = stoneOrderForm.querySelector("button[type='submit']");
+  if (submitButton) submitButton.textContent = "Creating quote ID...";
 
   if (stoneStatusEl) {
-    stoneStatusEl.textContent = "Opening WhatsApp with gemstone order details.";
+    stoneStatusEl.textContent = "Creating gemstone quote request...";
   }
 
-  window.location.href = `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
+  const syncResult = await saveBookingOnline(booking);
+  renderTicket(booking, syncResult);
+  stoneOrderForm.reset();
+
+  if (stoneStatusEl) {
+    stoneStatusEl.textContent = syncResult.savedCloud
+      ? "Gemstone quote ID created and saved for staff follow-up."
+      : "Gemstone quote ID created. Send it on WhatsApp for staff follow-up.";
+  }
+
+  if (submitButton) submitButton.textContent = "Create gemstone quote ID";
 });
 
 portalBookingForm?.addEventListener("submit", async (event) => {

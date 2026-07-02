@@ -8,32 +8,46 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="site-header" aria-label="Main header">
-      <div class="header-topline">
-        <span>Premium online pooja, astrology, gemstone and hast rekha service</span>
-        <span>Clear quote before payment | India and NRI clients</span>
-      </div>
-      <div class="header-main">
-        <a class="brand" href="index.html#top" aria-label="Pdt. Jyotishya Acharya Kumodanand Jha home">
-          <span class="brand-mark" aria-hidden="true">PJ</span>
-          <span>
-            <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
-            <small>Bandevi Astro | Pooja, Astrology, Gemstones</small>
-          </span>
-        </a>
-        <nav class="main-nav" aria-label="Primary navigation">
-          <a href="index.html#services">Services</a>
-          <a href="about.html">About</a>
-          <a href="gemstone-shop.html">Gemstones</a>
-          <a href="track-booking.html">Track</a>
-          <a href="login.html">Login</a>
-        </nav>
-        <div class="header-actions" aria-label="Quick contact actions">
-          <a class="header-action whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
-          <a class="header-action primary" href="book-online.html"><span>Book</span><strong>Now</strong></a>
-        </div>
-      </div>
-    </header>
+    <header class="site-header premium-header" aria-label="Main header">
+  <div class="header-topline">
+    <span>Secure Booking ID and status tracking</span>
+    <span>Online pooja, hawan, kundli, gemstones and hast rekha</span>
+    <span>India and NRI clients | Clear quote before payment</span>
+  </div>
+  <div class="header-main">
+    <a class="brand" href="index.html#top" aria-label="Bandevi Astro home">
+      <span class="brand-mark" aria-hidden="true">BA</span>
+      <span>
+        <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
+        <small>Bandevi Astro | Premium Spiritual Services</small>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open menu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <strong>Menu</strong>
+    </button>
+    <nav class="main-nav" id="primaryNav" aria-label="Primary navigation">
+      <a href="index.html#services">Services</a>
+      <a href="online-pooja.html">Online Pooja</a>
+      <a href="hawan.html">Hawan</a>
+      <a href="gemstone-shop.html">Gemstones</a>
+      <a href="track-booking.html">Track</a>
+      <a href="login.html">Login</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="header-actions" aria-label="Quick contact actions">
+      <a class="header-action whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
+      <a class="header-action primary" href="book-online.html"><span>Book</span><strong>Now</strong></a>
+    </div>
+  </div>
+  <div class="header-trust-row" aria-label="Trust highlights">
+    <a href="track-booking.html"><strong>Track booking</strong><span>Use Booking ID</span></a>
+    <a href="login.html"><strong>Client login</strong><span>History and updates</span></a>
+    <a href="about.html"><strong>Trust first</strong><span>No payment before quote</span></a>
+  </div>
+</header>
     <main class="detail-main">
       <section class="detail-hero">
         <div class="detail-hero-inner">
@@ -63,7 +77,77 @@
       </section>
       <section class="cta-section"><div class="cta-panel"><div><h2>Book hast rekha reading</h2><p>Send your name and service request to schedule a private palmistry session.</p></div><a class="btn btn-primary" href="https://wa.me/919876543210?text=Namaste%2C%20I%20want%20Hast%20Rekha%20consultation.">Enquire on WhatsApp</a></div></section>
     </main>
-    <footer class="site-footer"><div><strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong><p>Online pooja, hawan, astrology, gemstones, hast rekha, vastu and muhurat.</p><nav class="footer-links"><a href="about.html">About</a><a href="terms-and-conditions.html">Terms</a><a href="privacy-policy.html">Privacy</a><a href="cancellation-policy.html">Cancellation</a><a href="refund-policy.html">Refund</a><a href="shipping-policy.html">Shipping</a><a href="faq.html">FAQ</a></nav></div><p>Copyright <span id="year"></span>.</p></footer>
+    <footer class="site-footer premium-footer">
+  <section class="footer-cta" aria-label="Booking call to action">
+    <div>
+      <p class="eyebrow">Premium spiritual service</p>
+      <h2>Book online, confirm on WhatsApp, track every stage.</h2>
+      <p>Clients can request pooja, hawan, kundli, hast rekha, vastu, muhurat and gemstone guidance with a clear Booking ID before any payment.</p>
+    </div>
+    <div class="footer-cta-actions">
+      <a class="btn btn-primary" href="book-online.html">Create Booking ID</a>
+      <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+    </div>
+  </section>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-brand-mark">BA</span>
+      <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
+      <p>Bandevi Astro offers online pooja, hawan, kundli, hast rekha, gemstone guidance, vastu and muhurat support for India and NRI clients.</p>
+      <div class="footer-badges" aria-label="Trust highlights">
+        <span>Secure Booking ID</span>
+        <span>Staff status updates</span>
+        <span>Policy backed</span>
+      </div>
+    </div>
+    <nav class="footer-column" aria-label="Footer services">
+      <h2>Services</h2>
+      <a href="online-pooja.html">Online Pooja</a>
+      <a href="hawan.html">Hawan / Havan</a>
+      <a href="kundli.html">Kundli Consultation</a>
+      <a href="hast-rekha.html">Hast Rekha</a>
+      <a href="vastu-muhurat.html">Vastu & Muhurat</a>
+      <a href="nri-pooja.html">NRI Pooja</a>
+      <a href="marriage-problem.html">Marriage Guidance</a>
+      <a href="business-problem.html">Business Guidance</a>
+    </nav>
+    <nav class="footer-column" aria-label="Gemstone links">
+      <h2>Gemstones</h2>
+      <a href="gemstone.html">Gemstone Guidance</a>
+      <a href="gemstone-shop.html?stone=Manik%20%2F%20Ruby">Ruby / Manik</a>
+      <a href="gemstone-shop.html?stone=Panna%20%2F%20Emerald">Emerald / Panna</a>
+      <a href="gemstone-shop.html?stone=Pukhraj%20%2F%20Yellow%20Sapphire">Yellow Sapphire</a>
+      <a href="gemstone-shop.html?stone=Neelam%20%2F%20Blue%20Sapphire">Blue Sapphire</a>
+      <a href="gemstone-shop.html">All Gemstones</a>
+    </nav>
+    <nav class="footer-column" aria-label="Client desk links">
+      <h2>Client Desk</h2>
+      <a href="book-online.html">Book Online</a>
+      <a href="track-booking.html">Track Booking</a>
+      <a href="login.html">Customer Login</a>
+      <a href="about.html">About and Trust</a>
+      <a href="faq.html">FAQ</a>
+      <a href="admin-bookings.html">Staff Desk</a>
+    </nav>
+    <div class="footer-contact-card" aria-label="Contact details">
+      <h2>Contact</h2>
+      <p>For urgent enquiry, send service name, city/country, preferred date and concern on WhatsApp.</p>
+      <a class="footer-contact-link" href="https://wa.me/919876543210">WhatsApp: +91 98765 43210</a>
+      <a class="footer-contact-link" href="mailto:bandeviglobalgroup@gmail.com">bandeviglobalgroup@gmail.com</a>
+      <p class="footer-note">Spiritual services are faith-based and do not replace medical, legal, financial or safety advice.</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright <span id="year"></span> Bandevi Astro. Clear quote before payment. Privacy, cancellation, refund and shipping terms apply.</p>
+    <div class="footer-bottom-links">
+      <a href="terms-and-conditions.html">Terms</a>
+      <a href="privacy-policy.html">Privacy</a>
+      <a href="cancellation-policy.html">Cancellation</a>
+      <a href="refund-policy.html">Refund</a>
+      <a href="shipping-policy.html">Shipping</a>
+    </div>
+  </div>
+</footer>
     <script src="site-config.js"></script>
     <script src="script.js"></script>
   </body>
