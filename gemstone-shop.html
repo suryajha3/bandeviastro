@@ -15,9 +15,9 @@
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="index.html#services">Services</a>
-        <a href="index.html#trust">Trust</a>
-        <a href="index.html#guidance">Guidance</a>
+        <a href="about.html">About</a>
         <a href="gemstone-shop.html">Shop</a>
+        <a href="faq.html">FAQ</a>
         <a href="#stoneOrder">Buy</a>
       </nav>
       <a class="header-action" href="tel:+919876543210"><span>Call</span><strong>+91 98765 43210</strong></a>
@@ -39,6 +39,59 @@
           <div><strong>Kundli</strong><span>Wear only after suitability review</span></div>
           <div><strong>Quote</strong><span>Price depends on carat, origin and clarity</span></div>
           <div><strong>Payment</strong><span>UPI or Razorpay after order confirmation</span></div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="buy-flow-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Buy online with trust</p>
+          <h2 id="buy-flow-title">How gemstone purchase works</h2>
+          <p>Gemstones are quoted after suitability, quality and certificate checks. This avoids fake fixed pricing and protects the client.</p>
+        </div>
+        <div class="buy-flow-grid">
+          <article>
+            <span class="quote-chip">1</span>
+            <h3>Suitability check</h3>
+            <p>Share birth details or existing recommendation. We confirm whether the stone is suitable before purchase.</p>
+          </article>
+          <article>
+            <span class="quote-chip">2</span>
+            <h3>Quote and certificate</h3>
+            <p>Receive stone options with carat/ratti, origin, treatment note, certificate availability and final price.</p>
+          </article>
+          <article>
+            <span class="quote-chip">3</span>
+            <h3>Payment and delivery</h3>
+            <p>Pay only after approval. Dispatch is handled under the shipping and refund policy linked on this page.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="quote-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Transparent quote bands</p>
+          <h2 id="quote-title">Final price depends on quality</h2>
+          <p>Use these as enquiry categories, not fixed prices. Exact price is confirmed before payment.</p>
+        </div>
+        <div class="quote-grid">
+          <article>
+            <span class="quote-chip">Starter</span>
+            <h3>Budget guidance</h3>
+            <p>Suitable for clients who need a basic certified option and clear wearing instructions.</p>
+            <button type="button" class="text-button" data-stone="Budget certified gemstone quote">Request quote</button>
+          </article>
+          <article>
+            <span class="quote-chip">Premium</span>
+            <h3>Higher clarity stone</h3>
+            <p>For clients who want better clarity, origin selection and ring/pendant finishing.</p>
+            <button type="button" class="text-button" data-stone="Premium gemstone quote">Request quote</button>
+          </article>
+          <article>
+            <span class="quote-chip">Custom</span>
+            <h3>Ring or pendant order</h3>
+            <p>Metal, size, setting, certificate and dispatch are confirmed before custom work begins.</p>
+            <button type="button" class="text-button" data-stone="Custom gemstone ring or pendant">Request quote</button>
+          </article>
         </div>
       </section>
 
@@ -114,6 +167,10 @@
             Purpose / birth details
             <textarea id="stonePurpose" rows="4" placeholder="Example: kundli recommendation, career, marriage, health tendency, birth date/time/place"></textarea>
           </label>
+          <label class="checkbox-line full-span">
+            <input type="checkbox" required />
+            <span>I agree to the <a href="terms-and-conditions.html">Terms</a>, <a href="privacy-policy.html">Privacy Policy</a>, <a href="refund-policy.html">Refund Policy</a> and <a href="shipping-policy.html">Shipping Policy</a>.</span>
+          </label>
           <button class="btn btn-primary full-span" type="submit">Send gemstone order enquiry</button>
           <p class="form-note full-span" id="stoneOrderStatus" aria-live="polite">Gemstones are faith-based remedies. Wear only after suitability guidance.</p>
         </form>
@@ -133,12 +190,31 @@
             <summary>How payment will happen?</summary>
             <p>After quote approval, payment can be collected by UPI or Razorpay link. Add real payment details before launch.</p>
           </details>
+          <details>
+            <summary>What policies apply to gemstone orders?</summary>
+            <p>Terms, cancellation, refund and shipping policies apply to every paid gemstone order. Review them before payment.</p>
+          </details>
         </div>
       </section>
     </main>
 
     <a class="floating-whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp chat">WA</a>
-    <footer class="site-footer"><div><strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong><p>Online pooja, hawan, astrology, gemstones, hast rekha, vastu and muhurat.</p></div><p>Copyright <span id="year"></span>. Sample contact details are ready to replace before launch.</p></footer>
+    <footer class="site-footer">
+      <div>
+        <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
+        <p>Online pooja, hawan, astrology, gemstones, hast rekha, vastu and muhurat.</p>
+        <nav class="footer-links" aria-label="Footer policies">
+          <a href="about.html">About</a>
+          <a href="terms-and-conditions.html">Terms</a>
+          <a href="privacy-policy.html">Privacy</a>
+          <a href="cancellation-policy.html">Cancellation</a>
+          <a href="refund-policy.html">Refund</a>
+          <a href="shipping-policy.html">Shipping</a>
+          <a href="faq.html">FAQ</a>
+        </nav>
+      </div>
+      <p>Copyright <span id="year"></span>. Sample contact details are ready to replace before launch.</p>
+    </footer>
     <script src="script.js"></script>
   </body>
 </html>

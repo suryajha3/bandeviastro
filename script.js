@@ -28,6 +28,10 @@ function setStone(stoneName) {
     window.location.href = `gemstone-shop.html?stone=${encodeURIComponent(stoneName)}`;
     return;
   }
+  if (![...stoneSelect.options].some((option) => option.value === stoneName)) {
+    const option = new Option(stoneName, stoneName);
+    stoneSelect.add(option, 0);
+  }
   stoneSelect.value = stoneName;
   document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -39,6 +43,9 @@ document.querySelectorAll("[data-stone]").forEach((button) => {
 if (stoneSelect) {
   const requestedStone = new URLSearchParams(window.location.search).get("stone");
   if (requestedStone) {
+    if (![...stoneSelect.options].some((option) => option.value === requestedStone)) {
+      stoneSelect.add(new Option(requestedStone, requestedStone), 0);
+    }
     stoneSelect.value = requestedStone;
   }
 }
