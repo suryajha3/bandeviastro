@@ -504,6 +504,12 @@ function setStone(stoneName) {
     stoneSelect.add(option, 0);
   }
   stoneSelect.value = stoneName;
+  const stoneFormField = document.querySelector("#stoneForm");
+  if (stoneFormField && /ring/i.test(stoneName)) {
+    stoneFormField.value = "Ring";
+  } else if (stoneFormField && /pendant/i.test(stoneName)) {
+    stoneFormField.value = "Pendant";
+  }
   document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

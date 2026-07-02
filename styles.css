@@ -705,13 +705,15 @@ h3 {
 }
 
 .stone-preview-section,
-.stone-catalog {
+.stone-catalog,
+.ring-products-section {
   background: #ffffff;
 }
 
 .stone-preview-grid,
 .stone-product-grid,
-.assurance-grid {
+.assurance-grid,
+.ring-product-grid {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -726,6 +728,84 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+
+.ring-products-section {
+  border-top: 1px solid rgba(91, 18, 32, 0.1);
+  border-bottom: 1px solid rgba(91, 18, 32, 0.1);
+}
+
+.ring-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ring-product-card {
+  display: flex;
+  min-height: 430px;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 238, 0.88)),
+    #ffffff;
+  box-shadow: 0 14px 36px rgba(91, 18, 32, 0.08);
+}
+
+.ring-product-card.high-caution {
+  border-color: rgba(91, 18, 32, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 238, 0.92), rgba(255, 255, 255, 0.96)),
+    #ffffff;
+}
+
+.ring-product-card h3 {
+  margin-top: 14px;
+}
+
+.ring-product-card p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.ring-spec-list {
+  display: grid;
+  gap: 8px;
+  margin: auto 0 18px;
+}
+
+.ring-spec-list div {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 10px;
+  border: 1px solid rgba(91, 18, 32, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.ring-spec-list dt,
+.ring-spec-list dd {
+  margin: 0;
+}
+
+.ring-spec-list dt {
+  color: var(--maroon);
+  font-size: 0.75rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.ring-spec-list dd {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.ring-trust-strip {
+  margin-top: 20px;
 }
 
 .stone-card {
@@ -1851,12 +1931,13 @@ details p {
   .proof-section,
   .seo-link-grid,
   .credential-grid,
-  .payment-grid,
-  .stone-preview-grid,
-  .stone-product-grid,
-  .assurance-grid,
-  .about-panel,
-  .policy-layout {
+    .payment-grid,
+    .stone-preview-grid,
+    .stone-product-grid,
+    .ring-product-grid,
+    .assurance-grid,
+    .about-panel,
+    .policy-layout {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -2001,6 +2082,7 @@ details p {
   .payment-grid,
   .stone-preview-grid,
   .stone-product-grid,
+  .ring-product-grid,
   .assurance-grid,
   .about-panel,
   .buy-flow-grid,
@@ -2987,6 +3069,10 @@ details p {
 
   .product-photo {
     min-height: 154px;
+  }
+
+  .ring-product-card {
+    min-height: auto;
   }
 
   .premium-slider-section {
