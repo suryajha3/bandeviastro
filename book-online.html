@@ -149,8 +149,21 @@
               </optgroup>
             </select>
           </label>
+          <div class="service-preview full-span" id="servicePreview" aria-live="polite">
+            <div>
+              <p class="eyebrow">Selected service</p>
+              <h3 id="servicePreviewTitle">Choose a service to see booking guidance</h3>
+              <p id="servicePreviewBody">The booking desk will show the required details, proof type and quote style before payment.</p>
+            </div>
+            <div class="service-preview-meta">
+              <div><span>Quote</span><strong id="servicePreviewQuote">Clear quote before payment</strong></div>
+              <div><span>Proof</span><strong id="servicePreviewProof">Photos, video or notes as applicable</strong></div>
+              <div><span>Details needed</span><strong id="servicePreviewDetails">Name, contact and concern</strong></div>
+            </div>
+          </div>
           <label>Preferred date<input id="portalDate" type="date" /></label>
           <label>Preferred time<input id="portalTime" type="time" /></label>
+          <label>Country time zone<input id="portalTimezone" type="text" placeholder="India IST, USA EST, UAE GST..." /></label>
           <label>
             Mode
             <select id="portalMode">
@@ -160,6 +173,7 @@
               <option value="Gemstone delivery">Gemstone delivery</option>
             </select>
           </label>
+          <label class="full-span">Birth / sankalp details<input id="portalSankalp" type="text" placeholder="Name, gotra, DOB/time/place if needed, or family sankalp name" /></label>
           <label class="full-span">Concern / requirement<textarea id="portalConcern" rows="4" placeholder="Marriage, business, grah shanti, gemstone, muhurat..."></textarea></label>
           <label class="checkbox-line full-span">
             <input type="checkbox" required />
@@ -172,8 +186,10 @@
             <h3>Your Booking ID</h3>
             <span class="ticket-id" id="ticketId"></span>
             <p id="ticketSummary"></p>
+            <div class="ticket-detail-grid" id="ticketDetails"></div>
             <p class="sync-note" id="ticketSyncNote"></p>
             <div class="ticket-actions">
+              <button class="btn btn-secondary" id="ticketCopy" type="button">Copy Booking ID</button>
               <a class="btn btn-primary" id="ticketTrackLink" href="track-booking.html">Track status</a>
               <a class="btn btn-secondary" id="ticketWhatsApp" href="https://wa.me/919876543210">Send on WhatsApp</a>
             </div>

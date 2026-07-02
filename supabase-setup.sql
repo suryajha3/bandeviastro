@@ -116,6 +116,7 @@ returns table (
   payment_status text,
   amount text,
   proof_url text,
+  staff_note text,
   created_at timestamptz,
   updated_at timestamptz
 )
@@ -143,6 +144,7 @@ as $$
     b.payment_status,
     b.amount,
     b.proof_url,
+    b.staff_note,
     b.created_at,
     b.updated_at
   from public.bookings b

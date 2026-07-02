@@ -14,14 +14,24 @@ const trackBookingForm = document.querySelector("#trackBookingForm");
 const adminAccessForm = document.querySelector("#adminAccessForm");
 const adminPanel = document.querySelector("#adminPanel");
 const adminBookingList = document.querySelector("#adminBookingList");
+const adminStats = document.querySelector("#adminStats");
+const adminSearchInput = document.querySelector("#adminSearch");
+const adminStatusFilter = document.querySelector("#adminStatusFilter");
+const adminRefreshButton = document.querySelector("#adminRefresh");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
 const menuToggle = document.querySelector("#menuToggle");
 const primaryNav = document.querySelector("#primaryNav");
+const portalServiceField = document.querySelector("#portalService");
+const portalModeField = document.querySelector("#portalMode");
+const servicePreview = document.querySelector("#servicePreview");
+const ticketDetails = document.querySelector("#ticketDetails");
+const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
 let adminBookingsCache = [];
+let adminBookingsSource = "local";
 
 const bookingStatuses = [
   "Enquiry Received",
@@ -52,6 +62,57 @@ const serviceStartingPrices = {
   "Marriage Guidance": "From Rs 1,501",
   "Business Guidance": "From Rs 2,100"
 };
+
+const serviceProfileRules = [
+  {
+    test: (service) => /hawan|havan/i.test(service),
+    title: "Hawan / Havan ritual booking",
+    body: "Best for grah shanti, vastu, business, pitra, mangal, Durga or Mahamrityunjay fire rituals with clear samagri and schedule confirmation.",
+    quote: "From Rs 5,100 / final quote by samagri and place",
+    proof: "Hawan photos or short video after completion",
+    details: "Sankalp name, gotra, city/country, preferred date and purpose"
+  },
+  {
+    test: (service) => /kundali|kundli|dosh review|dasha|grahan|rahu|ketu|shani|sade sati|gemstone suitability/i.test(service),
+    title: "Kundali and dosh consultation",
+    body: "Best for birth chart review, dosh checking, marriage, career, business, dasha and gemstone suitability before any remedy is suggested.",
+    quote: "From Rs 1,501 / final quote by depth of review",
+    proof: "Consultation notes or remedy summary after session",
+    details: "Date, time and place of birth plus exact question"
+  },
+  {
+    test: (service) => /gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond/i.test(service),
+    title: "Gemstone guidance or buying request",
+    body: "Best for ring, pendant or loose gemstone selection after kundali suitability, budget, certification and delivery discussion.",
+    quote: "Certificate-based quote after kundali and stock check",
+    proof: "Stone photo, certificate details and dispatch update",
+    details: "Birth details, stone form, metal, size, budget and delivery country"
+  },
+  {
+    test: (service) => /pooja|jaap|path|katha|rudrabhishek|navgraha|ganesh|lakshmi|satyanarayan|saraswati|hanuman|durga|pitra|kaal sarp|mangal/i.test(service),
+    title: "Online pooja and jaap booking",
+    body: "Best for temple pooja, mantra jaap, sankalp worship and dosh nivaran with proof shared after completion.",
+    quote: "From Rs 1,501 / final quote by ritual and mantra count",
+    proof: "Sankalp proof, photos or short video as applicable",
+    details: "Name, gotra, purpose, city/country and preferred date"
+  },
+  {
+    test: (service) => /vastu|muhurat/i.test(service),
+    title: "Vastu and muhurat consultation",
+    body: "Best for home, office, shop, griha pravesh, business opening, travel or auspicious timing guidance.",
+    quote: "From Rs 2,100 / final quote by scope",
+    proof: "Consultation notes and suggested timing",
+    details: "Location, purpose, preferred date window and key concern"
+  },
+  {
+    test: (service) => /hast rekha|palmistry/i.test(service),
+    title: "Hast Rekha / palmistry reading",
+    body: "Best for practical life, career, relationship or business guidance from palm reading with online consultation support.",
+    quote: "From Rs 1,100",
+    proof: "Reading summary or follow-up note",
+    details: "Clear palm photos, dominant hand and main question"
+  }
+];
 
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
@@ -151,6 +212,38 @@ function safeExternalUrl(value) {
   }
 }
 
+function getServiceProfile(serviceName) {
+  const service = serviceName || "";
+  const matchedRule = serviceProfileRules.find((rule) => rule.test(service));
+  const fallbackQuote = serviceStartingPrices[service] || "Clear quote before payment";
+  return matchedRule || {
+    title: "Premium spiritual service booking",
+    body: "Best for a personal consultation, pooja, astrology, vastu, muhurat or spiritual guidance request.",
+    quote: fallbackQuote,
+    proof: "Update shared by staff after confirmation",
+    details: "Name, contact, country, preferred date and concern"
+  };
+}
+
+function getStatusGuidance(booking) {
+  const amount = booking?.amount || getServiceProfile(booking?.service).quote;
+  const guidance = {
+    "Enquiry Received": "Your request is received. The team will review details and share the right quote, schedule and payment process.",
+    "Quote Sent": `Quote is ready: ${amount}. Please confirm on WhatsApp before making payment.`,
+    "Payment Pending": "Payment is pending after quote approval. Staff will confirm the payment method before collection.",
+    "Confirmed": "Your booking is confirmed. The team is preparing the schedule, pandit assignment or consultation slot.",
+    "Pooja Scheduled": "Your service is scheduled. Please keep your phone available for final coordination and proof updates.",
+    "Completed": "Your service is marked completed. Check proof, notes and WhatsApp updates from the team."
+  };
+  return guidance[booking?.status] || "The team will share the next update soon.";
+}
+
+function formatBookingDate(booking) {
+  const date = booking?.date || "Flexible";
+  const time = booking?.time || "Flexible";
+  return `${date} / ${time}`;
+}
+
 function readBookings() {
   try {
     return JSON.parse(localStorage.getItem(bookingStorageKey) || "[]");
@@ -194,7 +287,11 @@ function findBooking(bookingId, contactValue) {
   return readBookings().find((booking) => {
     if (booking.id !== id) return false;
     if (!contact) return true;
-    return [booking.phone, booking.email].some((value) => normalizeContact(value).includes(contact) || contact.includes(normalizeContact(value)));
+    if (contact.length < 3) return false;
+    const contactValues = [booking.phone, booking.email]
+      .map(normalizeContact)
+      .filter((value) => value.length >= 3);
+    return contactValues.some((value) => value.includes(contact) || contact.includes(value));
   });
 }
 
@@ -368,6 +465,23 @@ function bookingWhatsAppUrl(booking) {
   return `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
 }
 
+function staffWhatsAppUrl(booking) {
+  const phone = normalizeContact(booking.phone).replace(/[^0-9]/g, "");
+  const message = [
+    `Namaste ${booking.name},`,
+    "",
+    "Bandevi Astro booking update:",
+    `Booking ID: ${booking.id}`,
+    `Service: ${booking.service}`,
+    `Current status: ${booking.status}`,
+    `Payment status: ${booking.paymentStatus}`,
+    `Amount / quote: ${booking.amount || "Quote pending"}`,
+    "",
+    getStatusGuidance(booking)
+  ].join("\n");
+  return `https://wa.me/${phone || businessWhatsApp}?text=${encodeURIComponent(message)}`;
+}
+
 function renderTicket(booking, syncResult = {}) {
   const ticket = document.querySelector("#portalTicket");
   const ticketId = document.querySelector("#ticketId");
@@ -382,6 +496,26 @@ function renderTicket(booking, syncResult = {}) {
   ticketSummary.textContent = `${booking.service} request received for ${booking.name}. Status: ${booking.status}.`;
   ticketTrackLink.href = `track-booking.html?id=${encodeURIComponent(booking.id)}`;
   ticketWhatsApp.href = bookingWhatsAppUrl(booking);
+  if (ticketCopyButton) {
+    ticketCopyButton.dataset.bookingId = booking.id;
+    ticketCopyButton.textContent = "Copy Booking ID";
+  }
+
+  if (ticketDetails) {
+    const detailItems = [
+      ["Service", booking.service],
+      ["Quote", booking.amount || "Quote pending"],
+      ["Date / time", formatBookingDate(booking)],
+      ["Mode", booking.mode],
+      ["Next action", getStatusGuidance(booking)]
+    ];
+    ticketDetails.innerHTML = detailItems.map(([label, value]) => `
+      <div>
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+      </div>
+    `).join("");
+  }
 
   if (ticketSyncNote) {
     if (syncResult.savedCloud) {
@@ -400,11 +534,15 @@ function renderStatusPanel(booking) {
   const statusTimeline = document.querySelector("#statusTimeline");
   const statusMeta = document.querySelector("#statusMeta");
   const statusWhatsApp = document.querySelector("#statusWhatsApp");
+  const statusNextAction = document.querySelector("#statusNextAction");
   if (!statusPanel || !statusMessage || !statusTimeline || !statusMeta || !statusWhatsApp) return;
 
   if (!booking) {
     statusPanel.classList.add("is-visible");
     statusMessage.textContent = "No booking record found for this Booking ID and contact. Please check the details or send the Booking ID on WhatsApp for staff confirmation.";
+    if (statusNextAction) {
+      statusNextAction.innerHTML = `<strong>Next action</strong><p>Check the Booking ID, use the same phone/email, or message the team on WhatsApp.</p>`;
+    }
     statusTimeline.innerHTML = "";
     statusMeta.innerHTML = "";
     statusWhatsApp.href = `https://wa.me/${businessWhatsApp}`;
@@ -412,21 +550,38 @@ function renderStatusPanel(booking) {
   }
 
   const currentIndex = statusIndex(booking.status);
+  const serviceProfile = getServiceProfile(booking.service);
   statusPanel.classList.add("is-visible");
   statusMessage.textContent = `Booking ${booking.id} is currently: ${booking.status}.`;
+  if (statusNextAction) {
+    statusNextAction.innerHTML = `
+      <strong>Next action</strong>
+      <p>${escapeHtml(getStatusGuidance(booking))}</p>
+      <span>${escapeHtml(serviceProfile.proof)}</span>
+    `;
+  }
   statusTimeline.innerHTML = bookingStatuses.map((status, index) => {
     const stateClass = index < currentIndex ? "is-complete" : index === currentIndex ? "is-current" : "";
-    return `<li class="${stateClass}"><span class="status-dot">${index + 1}</span><div><strong>${escapeHtml(status)}</strong><p>${index <= currentIndex ? "Updated in your booking flow." : "Next step after staff update."}</p></div></li>`;
+    const timelineText = index < currentIndex
+      ? "Completed in your booking flow."
+      : index === currentIndex
+        ? getStatusGuidance({ ...booking, status })
+        : "Next step after staff update.";
+    return `<li class="${stateClass}"><span class="status-dot">${index + 1}</span><div><strong>${escapeHtml(status)}</strong><p>${escapeHtml(timelineText)}</p></div></li>`;
   }).join("");
 
   const metaItems = [
     ["Service", booking.service],
     ["Payment", booking.paymentStatus],
     ["Amount", booking.amount || "Quote pending"],
-    ["Preferred date", booking.date || "Flexible"],
+    ["Date / time", formatBookingDate(booking)],
     ["Mode", booking.mode],
     ["Updated", new Date(booking.updatedAt).toLocaleString()]
   ];
+
+  if (booking.staffNote) {
+    metaItems.push(["Team update", booking.staffNote]);
+  }
 
   if (booking.proofUrl) {
     metaItems.push(["Proof", `<a href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open proof</a>`]);
@@ -439,19 +594,74 @@ function renderStatusPanel(booking) {
   statusWhatsApp.href = bookingWhatsAppUrl(booking);
 }
 
-async function renderAdminBookings() {
+function initAdminStatusFilter() {
+  if (!adminStatusFilter || adminStatusFilter.dataset.ready === "true") return;
+  adminStatusFilter.innerHTML = [
+    `<option value="">All statuses</option>`,
+    ...bookingStatuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`)
+  ].join("");
+  adminStatusFilter.dataset.ready = "true";
+}
+
+function getFilteredAdminBookings() {
+  const query = normalizeContact(adminSearchInput?.value || "");
+  const status = adminStatusFilter?.value || "";
+
+  return adminBookingsCache.filter((booking) => {
+    const searchable = normalizeContact([
+      booking.id,
+      booking.name,
+      booking.phone,
+      booking.email,
+      booking.country,
+      booking.service,
+      booking.mode,
+      booking.concern
+    ].join(" "));
+    const matchesQuery = !query || searchable.includes(query);
+    const matchesStatus = !status || booking.status === status;
+    return matchesQuery && matchesStatus;
+  });
+}
+
+function renderAdminStats(visibleBookings) {
+  if (!adminStats) return;
+  const total = adminBookingsCache.length;
+  const pendingPayment = adminBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const scheduled = adminBookingsCache.filter((booking) => booking.status === "Pooja Scheduled").length;
+  const completed = adminBookingsCache.filter((booking) => booking.status === "Completed").length;
+  const stats = [
+    ["Total", total],
+    ["Visible", visibleBookings.length],
+    ["Payment pending", pendingPayment],
+    ["Scheduled", scheduled],
+    ["Completed", completed]
+  ];
+
+  adminStats.innerHTML = stats.map(([label, value]) => `
+    <div>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
+  `).join("");
+}
+
+function renderAdminDashboard() {
   if (!adminBookingList) return;
-  adminBookingList.innerHTML = `<article><h3>Loading bookings</h3><p>Checking the secure booking desk.</p></article>`;
+  initAdminStatusFilter();
+  const bookings = getFilteredAdminBookings();
+  renderAdminStats(bookings);
 
-  const result = await readBookingsOnline();
-  const bookings = result.bookings;
-  adminBookingsCache = bookings;
-
-  if (!bookings.length) {
-    const emptyMessage = result.source === "cloud"
+  if (!adminBookingsCache.length) {
+    const emptyMessage = adminBookingsSource === "cloud"
       ? "No bookings found in the secure booking desk yet."
       : "No secure shared bookings yet. Add shared database settings to make bookings available across staff devices.";
     adminBookingList.innerHTML = `<article><h3>No bookings yet</h3><p>${emptyMessage}</p></article>`;
+    return;
+  }
+
+  if (!bookings.length) {
+    adminBookingList.innerHTML = `<article><h3>No matching bookings</h3><p>Try a different search term or status filter.</p></article>`;
     return;
   }
 
@@ -463,9 +673,17 @@ async function renderAdminBookings() {
         <div class="admin-booking-head">
           <div>
             <h3>${escapeHtml(booking.name)}</h3>
-            <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.service)} | ${escapeHtml(booking.phone)}</p>
+            <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.service)}</p>
           </div>
           <span class="status-pill">${escapeHtml(booking.status)}</span>
+        </div>
+        <div class="admin-client-grid">
+          <div><span>Phone</span><strong>${escapeHtml(booking.phone)}</strong></div>
+          <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
+          <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
+          <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
+          <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
+          <div><span>Updated</span><strong>${escapeHtml(new Date(booking.updatedAt).toLocaleString())}</strong></div>
         </div>
         <div class="admin-edit-grid">
           <label>Status<select data-field="status">${statusOptions}</select></label>
@@ -473,14 +691,29 @@ async function renderAdminBookings() {
           <label>Amount<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
         </div>
         <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
-        <label>Staff note<textarea data-field="staffNote" rows="3" placeholder="Internal note or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
+        <label>Customer update note<textarea data-field="staffNote" rows="3" placeholder="This note appears in customer tracking">${escapeHtml(booking.staffNote || "")}</textarea></label>
+        <div class="admin-note-box">
+          <strong>Client concern</strong>
+          <p>${escapeHtml(booking.concern || "No concern added.")}</p>
+        </div>
         <div class="admin-actions">
           <button class="btn btn-primary" type="button" data-admin-save="${escapeHtml(booking.id)}">Save update</button>
-          <a class="btn btn-secondary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Open WhatsApp</a>
+          <a class="btn btn-secondary" href="${escapeHtml(staffWhatsAppUrl(booking))}">Message client</a>
+          <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">View tracking</a>
         </div>
       </article>
     `;
   }).join("");
+}
+
+async function renderAdminBookings() {
+  if (!adminBookingList) return;
+  adminBookingList.innerHTML = `<article><h3>Loading bookings</h3><p>Checking the secure booking desk.</p></article>`;
+
+  const result = await readBookingsOnline();
+  adminBookingsCache = result.bookings;
+  adminBookingsSource = result.source;
+  renderAdminDashboard();
 }
 
 function setService(serviceName) {
@@ -527,6 +760,33 @@ function setSelectValue(select, value) {
   select.value = value;
 }
 
+function updateServicePreview() {
+  if (!servicePreview || !portalServiceField) return;
+  const service = portalServiceField.value;
+  const profile = getServiceProfile(service);
+  const title = document.querySelector("#servicePreviewTitle");
+  const body = document.querySelector("#servicePreviewBody");
+  const quote = document.querySelector("#servicePreviewQuote");
+  const proof = document.querySelector("#servicePreviewProof");
+  const details = document.querySelector("#servicePreviewDetails");
+
+  if (title) title.textContent = profile.title;
+  if (body) body.textContent = profile.body;
+  if (quote) quote.textContent = profile.quote;
+  if (proof) proof.textContent = profile.proof;
+  if (details) details.textContent = profile.details;
+
+  if (portalModeField && portalModeField.dataset.touched !== "true") {
+    if (/gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond/i.test(service)) {
+      portalModeField.value = "Gemstone delivery";
+    } else if (/kundali|kundli|hast rekha|palmistry|vastu|muhurat/i.test(service)) {
+      portalModeField.value = "Online video call";
+    } else {
+      portalModeField.value = "Temple pooja with proof";
+    }
+  }
+}
+
 function prefillPortalBookingFromUrl() {
   if (!portalBookingForm) return;
   const params = new URLSearchParams(window.location.search);
@@ -538,11 +798,28 @@ function prefillPortalBookingFromUrl() {
   const portalConcern = document.querySelector("#portalConcern");
 
   setSelectValue(portalService, requestedService);
+  if (portalMode && requestedMode) {
+    portalMode.dataset.touched = "true";
+  }
   setSelectValue(portalMode, requestedMode);
+  updateServicePreview();
 
   if (portalConcern && requestedConcern && !portalConcern.value) {
     portalConcern.value = requestedConcern;
   }
+}
+
+function buildPortalConcern() {
+  const requirement = document.querySelector("#portalConcern")?.value.trim();
+  const sankalp = document.querySelector("#portalSankalp")?.value.trim();
+  const timezone = document.querySelector("#portalTimezone")?.value.trim();
+  const details = [];
+
+  if (requirement) details.push(`Requirement: ${requirement}`);
+  if (sankalp) details.push(`Birth / sankalp details: ${sankalp}`);
+  if (timezone) details.push(`Country time zone: ${timezone}`);
+
+  return details.join("\n") || "Please call me to discuss details.";
 }
 
 if (stoneSelect) {
@@ -654,6 +931,8 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
 
 portalBookingForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const selectedService = document.querySelector("#portalService").value;
+  const serviceProfile = getServiceProfile(selectedService);
 
   const booking = {
     id: generateBookingId(),
@@ -661,14 +940,14 @@ portalBookingForm?.addEventListener("submit", async (event) => {
     phone: document.querySelector("#portalPhone").value.trim(),
     email: document.querySelector("#portalEmail").value.trim(),
     country: document.querySelector("#portalCountry").value.trim(),
-    service: document.querySelector("#portalService").value,
+    service: selectedService,
     date: document.querySelector("#portalDate").value,
     time: document.querySelector("#portalTime").value,
     mode: document.querySelector("#portalMode").value,
-    concern: document.querySelector("#portalConcern").value.trim(),
+    concern: buildPortalConcern(),
     status: "Enquiry Received",
     paymentStatus: "Not Requested",
-    amount: serviceStartingPrices[document.querySelector("#portalService").value] || "Quote pending",
+    amount: serviceProfile.quote,
     proofUrl: "",
     staffNote: "",
     createdAt: new Date().toISOString(),
@@ -680,6 +959,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
   const syncResult = await saveBookingOnline(booking);
   renderTicket(booking, syncResult);
   portalBookingForm.reset();
+  updateServicePreview();
   await prefillPortalFromSession();
   if (submitButton) submitButton.textContent = "Create booking ID";
 });
@@ -814,6 +1094,10 @@ adminBookingList?.addEventListener("click", async (event) => {
   }
 });
 
+adminSearchInput?.addEventListener("input", renderAdminDashboard);
+adminStatusFilter?.addEventListener("change", renderAdminDashboard);
+adminRefreshButton?.addEventListener("click", renderAdminBookings);
+
 async function prefillPortalFromSession() {
   if (!portalBookingForm || !isCloudEnabled()) return;
 
@@ -843,7 +1127,12 @@ async function renderAccountBookings() {
   if (!accountBookingList) return;
 
   if (!isCloudEnabled()) {
-    accountBookingList.innerHTML = `<article><h3>Secure account activation pending</h3><p>Customer login is ready on the website. Track by Booking ID while account history is activated.</p></article>`;
+    const localBookings = readBookings().slice(0, 8);
+    if (!localBookings.length) {
+      accountBookingList.innerHTML = `<article><h3>Secure account activation pending</h3><p>Customer login is ready on the website. Track by Booking ID while account history is activated.</p></article>`;
+      return;
+    }
+    accountBookingList.innerHTML = localBookings.map(renderAccountBookingCard).join("");
     return;
   }
 
@@ -866,19 +1155,31 @@ async function renderAccountBookings() {
       return;
     }
 
-    accountBookingList.innerHTML = bookings.map((booking) => `
-      <article>
-        <div>
-          <h3>${escapeHtml(booking.service)}</h3>
-          <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.status)} | ${escapeHtml(booking.paymentStatus)}</p>
-        </div>
-        <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
-      </article>
-    `).join("");
+    accountBookingList.innerHTML = bookings.map(renderAccountBookingCard).join("");
   } catch (error) {
     console.warn("Account booking list failed", error);
     accountBookingList.innerHTML = `<article><h3>Booking history unavailable</h3><p>Please use Booking ID tracking or WhatsApp support while staff checks the account.</p></article>`;
   }
+}
+
+function renderAccountBookingCard(booking) {
+  return `
+    <article>
+      <div>
+        <div class="mini-booking-head">
+          <h3>${escapeHtml(booking.service)}</h3>
+          <span class="status-pill">${escapeHtml(booking.status)}</span>
+        </div>
+        <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.paymentStatus)} | ${escapeHtml(booking.amount || "Quote pending")}</p>
+        <div class="mini-booking-meta">
+          <span>${escapeHtml(formatBookingDate(booking))}</span>
+          <span>${escapeHtml(booking.mode || "Mode pending")}</span>
+          <span>${escapeHtml(getStatusGuidance(booking))}</span>
+        </div>
+      </div>
+      <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
+    </article>
+  `;
 }
 
 async function refreshAuthState() {
@@ -958,6 +1259,23 @@ authLogoutButton?.addEventListener("click", async () => {
   await refreshAuthState();
 });
 
+portalServiceField?.addEventListener("change", updateServicePreview);
+portalModeField?.addEventListener("change", () => {
+  portalModeField.dataset.touched = "true";
+});
+
+ticketCopyButton?.addEventListener("click", async () => {
+  const bookingId = ticketCopyButton.dataset.bookingId;
+  if (!bookingId) return;
+  try {
+    await navigator.clipboard.writeText(bookingId);
+    ticketCopyButton.textContent = "Copied";
+  } catch {
+    ticketCopyButton.textContent = bookingId;
+  }
+});
+
 prefillPortalBookingFromUrl();
+updateServicePreview();
 prefillPortalFromSession();
 refreshAuthState();

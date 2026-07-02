@@ -1540,6 +1540,74 @@ details p {
   background: #fffdf9;
 }
 
+.service-preview {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 16px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 184, 75, 0.1)), #ffffff;
+}
+
+.service-preview h3 {
+  margin: 2px 0 8px;
+  color: var(--maroon);
+}
+
+.service-preview p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.service-preview-meta,
+.ticket-detail-grid,
+.admin-stat-grid,
+.admin-client-grid,
+.mini-booking-meta {
+  display: grid;
+  gap: 10px;
+}
+
+.service-preview-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.service-preview-meta div,
+.ticket-detail-grid div,
+.admin-stat-grid div,
+.admin-client-grid div,
+.mini-booking-meta span,
+.status-next-card,
+.admin-note-box {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 11px;
+  background: #fffdf9;
+}
+
+.service-preview-meta span,
+.ticket-detail-grid span,
+.admin-stat-grid span,
+.admin-client-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.service-preview-meta strong,
+.ticket-detail-grid strong,
+.admin-stat-grid strong,
+.admin-client-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
 .portal-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1583,6 +1651,11 @@ details p {
   font-weight: 900;
 }
 
+.ticket-detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 14px 0;
+}
+
 .ticket-actions,
 .admin-actions {
   display: flex;
@@ -1603,6 +1676,26 @@ details p {
 
 .status-panel.is-visible {
   display: block;
+}
+
+.status-next-card {
+  margin-top: 16px;
+  border-color: rgba(15, 118, 110, 0.22);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(255, 253, 249, 0.9));
+}
+
+.status-next-card strong {
+  display: block;
+  color: var(--maroon);
+}
+
+.status-next-card p {
+  margin: 6px 0;
+}
+
+.status-next-card span {
+  color: var(--teal);
+  font-weight: 900;
 }
 
 .status-timeline {
@@ -1715,6 +1808,13 @@ details p {
   box-shadow: 0 12px 30px rgba(91, 18, 32, 0.06);
 }
 
+.mini-booking-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 .mini-booking-list h3 {
   margin-bottom: 4px;
   color: var(--maroon);
@@ -1723,6 +1823,17 @@ details p {
 .mini-booking-list p {
   margin: 0;
   color: var(--muted);
+}
+
+.mini-booking-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.mini-booking-meta span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 .is-hidden {
@@ -1743,6 +1854,28 @@ details p {
 .admin-booking-list {
   display: grid;
   gap: 14px;
+}
+
+.admin-dashboard-tools {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.admin-stat-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.admin-stat-grid strong {
+  color: var(--maroon);
+  font-size: 1.2rem;
+}
+
+.admin-filter-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.55fr) auto;
+  gap: 12px;
+  align-items: end;
 }
 
 .admin-booking-list article {
@@ -1775,6 +1908,24 @@ details p {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.admin-client-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-note-box {
+  border-left: 4px solid var(--teal);
+}
+
+.admin-note-box strong {
+  display: block;
+  color: var(--maroon);
+}
+
+.admin-note-box p {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
 }
 
 .detail-main {
@@ -1956,8 +2107,17 @@ details p {
   }
 
   .status-lookup,
-  .admin-edit-grid {
+  .admin-edit-grid,
+  .service-preview,
+  .admin-filter-row {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-stat-grid,
+  .admin-client-grid,
+  .service-preview-meta,
+  .mini-booking-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-toolbar {
@@ -2095,7 +2255,14 @@ details p {
   .status-meta-grid,
   .status-lookup,
   .auth-button-row,
-  .admin-edit-grid {
+  .admin-edit-grid,
+  .service-preview,
+  .service-preview-meta,
+  .ticket-detail-grid,
+  .admin-stat-grid,
+  .admin-filter-row,
+  .admin-client-grid,
+  .mini-booking-meta {
     grid-template-columns: 1fr;
   }
 

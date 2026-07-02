@@ -78,6 +78,14 @@
         <div class="status-panel" id="adminPanel">
           <p class="eyebrow">Bookings</p>
           <h2>Service status desk</h2>
+          <div class="admin-dashboard-tools" id="adminDashboardTools">
+            <div class="admin-stat-grid" id="adminStats" aria-label="Booking summary"></div>
+            <div class="admin-filter-row">
+              <label>Search booking<input id="adminSearch" type="search" placeholder="Name, ID, phone or service" /></label>
+              <label>Status filter<select id="adminStatusFilter"><option value="">All statuses</option></select></label>
+              <button class="btn btn-secondary" id="adminRefresh" type="button">Refresh</button>
+            </div>
+          </div>
           <div class="admin-booking-list" id="adminBookingList"></div>
         </div>
       </section>
