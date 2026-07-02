@@ -406,6 +406,123 @@ h3 {
   color: var(--muted);
 }
 
+.trust-command-section {
+  padding-top: clamp(42px, 6vw, 72px);
+  background: #ffffff;
+}
+
+.trust-command-grid,
+.remedy-grid,
+.confidence-grid {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.trust-command-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+  gap: clamp(22px, 5vw, 56px);
+  align-items: center;
+}
+
+.trust-command-copy p:not(.eyebrow) {
+  max-width: 580px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.trust-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.trust-standard-grid,
+.remedy-grid,
+.confidence-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.trust-standard-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trust-standard-grid article,
+.remedy-grid a,
+.confidence-grid article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  background: #fffdf9;
+  box-shadow: 0 12px 30px rgba(91, 18, 32, 0.06);
+}
+
+.trust-standard-grid span {
+  display: inline-flex;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #ffffff;
+  background: var(--teal);
+  font-weight: 900;
+}
+
+.trust-standard-grid h3,
+.confidence-grid h3 {
+  color: var(--maroon);
+}
+
+.trust-standard-grid p,
+.confidence-grid p {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.remedy-shortcut-section {
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 184, 75, 0.09)),
+    #ffffff;
+}
+
+.remedy-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.remedy-grid a {
+  display: grid;
+  gap: 8px;
+  color: inherit;
+}
+
+.remedy-grid a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 118, 110, 0.32);
+}
+
+.remedy-grid span,
+.remedy-grid small {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.remedy-grid strong {
+  color: var(--maroon);
+  line-height: 1.35;
+}
+
+.client-confidence-section {
+  padding-top: 0;
+  background: #ffffff;
+}
+
+.confidence-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .section {
   padding: clamp(62px, 9vw, 112px) clamp(18px, 4vw, 60px);
 }
@@ -2071,6 +2188,7 @@ details p {
   .booking-section,
   .detail-grid,
   .cta-panel,
+  .trust-command-grid,
   .portal-shell,
   .auth-layout,
   .admin-layout {
@@ -2087,6 +2205,8 @@ details p {
     .stone-product-grid,
     .ring-product-grid,
     .assurance-grid,
+    .remedy-grid,
+    .confidence-grid,
     .about-panel,
     .policy-layout {
     grid-template-columns: repeat(2, 1fr);
@@ -2244,6 +2364,10 @@ details p {
   .stone-product-grid,
   .ring-product-grid,
   .assurance-grid,
+  .trust-command-grid,
+  .trust-standard-grid,
+  .remedy-grid,
+  .confidence-grid,
   .about-panel,
   .buy-flow-grid,
   .quote-grid,
