@@ -58,7 +58,7 @@
           <p>Get private horoscope guidance for marriage, career, finance, family, dasha and dosha concerns. जन्म तिथि, समय और स्थान के आधार पर सरल भाषा में मार्गदर्शन।</p>
           <div class="detail-hero-actions" aria-label="Kundli consultation booking actions">
             <a class="btn btn-primary" href="book-online.html?service=Kundli%20Consultation&mode=Online%20video%20call">Create Booking ID</a>
-            <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+            <a class="btn btn-secondary" href="#kundli-catalog">View Kundli List</a>
           </div>
           </div>
           <figure class="detail-hero-media">
@@ -95,84 +95,172 @@
           </figure>
         </div>
       </section>
-      <section class="detail-section premium-detail-section" aria-labelledby="kundli-options-title">
+      <section class="detail-section premium-detail-section" id="kundli-catalog" aria-labelledby="kundli-options-title">
         <div class="section-heading compact">
-          <p class="eyebrow">Separate kundali and dosh products</p>
-          <h2 id="kundli-options-title">Choose kundali service by name</h2>
-          <p>Every kundali or dosh service follows the same process: birth details, main question, review, remedy suggestion, final quote and Booking ID before payment.</p>
+          <p class="eyebrow">Premium kundli and dosh catalogue</p>
+          <h2 id="kundli-options-title">Choose kundli service by question, report or dosh</h2>
+          <p>Every kundli or dosh service follows the same process: birth details, main question, review, remedy suggestion, final quote and Booking ID before payment.</p>
         </div>
-        <div class="detail-offer-grid">
-          <article>
-            <span class="quote-chip">Janam</span>
-            <h3>Janam Kundali Reading</h3>
-            <p>For overall life direction, strengths, grah positions, dasha and practical remedy guidance.</p>
-            <a class="text-button" href="book-online.html?service=Janam%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+        <div class="pooja-catalog-summary" aria-label="Kundli catalogue trust points">
+          <div><strong>12</strong><span>Bookable kundli and dosh services</span></div>
+          <div><strong>Private</strong><span>Birth data and family questions handled carefully</span></div>
+          <div><strong>Clear output</strong><span>Notes, remedy direction or suitability guidance</span></div>
+          <div><strong>Trackable</strong><span>Booking ID for consultation and follow-up</span></div>
+        </div>
+        <div class="service-finder" data-service-finder="#kundli-catalog" aria-label="Kundli service finder">
+          <div class="service-finder-head">
+            <div>
+              <p class="eyebrow">Service finder</p>
+              <h3>Match kundli by question</h3>
+            </div>
+            <span data-match-count>12 services</span>
+          </div>
+          <div class="service-filter-row" role="group" aria-label="Filter kundli services">
+            <button type="button" class="is-active" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-filter="dosh" data-keywords="dosh,kaal sarp,mangal,shani,rahu,ketu,grahan,pitra">Dosh</button>
+            <button type="button" data-filter="marriage" data-keywords="marriage,compatibility,mangal,match">Marriage</button>
+            <button type="button" data-filter="career" data-keywords="career,job,work,business,growth,finance">Career</button>
+            <button type="button" data-filter="timing" data-keywords="dasha,antardasha,timing,period">Timing</button>
+            <button type="button" data-filter="gemstone" data-keywords="gemstone,stone,ruby,emerald,pukhraj,neelam">Gemstone</button>
+          </div>
+          <label class="service-search">
+            <span>Search</span>
+            <input type="search" data-service-search placeholder="Search kundli, dosh, marriage..." />
+          </label>
+          <p class="service-empty-message" data-empty-message hidden>No matching kundli service found.</p>
+        </div>
+        <div class="pooja-product-grid kundli-product-grid">
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/kundli-premium.jpg" alt="Janam Kundali reading desk with birth chart and diya" loading="lazy" /><span>Janam Kundli</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Full chart</span>
+              <h3>Janam Kundali Reading</h3>
+              <p>For overall life direction, strengths, grah positions, dasha and practical remedy guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Needs</span><strong>DOB/time/place</strong></div></div>
+              <ul class="pooja-product-list"><li>Birth chart review</li><li>Main life questions</li><li>Remedy direction note</li></ul>
+              <a class="text-button" href="book-online.html?service=Janam%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Marriage</span>
-            <h3>Marriage Kundali Match</h3>
-            <p>For guna milan, compatibility, family concerns, delay and remedy planning.</p>
-            <a class="text-button" href="book-online.html?service=Marriage%20Kundali%20Match&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/kundli-premium.jpg" alt="Marriage Kundali match consultation with chart comparison" loading="lazy" /><span>Marriage Match</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Compatibility</span>
+              <h3>Marriage Kundali Match</h3>
+              <p>For guna milan, compatibility, family concerns, delay and remedy planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Needs</span><strong>Two charts</strong></div></div>
+              <ul class="pooja-product-list"><li>Guna and dosh review</li><li>Compatibility questions</li><li>Remedy suggestion if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Marriage%20Kundali%20Match&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Career</span>
-            <h3>Career Kundali Reading</h3>
-            <p>For job, career direction, opportunity timing and practical grah-based guidance.</p>
-            <a class="text-button" href="book-online.html?service=Career%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/kundli-premium.jpg" alt="Career Kundali reading with horoscope and guidance notes" loading="lazy" /><span>Career</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Career timing</span>
+              <h3>Career Kundali Reading</h3>
+              <p>For job, career direction, opportunity timing and practical grah-based guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Focus</span><strong>Work/career</strong></div></div>
+              <ul class="pooja-product-list"><li>Career house review</li><li>Dasha timing support</li><li>Practical next-step guidance</li></ul>
+              <a class="text-button" href="book-online.html?service=Career%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Business</span>
-            <h3>Business Kundali Reading</h3>
-            <p>For business timing, partnership, finance, shop opening and growth-related questions.</p>
-            <a class="text-button" href="book-online.html?service=Business%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/kundli-premium.jpg" alt="Business Kundali reading with chart and gemstone desk" loading="lazy" /><span>Business</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Business guidance</span>
+              <h3>Business Kundali Reading</h3>
+              <p>For business timing, partnership, finance, shop opening and growth-related questions.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Focus</span><strong>Growth</strong></div></div>
+              <ul class="pooja-product-list"><li>Business timing review</li><li>Partnership/finance question</li><li>Muhurat or remedy direction</li></ul>
+              <a class="text-button" href="book-online.html?service=Business%20Kundali%20Reading&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Dasha</span>
-            <h3>Dasha and Antardasha Review</h3>
-            <p>For current planetary period, timing, challenges and remedy planning.</p>
-            <a class="text-button" href="book-online.html?service=Dasha%20and%20Antardasha%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/kundli-premium.jpg" alt="Dasha and Antardasha review with horoscope chart" loading="lazy" /><span>Dasha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Timing review</span>
+              <h3>Dasha and Antardasha Review</h3>
+              <p>For current planetary period, timing, challenges and remedy planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Focus</span><strong>Timing</strong></div></div>
+              <ul class="pooja-product-list"><li>Current period review</li><li>Risk and opportunity timing</li><li>Remedy direction</li></ul>
+              <a class="text-button" href="book-online.html?service=Dasha%20and%20Antardasha%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Pitra</span>
-            <h3>Pitra Dosh Kundali Review</h3>
-            <p>For pitra dosh concern, family obstacles and suitable shanti or pooja guidance.</p>
-            <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Kundali%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/kundli-premium.jpg" alt="Pitra Dosh Kundali review for family obstacle guidance" loading="lazy" /><span>Pitra Dosh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family concern</span>
+              <h3>Pitra Dosh Kundali Review</h3>
+              <p>For pitra dosh concern, family obstacles and suitable shanti or pooja guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Output</span><strong>Remedy path</strong></div></div>
+              <ul class="pooja-product-list"><li>Chart indicator review</li><li>Family concern discussion</li><li>Pooja/hawan guidance if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Kundali%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Kaal Sarp</span>
-            <h3>Kaal Sarp Dosh Review</h3>
-            <p>For kaal sarp concern, grah placement review and remedy or pooja guidance.</p>
-            <a class="text-button" href="book-online.html?service=Kaal%20Sarp%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/kundli-premium.jpg" alt="Kaal Sarp Dosh review with birth chart consultation" loading="lazy" /><span>Kaal Sarp</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Dosh check</span>
+              <h3>Kaal Sarp Dosh Review</h3>
+              <p>For kaal sarp concern, grah placement review and remedy or pooja guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Needs</span><strong>Birth data</strong></div></div>
+              <ul class="pooja-product-list"><li>Placement verification</li><li>Concern and timing discussion</li><li>Remedy options explained</li></ul>
+              <a class="text-button" href="book-online.html?service=Kaal%20Sarp%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Mangal</span>
-            <h3>Mangal Dosh Review</h3>
-            <p>For manglik concern, marriage delay, compatibility and remedy planning.</p>
-            <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/kundli-premium.jpg" alt="Mangal Dosh review for marriage delay and compatibility" loading="lazy" /><span>Mangal Dosh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Marriage dosh</span>
+              <h3>Mangal Dosh Review</h3>
+              <p>For manglik concern, marriage delay, compatibility and remedy planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Focus</span><strong>Marriage</strong></div></div>
+              <ul class="pooja-product-list"><li>Mangal placement review</li><li>Compatibility concern</li><li>Pooja/hawan suggestion if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Shani</span>
-            <h3>Shani Dosh / Sade Sati Review</h3>
-            <p>For shani-related difficulty, sade sati, dhaiya and practical remedy guidance.</p>
-            <a class="text-button" href="book-online.html?service=Shani%20Dosh%20%2F%20Sade%20Sati%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/kundli-premium.jpg" alt="Shani Dosh and Sade Sati consultation chart review" loading="lazy" /><span>Shani</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shani period</span>
+              <h3>Shani Dosh / Sade Sati Review</h3>
+              <p>For shani-related difficulty, sade sati, dhaiya and practical remedy guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Focus</span><strong>Discipline</strong></div></div>
+              <ul class="pooja-product-list"><li>Shani period review</li><li>Timing and concern discussion</li><li>Practical remedy direction</li></ul>
+              <a class="text-button" href="book-online.html?service=Shani%20Dosh%20%2F%20Sade%20Sati%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Rahu Ketu</span>
-            <h3>Rahu Ketu Dosh Review</h3>
-            <p>For Rahu-Ketu related concern, timing, grah shanti and remedy guidance.</p>
-            <a class="text-button" href="book-online.html?service=Rahu%20Ketu%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/kundli-premium.jpg" alt="Rahu Ketu Dosh Review with astrology chart and notes" loading="lazy" /><span>Rahu Ketu</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shadow grah</span>
+              <h3>Rahu Ketu Dosh Review</h3>
+              <p>For Rahu-Ketu related concern, timing, grah shanti and remedy guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Output</span><strong>Remedy note</strong></div></div>
+              <ul class="pooja-product-list"><li>Axis placement review</li><li>Concern and timing check</li><li>Shanti guidance if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Rahu%20Ketu%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Grahan</span>
-            <h3>Grahan Dosh Review</h3>
-            <p>For grahan dosh concern, chart review, remedy options and pooja guidance.</p>
-            <a class="text-button" href="book-online.html?service=Grahan%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/kundli-premium.jpg" alt="Grahan Dosh Review astrology consultation and chart reading" loading="lazy" /><span>Grahan Dosh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Dosh review</span>
+              <h3>Grahan Dosh Review</h3>
+              <p>For grahan dosh concern, chart review, remedy options and pooja guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Needs</span><strong>Birth data</strong></div></div>
+              <ul class="pooja-product-list"><li>Grahan dosh check</li><li>Impact and timing discussion</li><li>Remedy options explained</li></ul>
+              <a class="text-button" href="book-online.html?service=Grahan%20Dosh%20Review&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Gemstone</span>
-            <h3>Gemstone Suitability Kundali Check</h3>
-            <p>For Ruby, Emerald, Pukhraj, Neelam and other stones before wearing or buying.</p>
-            <a class="text-button" href="book-online.html?service=Gemstone%20Suitability%20Kundali%20Check&mode=Online%20video%20call">Create Booking ID</a>
+          <article class="pooja-product-card kundli-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/kundli-premium.jpg" alt="Gemstone suitability kundali check with gems and birth chart" loading="lazy" /><span>Gemstone Check</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Stone suitability</span>
+              <h3>Gemstone Suitability Kundali Check</h3>
+              <p>For Ruby, Emerald, Pukhraj, Neelam and other stones before wearing or buying.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Video call</strong></div><div><span>Output</span><strong>Suitable stone</strong></div></div>
+              <ul class="pooja-product-list"><li>Planet suitability review</li><li>Risk and wearing guidance</li><li>Stone quote path if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Gemstone%20Suitability%20Kundali%20Check&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
           </article>
         </div>
       </section>

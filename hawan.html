@@ -58,7 +58,7 @@
           <p>Plan grah shanti, vastu shanti, mangal dosh, business opening or family hawan with clear samagri list and ritual flow. हवन के लिए सामग्री, संकल्प और विधि पहले से स्पष्ट की जाती है।</p>
           <div class="detail-hero-actions" aria-label="Hawan booking actions">
             <a class="btn btn-primary" href="book-online.html?service=Hawan%20%2F%20Havan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
-            <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+            <a class="btn btn-secondary" href="#hawan-catalog">View Hawan List</a>
           </div>
           </div>
           <figure class="detail-hero-media">
@@ -95,84 +95,172 @@
           </figure>
         </div>
       </section>
-      <section class="detail-section premium-detail-section" aria-labelledby="hawan-options-title">
+      <section class="detail-section premium-detail-section" id="hawan-catalog" aria-labelledby="hawan-options-title">
         <div class="section-heading compact">
-          <p class="eyebrow">Separate hawan products</p>
-          <h2 id="hawan-options-title">Choose hawan by name</h2>
+          <p class="eyebrow">Premium hawan catalogue</p>
+          <h2 id="hawan-options-title">Choose hawan by purpose, place and proof option</h2>
           <p>Every hawan follows the same process: purpose, samagri, location or online mode, date, proof, final quote and Booking ID before payment.</p>
         </div>
-        <div class="detail-offer-grid">
-          <article>
-            <span class="quote-chip">Grah</span>
-            <h3>Navgraha Shanti Hawan</h3>
-            <p>For grah shanti, dasha support and family peace after understanding the concern.</p>
-            <a class="text-button" href="book-online.html?service=Navgraha%20Shanti%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+        <div class="pooja-catalog-summary" aria-label="Hawan catalogue trust points">
+          <div><strong>12</strong><span>Bookable hawan services</span></div>
+          <div><strong>Samagri plan</strong><span>Items and location needs confirmed first</span></div>
+          <div><strong>Temple / home</strong><span>Online proof or visit-based options</span></div>
+          <div><strong>Trackable</strong><span>Booking ID from enquiry to completion</span></div>
+        </div>
+        <div class="service-finder" data-service-finder="#hawan-catalog" aria-label="Hawan service finder">
+          <div class="service-finder-head">
+            <div>
+              <p class="eyebrow">Service finder</p>
+              <h3>Match hawan by purpose</h3>
+            </div>
+            <span data-match-count>12 services</span>
+          </div>
+          <div class="service-filter-row" role="group" aria-label="Filter hawan services">
+            <button type="button" class="is-active" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-filter="grah" data-keywords="grah,navgraha,dasha,shanti">Grah</button>
+            <button type="button" data-filter="health" data-keywords="health,mahamrityunjay,protection,shiva,rudra">Health</button>
+            <button type="button" data-filter="home" data-keywords="home,vastu,griha,space,office,shop">Home</button>
+            <button type="button" data-filter="business" data-keywords="business,shop,office,prosperity,laxmi,lakshmi,kuber">Business</button>
+            <button type="button" data-filter="dosh" data-keywords="dosh,pitra,mangal,remedy">Dosh</button>
+          </div>
+          <label class="service-search">
+            <span>Search</span>
+            <input type="search" data-service-search placeholder="Search hawan, shanti, business..." />
+          </label>
+          <p class="service-empty-message" data-empty-message hidden>No matching hawan found.</p>
+        </div>
+        <div class="pooja-product-grid hawan-product-grid">
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/hawan-premium.jpg" alt="Navgraha Shanti Hawan setup with sacred fire and samagri" loading="lazy" /><span>Navgraha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Grah shanti</span>
+              <h3>Navgraha Shanti Hawan</h3>
+              <p>For grah shanti, dasha support and family peace after understanding the concern.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Needs</span><strong>Birth details</strong></div></div>
+              <ul class="pooja-product-list"><li>Nine-planet shanti scope</li><li>Ahuti and mantra planning</li><li>Proof after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=Navgraha%20Shanti%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Shiva</span>
-            <h3>Mahamrityunjay Hawan</h3>
-            <p>For health prayers, protection sankalp and family wellbeing with mantra and ahuti details.</p>
-            <a class="text-button" href="book-online.html?service=Mahamrityunjay%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/hawan-premium.jpg" alt="Mahamrityunjay Hawan sacred fire ritual setup" loading="lazy" /><span>Mahamrityunjay</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Health prayer</span>
+              <h3>Mahamrityunjay Hawan</h3>
+              <p>For health prayers, protection sankalp and family wellbeing with mantra and ahuti details.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live/proof</strong></div><div><span>Needs</span><strong>Name, gotra</strong></div></div>
+              <ul class="pooja-product-list"><li>Mantra count discussion</li><li>Samagri list confirmation</li><li>Clear quote before payment</li></ul>
+              <a class="text-button" href="book-online.html?service=Mahamrityunjay%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Rudra</span>
-            <h3>Rudra Hawan</h3>
-            <p>For Lord Shiva worship, shanti, protection and remedy-led family sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Rudra%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/hawan-premium.jpg" alt="Rudra Hawan ritual fire for Shiva worship" loading="lazy" /><span>Rudra</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shiva worship</span>
+              <h3>Rudra Hawan</h3>
+              <p>For Lord Shiva worship, shanti, protection and remedy-led family sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Best for</span><strong>Shanti</strong></div></div>
+              <ul class="pooja-product-list"><li>Rudra sankalp review</li><li>Ahuti and offering plan</li><li>Completion proof update</li></ul>
+              <a class="text-button" href="book-online.html?service=Rudra%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Durga</span>
-            <h3>Durga Saptashati Hawan</h3>
-            <p>For Durga worship, Navratri sankalp, protection prayers and family strength.</p>
-            <a class="text-button" href="book-online.html?service=Durga%20Saptashati%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/hawan-premium.jpg" alt="Durga Saptashati Hawan setup for protection and Navratri sankalp" loading="lazy" /><span>Durga</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Protection</span>
+              <h3>Durga Saptashati Hawan</h3>
+              <p>For Durga worship, Navratri sankalp, protection prayers and family strength.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live/proof</strong></div><div><span>Best for</span><strong>Navratri</strong></div></div>
+              <ul class="pooja-product-list"><li>Path and hawan scope</li><li>Date and samagri planning</li><li>Photo/video proof</li></ul>
+              <a class="text-button" href="book-online.html?service=Durga%20Saptashati%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Chandi</span>
-            <h3>Chandi Hawan</h3>
-            <p>For special shakti worship, protection sankalp and advanced ritual planning.</p>
-            <a class="text-button" href="book-online.html?service=Chandi%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/hawan-premium.jpg" alt="Chandi Hawan sacred fire ritual for shakti worship" loading="lazy" /><span>Chandi</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shakti ritual</span>
+              <h3>Chandi Hawan</h3>
+              <p>For special shakti worship, protection sankalp and advanced ritual planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Scope</span><strong>Advanced</strong></div></div>
+              <ul class="pooja-product-list"><li>Purpose and urgency review</li><li>Ritual depth confirmation</li><li>Quote by scope</li></ul>
+              <a class="text-button" href="book-online.html?service=Chandi%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Vastu</span>
-            <h3>Vastu Shanti Hawan</h3>
-            <p>For home, office, shop, griha pravesh or space-cleansing intentions.</p>
-            <a class="text-button" href="book-online.html?service=Vastu%20Shanti%20Hawan&mode=Home%20%2F%20office%20visit">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/hawan-premium.jpg" alt="Vastu Shanti Hawan for home office and shop cleansing" loading="lazy" /><span>Vastu</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Home / office</span>
+              <h3>Vastu Shanti Hawan</h3>
+              <p>For home, office, shop, griha pravesh or space-cleansing intentions.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Visit/proof</strong></div><div><span>Needs</span><strong>Location</strong></div></div>
+              <ul class="pooja-product-list"><li>Space and purpose review</li><li>Samagri responsibility</li><li>Muhurat support if needed</li></ul>
+              <a class="text-button" href="book-online.html?service=Vastu%20Shanti%20Hawan&mode=Home%20%2F%20office%20visit">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Pitra</span>
-            <h3>Pitra Dosh Shanti Hawan</h3>
-            <p>For pitra dosh concern, family peace and ancestor-related shanti prayers.</p>
-            <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Shanti%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/hawan-premium.jpg" alt="Pitra Dosh Shanti Hawan fire ritual arrangement" loading="lazy" /><span>Pitra</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family shanti</span>
+              <h3>Pitra Dosh Shanti Hawan</h3>
+              <p>For pitra dosh concern, family peace and ancestor-related shanti prayers.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Needs</span><strong>Family details</strong></div></div>
+              <ul class="pooja-product-list"><li>Concern and lineage note</li><li>Date/tithi preference</li><li>Follow-up guidance</li></ul>
+              <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Shanti%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Mangal</span>
-            <h3>Mangal Dosh Hawan</h3>
-            <p>For mangal dosh, marriage delay concerns and grah shanti remedy planning.</p>
-            <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/hawan-premium.jpg" alt="Mangal Dosh Hawan for marriage remedy and grah shanti" loading="lazy" /><span>Mangal</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Marriage remedy</span>
+              <h3>Mangal Dosh Hawan</h3>
+              <p>For mangal dosh, marriage delay concerns and grah shanti remedy planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Needs</span><strong>Kundli if any</strong></div></div>
+              <ul class="pooja-product-list"><li>Chart concern review</li><li>Remedy hawan scope</li><li>Proof after ritual</li></ul>
+              <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Lakshmi</span>
-            <h3>Lakshmi Kuber Hawan</h3>
-            <p>For prosperity prayers, business growth sankalp and home or shop blessings.</p>
-            <a class="text-button" href="book-online.html?service=Lakshmi%20Kuber%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/hawan-premium.jpg" alt="Lakshmi Kuber Hawan for prosperity and business growth" loading="lazy" /><span>Lakshmi Kuber</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Prosperity</span>
+              <h3>Lakshmi Kuber Hawan</h3>
+              <p>For prosperity prayers, business growth sankalp and home or shop blessings.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live/proof</strong></div><div><span>Best for</span><strong>Business</strong></div></div>
+              <ul class="pooja-product-list"><li>Home/shop sankalp</li><li>Festival or muhurat support</li><li>Completion proof update</li></ul>
+              <a class="text-button" href="book-online.html?service=Lakshmi%20Kuber%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Ganesh</span>
-            <h3>Ganesh Hawan</h3>
-            <p>For new beginnings, obstacle-removal prayers, family and business sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Ganesh%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/hawan-premium.jpg" alt="Ganesh Hawan for new beginnings and obstacle removal" loading="lazy" /><span>Ganesh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">New beginning</span>
+              <h3>Ganesh Hawan</h3>
+              <p>For new beginnings, obstacle-removal prayers, family and business sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live/proof</strong></div><div><span>Best for</span><strong>Start</strong></div></div>
+              <ul class="pooja-product-list"><li>Purpose sankalp</li><li>Samagri and date plan</li><li>Booking ID tracking</li></ul>
+              <a class="text-button" href="book-online.html?service=Ganesh%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Business</span>
-            <h3>Business Opening Hawan</h3>
-            <p>For shop opening, office start, new project, partnership or muhurat planning.</p>
-            <a class="text-button" href="book-online.html?service=Business%20Opening%20Hawan&mode=Home%20%2F%20office%20visit">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/hawan-premium.jpg" alt="Business Opening Hawan for shop office and new project launch" loading="lazy" /><span>Business</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shop / office</span>
+              <h3>Business Opening Hawan</h3>
+              <p>For shop opening, office start, new project, partnership or muhurat planning.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Visit/proof</strong></div><div><span>Needs</span><strong>Place/date</strong></div></div>
+              <ul class="pooja-product-list"><li>Muhurat window support</li><li>Place and purpose review</li><li>Quote by location/scope</li></ul>
+              <a class="text-button" href="book-online.html?service=Business%20Opening%20Hawan&mode=Home%20%2F%20office%20visit">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Custom</span>
-            <h3>Custom Sankalp Hawan</h3>
-            <p>For family, career, health prayer, travel, education or special personal sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Custom%20Sankalp%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card hawan-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/hawan-premium.jpg" alt="Custom Sankalp Hawan for family career education and special purpose" loading="lazy" /><span>Custom</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Personal sankalp</span>
+              <h3>Custom Sankalp Hawan</h3>
+              <p>For family, career, health prayer, travel, education or special personal sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live/proof</strong></div><div><span>Needs</span><strong>Purpose</strong></div></div>
+              <ul class="pooja-product-list"><li>Custom ritual planning</li><li>Samagri and proof option</li><li>Final quote before payment</li></ul>
+              <a class="text-button" href="book-online.html?service=Custom%20Sankalp%20Hawan&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
         </div>
       </section>

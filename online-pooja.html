@@ -58,7 +58,7 @@
           <p>Book pooja for family peace, business, griha pravesh, festival worship or grah shanti from anywhere. पूजा में नाम, गोत्र और उद्देश्य के साथ संकल्प किया जाता है।</p>
           <div class="detail-hero-actions" aria-label="Online pooja booking actions">
             <a class="btn btn-primary" href="book-online.html?service=Online%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
-            <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+            <a class="btn btn-secondary" href="#pooja-catalog">View Pooja List</a>
           </div>
           </div>
           <figure class="detail-hero-media">
@@ -95,84 +95,216 @@
           </figure>
         </div>
       </section>
-      <section class="detail-section premium-detail-section" aria-labelledby="pooja-options-title">
+      <section class="detail-section premium-detail-section" id="pooja-catalog" aria-labelledby="pooja-options-title">
         <div class="section-heading compact">
-          <p class="eyebrow">Separate online pooja products</p>
-          <h2 id="pooja-options-title">Choose pooja by name</h2>
-          <p>Every pooja or jaap follows the same process: sankalp details, date, mode, proof option, final quote and Booking ID before payment.</p>
+          <p class="eyebrow">Premium online pooja catalogue</p>
+          <h2 id="pooja-options-title">Choose pooja by name, purpose and proof option</h2>
+          <p>Every pooja or jaap follows the same process: sankalp details, preferred date, online/proof mode, final quote and Booking ID before payment.</p>
         </div>
-        <div class="detail-offer-grid">
-          <article>
-            <span class="quote-chip">Shiva</span>
-            <h3>Mahamrityunjay Jaap / Pooja</h3>
-            <p>For health prayers, protection sankalp and family wellbeing with mantra count and proof discussed first.</p>
-            <a class="text-button" href="book-online.html?service=Mahamrityunjay%20Jaap%20%2F%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+        <div class="pooja-catalog-summary" aria-label="Online pooja catalogue trust points">
+          <div><strong>16</strong><span>Bookable pooja and jaap services</span></div>
+          <div><strong>Live / proof</strong><span>Video participation or photo/video proof</span></div>
+          <div><strong>Quote first</strong><span>No payment before scope confirmation</span></div>
+          <div><strong>Trackable</strong><span>Booking ID for status and follow-up</span></div>
+        </div>
+        <div class="service-finder" data-service-finder="#pooja-catalog" aria-label="Online pooja service finder">
+          <div class="service-finder-head">
+            <div>
+              <p class="eyebrow">Service finder</p>
+              <h3>Match pooja by purpose</h3>
+            </div>
+            <span data-match-count>16 services</span>
+          </div>
+          <div class="service-filter-row" role="group" aria-label="Filter online pooja services">
+            <button type="button" class="is-active" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-filter="dosh" data-keywords="dosh,shanti,kaal sarp,mangal,shani,pitra,grah">Dosh</button>
+            <button type="button" data-filter="health" data-keywords="health,protection,mahamrityunjay,hanuman">Health</button>
+            <button type="button" data-filter="home" data-keywords="home,griha,property,bhoomi,shop,office">Home</button>
+            <button type="button" data-filter="marriage" data-keywords="marriage,vivah,mangal,relationship">Marriage</button>
+            <button type="button" data-filter="prosperity" data-keywords="lakshmi,prosperity,business,shop">Prosperity</button>
+          </div>
+          <label class="service-search">
+            <span>Search</span>
+            <input type="search" data-service-search placeholder="Search pooja, dosh, grah, home..." />
+          </label>
+          <p class="service-empty-message" data-empty-message hidden>No matching pooja found.</p>
+        </div>
+        <div class="pooja-product-grid">
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/online-pooja-premium.jpg" alt="Mahamrityunjay jaap online pooja setup with diya and kalash" loading="lazy" /><span>Shiva Jaap</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Health &amp; protection</span>
+              <h3>Mahamrityunjay Jaap / Pooja</h3>
+              <p>For health prayers, protection sankalp and family wellbeing with mantra count confirmed before quote.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Details</span><strong>Name, gotra</strong></div></div>
+              <ul class="pooja-product-list"><li>Sankalp and purpose review</li><li>Mantra count guidance</li><li>Completion proof update</li></ul>
+              <a class="text-button" href="book-online.html?service=Mahamrityunjay%20Jaap%20%2F%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Pitra</span>
-            <h3>Pitra Dosh Nivaran Pooja</h3>
-            <p>For ancestor-related shanti prayers, family obstacles and pitra dosh concern after details are reviewed.</p>
-            <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Nivaran%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/online-pooja-premium.jpg" alt="Pitra dosh nivaran pooja arrangement for online sankalp booking" loading="lazy" /><span>Pitra Shanti</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family shanti</span>
+              <h3>Pitra Dosh Nivaran Pooja</h3>
+              <p>For ancestor-related shanti prayers, family obstacles and pitra dosh concerns after details are reviewed.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Details</span><strong>Family sankalp</strong></div></div>
+              <ul class="pooja-product-list"><li>Concern and lineage note</li><li>Preferred tithi/date check</li><li>Proof and follow-up note</li></ul>
+              <a class="text-button" href="book-online.html?service=Pitra%20Dosh%20Nivaran%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Durga</span>
-            <h3>Durga Pooja / Durga Saptashati Path</h3>
-            <p>For strength, protection, family peace and Navratri or special sankalp worship.</p>
-            <a class="text-button" href="book-online.html?service=Durga%20Pooja%20%2F%20Durga%20Saptashati%20Path&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/online-pooja-premium.jpg" alt="Durga pooja and Durga Saptashati path online ritual setup" loading="lazy" /><span>Durga Path</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Strength &amp; protection</span>
+              <h3>Durga Pooja / Durga Saptashati Path</h3>
+              <p>For strength, protection, family peace, Navratri worship and special sankalp path.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Best for</span><strong>Navratri</strong></div></div>
+              <ul class="pooja-product-list"><li>Sankalp and path scope</li><li>Date and offering guidance</li><li>Completion media update</li></ul>
+              <a class="text-button" href="book-online.html?service=Durga%20Pooja%20%2F%20Durga%20Saptashati%20Path&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Grah</span>
-            <h3>Navgraha Shanti Pooja</h3>
-            <p>For grah shanti, dasha support and remedy-led worship after concern or kundli review.</p>
-            <a class="text-button" href="book-online.html?service=Navgraha%20Shanti%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/online-pooja-premium.jpg" alt="Navgraha shanti pooja items prepared for online booking" loading="lazy" /><span>Navgraha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Grah shanti</span>
+              <h3>Navgraha Shanti Pooja</h3>
+              <p>For grah shanti, dasha support and remedy-led worship after concern or kundli review.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Details</span><strong>Kundli if any</strong></div></div>
+              <ul class="pooja-product-list"><li>Nine-planet remedy scope</li><li>Birth detail support</li><li>Quote by ritual depth</li></ul>
+              <a class="text-button" href="book-online.html?service=Navgraha%20Shanti%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Ganesh</span>
-            <h3>Ganesh Pooja</h3>
-            <p>For shubh aarambh, new work, obstacle removal prayers and family sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Ganesh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/online-pooja-premium.jpg" alt="Ganesh pooja online ritual setup for new work and shubh aarambh" loading="lazy" /><span>Ganesh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shubh aarambh</span>
+              <h3>Ganesh Pooja</h3>
+              <p>For new work, obstacle removal prayers, home blessing and family sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Best for</span><strong>New start</strong></div></div>
+              <ul class="pooja-product-list"><li>Name and purpose sankalp</li><li>Festival or muhurat support</li><li>Photo/video confirmation</li></ul>
+              <a class="text-button" href="book-online.html?service=Ganesh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Lakshmi</span>
-            <h3>Lakshmi Pooja</h3>
-            <p>For prosperity prayers, Diwali worship, home, shop or business blessing sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Lakshmi%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/online-pooja-premium.jpg" alt="Lakshmi pooja online service for prosperity and business blessing" loading="lazy" /><span>Lakshmi</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Prosperity</span>
+              <h3>Lakshmi Pooja</h3>
+              <p>For prosperity prayers, Diwali worship, home, shop or business blessing sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Best for</span><strong>Home/shop</strong></div></div>
+              <ul class="pooja-product-list"><li>Family or business sankalp</li><li>Festival date planning</li><li>Proof after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=Lakshmi%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Katha</span>
-            <h3>Satyanarayan Katha / Pooja</h3>
-            <p>For family blessings, gratitude, griha pravesh, birthdays, anniversaries and special sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Satyanarayan%20Katha%20%2F%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/online-pooja-premium.jpg" alt="Satyanarayan katha online pooja setup for family blessings" loading="lazy" /><span>Katha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family blessing</span>
+              <h3>Satyanarayan Katha / Pooja</h3>
+              <p>For gratitude, griha pravesh, birthdays, anniversaries and special family sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Online video</strong></div><div><span>Best for</span><strong>Family</strong></div></div>
+              <ul class="pooja-product-list"><li>Katha timing coordination</li><li>Family sankalp collection</li><li>Completion proof update</li></ul>
+              <a class="text-button" href="book-online.html?service=Satyanarayan%20Katha%20%2F%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Shiva</span>
-            <h3>Rudrabhishek Pooja</h3>
-            <p>For Lord Shiva worship, peace, protection prayers and special family sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Rudrabhishek%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/online-pooja-premium.jpg" alt="Rudrabhishek pooja online service with Shiva sankalp preparation" loading="lazy" /><span>Rudrabhishek</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shiva worship</span>
+              <h3>Rudrabhishek Pooja</h3>
+              <p>For Lord Shiva worship, peace, protection prayers and special family sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Best for</span><strong>Mondays</strong></div></div>
+              <ul class="pooja-product-list"><li>Abhishek scope confirmation</li><li>Sankalp and date planning</li><li>Proof after ritual</li></ul>
+              <a class="text-button" href="book-online.html?service=Rudrabhishek%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Dosh</span>
-            <h3>Kaal Sarp Dosh Pooja</h3>
-            <p>For kaal sarp dosh concern, grah shanti and remedy-led pooja after kundli review.</p>
-            <a class="text-button" href="book-online.html?service=Kaal%20Sarp%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/online-pooja-premium.jpg" alt="Kaal sarp dosh pooja online booking ritual items" loading="lazy" /><span>Kaal Sarp</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Dosh nivaran</span>
+              <h3>Kaal Sarp Dosh Pooja</h3>
+              <p>For kaal sarp dosh concern, grah shanti and remedy-led pooja after kundli review.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Details</span><strong>Birth data</strong></div></div>
+              <ul class="pooja-product-list"><li>Kundli concern review</li><li>Ritual scope confirmation</li><li>Clear quote before payment</li></ul>
+              <a class="text-button" href="book-online.html?service=Kaal%20Sarp%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Mangal</span>
-            <h3>Mangal Dosh Pooja</h3>
-            <p>For mangal dosh concern, marriage delay and grah shanti remedy after chart review.</p>
-            <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/online-pooja-premium.jpg" alt="Mangal dosh pooja booking setup for marriage remedy guidance" loading="lazy" /><span>Mangal</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Marriage remedy</span>
+              <h3>Mangal Dosh Pooja</h3>
+              <p>For mangal dosh concern, marriage delay and grah shanti remedy after chart review.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Details</span><strong>Kundli</strong></div></div>
+              <ul class="pooja-product-list"><li>Chart concern check</li><li>Remedy scope and date</li><li>Proof and follow-up note</li></ul>
+              <a class="text-button" href="book-online.html?service=Mangal%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Vidya</span>
-            <h3>Saraswati Pooja</h3>
-            <p>For education, exams, learning, children and creative blessing sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Saraswati%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/online-pooja-premium.jpg" alt="Saraswati pooja online service for education and exam blessings" loading="lazy" /><span>Saraswati</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Education</span>
+              <h3>Saraswati Pooja</h3>
+              <p>For education, exams, learning, children and creative blessing sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Best for</span><strong>Students</strong></div></div>
+              <ul class="pooja-product-list"><li>Student name sankalp</li><li>Exam or study concern</li><li>Completion confirmation</li></ul>
+              <a class="text-button" href="book-online.html?service=Saraswati%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
-          <article>
-            <span class="quote-chip">Hanuman</span>
-            <h3>Hanuman Pooja / Hanuman Chalisa Path</h3>
-            <p>For courage, protection, shani-related prayers and family strength sankalp.</p>
-            <a class="text-button" href="book-online.html?service=Hanuman%20Pooja%20%2F%20Hanuman%20Chalisa%20Path&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/online-pooja-premium.jpg" alt="Hanuman pooja online service for courage and protection prayers" loading="lazy" /><span>Hanuman</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Courage &amp; strength</span>
+              <h3>Hanuman Pooja / Hanuman Chalisa Path</h3>
+              <p>For courage, protection, shani-related prayers and family strength sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Best for</span><strong>Protection</strong></div></div>
+              <ul class="pooja-product-list"><li>Path or pooja scope</li><li>Tuesday/Saturday support</li><li>Proof after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=Hanuman%20Pooja%20%2F%20Hanuman%20Chalisa%20Path&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-center"><img src="assets/online-pooja-premium.jpg" alt="Griha pravesh pooja online booking for home blessing" loading="lazy" /><span>Griha Pravesh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Home blessing</span>
+              <h3>Griha Pravesh Pooja</h3>
+              <p>For new home entry, house blessing, family peace and auspicious start guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Online/visit</strong></div><div><span>Details</span><strong>Home city</strong></div></div>
+              <ul class="pooja-product-list"><li>Muhurat support if needed</li><li>Samagri guidance</li><li>Booking ID tracking</li></ul>
+              <a class="text-button" href="book-online.html?service=Griha%20Pravesh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-right"><img src="assets/online-pooja-premium.jpg" alt="Bhoomi poojan online booking for new property and construction" loading="lazy" /><span>Bhoomi Poojan</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Property start</span>
+              <h3>Bhoomi Poojan / New Property Pooja</h3>
+              <p>For land, construction, shop, office or property beginning with sankalp and muhurat guidance.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Online/visit</strong></div><div><span>Details</span><strong>Location</strong></div></div>
+              <ul class="pooja-product-list"><li>Purpose and place review</li><li>Muhurat window support</li><li>Quote by location/scope</li></ul>
+              <a class="text-button" href="book-online.html?service=Bhoomi%20Poojan%20%2F%20New%20Property%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-left"><img src="assets/online-pooja-premium.jpg" alt="Shani shanti pooja online service for shani related prayers" loading="lazy" /><span>Shani Shanti</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shani remedy</span>
+              <h3>Shani Shanti Pooja</h3>
+              <p>For shani-related prayers, sade sati concern, discipline, stability and grah shanti support.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Temple proof</strong></div><div><span>Details</span><strong>Birth data</strong></div></div>
+              <ul class="pooja-product-list"><li>Kundli concern optional</li><li>Saturday planning support</li><li>Proof after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=Shani%20Shanti%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card">
+            <div class="pooja-product-media media-focus-low"><img src="assets/online-pooja-premium.jpg" alt="Vivah badha nivaran pooja online booking for marriage obstacle prayers" loading="lazy" /><span>Vivah Badha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Marriage support</span>
+              <h3>Vivah Badha Nivaran Pooja</h3>
+              <p>For marriage delay, relationship obstacles and family sankalp after concern or kundli review.</p>
+              <div class="pooja-product-meta"><div><span>Mode</span><strong>Live or proof</strong></div><div><span>Details</span><strong>Kundli if any</strong></div></div>
+              <ul class="pooja-product-list"><li>Concern review</li><li>Remedy scope confirmation</li><li>Follow-up guidance note</li></ul>
+              <a class="text-button" href="book-online.html?service=Vivah%20Badha%20Nivaran%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
           </article>
         </div>
       </section>

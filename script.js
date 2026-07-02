@@ -73,7 +73,7 @@ const serviceProfileRules = [
     details: "Sankalp name, gotra, city/country, preferred date and purpose"
   },
   {
-    test: (service) => /kundali|kundli|dosh review|dasha|grahan|rahu|ketu|shani|sade sati|gemstone suitability/i.test(service),
+    test: (service) => /kundali|kundli|dosh review|dasha|grahan dosh|rahu ketu|shani dosh|sade sati|gemstone suitability/i.test(service),
     title: "Kundali and dosh consultation",
     body: "Best for birth chart review, dosh checking, marriage, career, business, dasha and gemstone suitability before any remedy is suggested.",
     quote: "From Rs 1,501 / final quote by depth of review",
@@ -809,6 +809,68 @@ function prefillPortalBookingFromUrl() {
   }
 }
 
+function normalizeCatalogText(value) {
+  return (value || "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function updateServiceFinder(finder) {
+  const section = document.querySelector(finder.dataset.serviceFinder);
+  if (!section) return;
+
+  const cards = [...section.querySelectorAll(".pooja-product-card")];
+  const activeFilter = finder.querySelector("[data-filter][aria-pressed='true']");
+  const search = normalizeCatalogText(finder.querySelector("[data-service-search]")?.value);
+  const terms = activeFilter && activeFilter.dataset.filter !== "all"
+    ? (activeFilter.dataset.keywords || activeFilter.dataset.filter).split(",").map(normalizeCatalogText).filter(Boolean)
+    : [];
+  const searchTerms = search.split(" ").filter(Boolean);
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const cardText = card.dataset.searchText || normalizeCatalogText(card.textContent);
+    card.dataset.searchText = cardText;
+    const matchesFilter = !terms.length || terms.some((term) => cardText.includes(term));
+    const matchesSearch = !searchTerms.length || searchTerms.every((term) => cardText.includes(term));
+    const isVisible = matchesFilter && matchesSearch;
+    card.classList.toggle("is-filtered-out", !isVisible);
+    if (isVisible) visibleCount += 1;
+  });
+
+  const countEl = finder.querySelector("[data-match-count]");
+  if (countEl) {
+    countEl.textContent = `${visibleCount} ${visibleCount === 1 ? "service" : "services"}`;
+  }
+
+  const emptyMessage = finder.querySelector("[data-empty-message]");
+  if (emptyMessage) {
+    emptyMessage.hidden = visibleCount !== 0;
+  }
+}
+
+function initializeServiceFinders() {
+  document.querySelectorAll("[data-service-finder]").forEach((finder) => {
+    const buttons = [...finder.querySelectorAll("[data-filter]")];
+    const searchInput = finder.querySelector("[data-service-search]");
+
+    buttons.forEach((button) => {
+      if (!button.hasAttribute("aria-pressed")) {
+        button.setAttribute("aria-pressed", "false");
+      }
+      button.addEventListener("click", () => {
+        buttons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+        updateServiceFinder(finder);
+      });
+    });
+
+    searchInput?.addEventListener("input", () => updateServiceFinder(finder));
+    updateServiceFinder(finder);
+  });
+}
+
 function buildPortalConcern() {
   const requirement = document.querySelector("#portalConcern")?.value.trim();
   const sankalp = document.querySelector("#portalSankalp")?.value.trim();
@@ -1277,5 +1339,6 @@ ticketCopyButton?.addEventListener("click", async () => {
 
 prefillPortalBookingFromUrl();
 updateServicePreview();
+initializeServiceFinders();
 prefillPortalFromSession();
 refreshAuthState();
