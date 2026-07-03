@@ -8,18 +8,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="site-header premium-header" aria-label="Main header">
-  <div class="header-topline">
-    <span>Secure Booking ID and status tracking</span>
-    <span>Online pooja, hawan, kundli, gemstones and hast rekha</span>
-    <span>India and NRI clients | Clear quote before payment</span>
+    <header class="site-header premium-header international-header" aria-label="Main header">
+  <div class="header-topline international-topline">
+    <span><strong>Global desk</strong> India, USA, UK, Canada, UAE and NRI families</span>
+    <a href="track-booking.html">Track Booking ID</a>
+    <span>Hindi and English | Quote before payment | Proof where applicable</span>
   </div>
   <div class="header-main">
-    <a class="brand" href="index.html#top" aria-label="Bandevi Astro home">
+    <a class="brand international-brand" href="index.html#top" aria-label="Bandevi Astro home">
       <span class="brand-mark" aria-hidden="true">BA</span>
-      <span>
-        <strong>Pdt. Jyotishya Acharya Kumodanand Jha</strong>
-        <small>Bandevi Astro | Premium Spiritual Services</small>
+      <span class="brand-copy">
+        <strong>Bandevi Astro</strong>
+        <small>Pdt. Jyotishya Acharya Kumodanand Jha</small>
+        <em>Global Jyotish, Pooja and Gemstone Desk</em>
       </span>
     </a>
     <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open menu">
@@ -28,34 +29,55 @@
       <span aria-hidden="true"></span>
       <strong>Menu</strong>
     </button>
-    <nav class="main-nav" id="primaryNav" aria-label="Primary navigation">
-      <a href="index.html#services">Services</a>
-      <a href="online-pooja.html">Online Pooja</a>
-      <a href="hawan.html">Hawan</a>
-      <a href="gemstone-shop.html">Gemstones</a>
-      <a href="track-booking.html">Track</a>
-      <a href="login.html">Login</a>
-      <a href="about.html">About</a>
+    <nav class="main-nav international-nav" id="primaryNav" aria-label="Primary navigation">
+      <a href="online-pooja.html"><strong>Pooja</strong><span>Proof</span></a>
+      <a href="hawan.html"><strong>Hawan</strong><span>Temple</span></a>
+      <a href="kundli.html"><strong>Kundli</strong><span>Dosh</span></a>
+      <a href="gemstone-shop.html"><strong>Gems</strong><span>Rings</span></a>
+      <a href="book-online.html"><strong>Book</strong><span>Create ID</span></a>
+      <a href="about.html"><strong>Trust</strong><span>About us</span></a>
     </nav>
     <div class="header-actions" aria-label="Quick contact actions">
+      <a class="header-action login" href="login.html" aria-label="Open client login"><span>Login</span><strong>Client</strong></a>
       <a class="header-action whatsapp" href="https://wa.me/919876543210" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
-      <a class="header-action primary" href="book-online.html"><span>Book</span><strong>Now</strong></a>
+      <a class="header-action primary" href="book-online.html" aria-label="Create booking ID"><span>Book</span><strong>Now</strong></a>
     </div>
   </div>
-  <div class="header-trust-row" aria-label="Trust highlights">
-    <a href="track-booking.html"><strong>Track booking</strong><span>Use Booking ID</span></a>
-    <a href="login.html"><strong>Client login</strong><span>History and updates</span></a>
-    <a href="about.html"><strong>Trust first</strong><span>No payment before quote</span></a>
+  <div class="header-trust-row international-service-rail" aria-label="International service shortcuts">
+    <a href="online-pooja.html"><strong>Online Pooja</strong><span>Temple, live video or proof</span></a>
+    <a href="hawan.html"><strong>Hawan Services</strong><span>Grah, vastu and business</span></a>
+    <a href="kundli.html"><strong>Kundli and Dosh</strong><span>Marriage, career and remedies</span></a>
+    <a href="gemstone-shop.html"><strong>Gemstone Rings</strong><span>Certified quote after review</span></a>
+    <a href="track-booking.html"><strong>Client Desk</strong><span>Booking ID, login and updates</span></a>
   </div>
 </header>
     <main class="detail-main">
-      <section class="detail-hero">
-        <div class="detail-hero-inner">
-          <a class="breadcrumb" href="index.html#guidance">Back to services</a>
-          <p class="eyebrow">NRI Pooja</p>
-          <h1>Online pooja and hawan for families living abroad</h1>
-          <p>Book sankalp, pooja, hawan or temple ritual support from outside India with time-zone coordination, live video option and clear proof after completion.</p>
+      <section class="detail-hero visual-detail-hero nri-hero">
+        <div class="detail-hero-inner visual-detail-hero-inner">
+          <div class="detail-hero-copy">
+            <a class="breadcrumb" href="index.html#guidance">Back to services</a>
+            <p class="eyebrow">NRI Pooja</p>
+            <h1>All online pooja and hawan services for families abroad</h1>
+            <p>Book sankalp, pooja, hawan or temple ritual support from outside India with time-zone coordination, live video option and clear proof after completion.</p>
+            <div class="detail-hero-actions" aria-label="NRI pooja booking actions">
+              <a class="btn btn-primary" href="book-online.html?service=NRI%20Online%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+              <a class="btn btn-secondary" href="#nri-pooja-catalog">View NRI Pooja List</a>
+            </div>
+          </div>
+          <figure class="detail-hero-media">
+            <img src="assets/real-pooja-havan-kund.jpg" alt="Real pooja and hawan kund setup with ritual items" />
+            <figcaption>
+              <strong>For USA, UK, Canada, UAE and global families</strong>
+              <span>Sankalp, time zone, proof and family participation planned before payment</span>
+            </figcaption>
+          </figure>
         </div>
+      </section>
+      <section class="detail-premium-bar" aria-label="NRI pooja trust highlights">
+        <div><strong>Global timing</strong><span>USA, UK, Canada, UAE and other time zones</span></div>
+        <div><strong>Family sankalp</strong><span>Name, gotra, purpose and relatives included</span></div>
+        <div><strong>Live or proof</strong><span>Video participation or photo/video update</span></div>
+        <div><strong>Booking ID</strong><span>Track quote, schedule and completion</span></div>
       </section>
       <section class="detail-section">
         <div class="detail-grid">
@@ -71,6 +93,234 @@
             <li>Clear dakshina, samagri, payment and cancellation terms before booking.</li>
           </ul>
         </div>
+      </section>
+      <section class="detail-section premium-detail-section" id="nri-pooja-catalog" aria-labelledby="nri-pooja-options-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">NRI pooja catalogue</p>
+          <h2 id="nri-pooja-options-title">Choose pooja by country, purpose and proof option</h2>
+          <p>Every NRI booking starts with country, time zone, sankalp details, preferred date, live/proof mode and final quote before payment.</p>
+        </div>
+        <div class="pooja-catalog-summary" aria-label="NRI pooja catalogue trust points">
+          <div><strong>17</strong><span>NRI pooja and hawan paths</span></div>
+          <div><strong>Time zone</strong><span>Family joining time planned clearly</span></div>
+          <div><strong>Real proof</strong><span>Photos or short video where applicable</span></div>
+          <div><strong>Private</strong><span>Birth, gotra and family details protected</span></div>
+        </div>
+        <div class="service-finder" data-service-finder="#nri-pooja-catalog" aria-label="NRI pooja service finder">
+          <div class="service-finder-head">
+            <div>
+              <p class="eyebrow">Service finder</p>
+              <h3>Match NRI pooja by need</h3>
+            </div>
+            <span data-match-count>17 services</span>
+          </div>
+          <div class="service-filter-row" role="group" aria-label="Filter NRI pooja services">
+            <button type="button" class="is-active" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-filter="festival" data-keywords="festival,diwali,navratri,lakshmi,durga,ganesh">Festival</button>
+            <button type="button" data-filter="dosh" data-keywords="dosh,pitra,kaal sarp,mangal,navgraha,shani">Dosh</button>
+            <button type="button" data-filter="home" data-keywords="home,griha,vastu,bhoomi,property,house">Home</button>
+            <button type="button" data-filter="family" data-keywords="family,birthday,ayush,naamkaran,annaprashan,marriage">Family</button>
+            <button type="button" data-filter="business" data-keywords="business,shop,office,lakshmi,kuber,opening">Business</button>
+          </div>
+          <label class="service-search">
+            <span>Search</span>
+            <input type="search" data-service-search placeholder="Search NRI pooja, dosh, festival, hawan..." />
+          </label>
+          <p class="service-empty-message" data-empty-message hidden>No matching NRI pooja found.</p>
+        </div>
+        <div class="pooja-product-grid nri-pooja-grid">
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri ganesh pooja new start obstacle removal family sankalp festival">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-pooja-thali.jpg" alt="Real Hindu pooja thali with diya and ritual items" loading="lazy" /><span>Ganesh Pooja</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">New beginning</span>
+              <h3>NRI Ganesh Pooja</h3>
+              <p>For new work, family shubh aarambh, travel, education and obstacle-removal prayers from abroad.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>New start</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Country and family timing planned</li><li>Name, gotra and purpose collected</li><li>Proof update after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Ganesh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri lakshmi pooja diwali prosperity business home shop festival">
+            <div class="pooja-product-media media-focus-right"><img src="assets/real-samagri-thali.jpg" alt="Real pooja thali near river with flowers and diya" loading="lazy" /><span>Lakshmi Pooja</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Prosperity</span>
+              <h3>NRI Lakshmi Pooja / Diwali Pooja</h3>
+              <p>For Diwali, home prosperity, shop, business, wealth prayer and family blessings abroad.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Diwali</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Festival date and time-zone planning</li><li>Family or business sankalp</li><li>Photo/video proof option</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Lakshmi%20Pooja%20%2F%20Diwali%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri satyanarayan katha pooja family home gratitude birthday anniversary griha">
+            <div class="pooja-product-media media-focus-left"><img src="assets/real-kalash.jpg" alt="Real purna kalash used in Hindu pooja" loading="lazy" /><span>Satyanarayan</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family blessing</span>
+              <h3>NRI Satyanarayan Katha / Pooja</h3>
+              <p>For gratitude, family peace, birthday, anniversary, new home and shared family sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Family</strong></div><div><span>Mode</span><strong>Video/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Family names can be included</li><li>Katha timing coordinated</li><li>Completion proof after ritual</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Satyanarayan%20Katha%20%2F%20Pooja&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri navgraha shanti pooja grah dosh dasha shani rahu ketu mangal">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-pooja-havan-kund.jpg" alt="Real pooja and hawan kund arrangement for grah shanti ritual" loading="lazy" /><span>Navgraha</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Grah shanti</span>
+              <h3>NRI Navgraha Shanti Pooja</h3>
+              <p>For planetary shanti, dasha concern, Shani, Rahu-Ketu, Mangal and family peace prayers.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Grah dosh</strong></div><div><span>Details</span><strong>Birth info</strong></div></div>
+              <ul class="pooja-product-list"><li>Kundli details if available</li><li>Remedy scope confirmed first</li><li>Trackable completion update</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Navgraha%20Shanti%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri mahamrityunjay jaap pooja health protection shiva family">
+            <div class="pooja-product-media media-focus-low"><img src="assets/real-havan-ritual.jpg" alt="Real havan ritual being performed with sacred fire" loading="lazy" /><span>Mahamrityunjay</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Health prayer</span>
+              <h3>NRI Mahamrityunjay Jaap / Pooja</h3>
+              <p>For health prayers, protection, recovery sankalp and family support from any country.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Health</strong></div><div><span>Mode</span><strong>Proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Mantra count discussed before quote</li><li>Family sankalp details collected</li><li>Proof shared after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Mahamrityunjay%20Jaap%20%2F%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri rudrabhishek shiva pooja protection peace monday">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-pooja-thali.jpg" alt="Real pooja thali for Shiva worship and online sankalp" loading="lazy" /><span>Rudrabhishek</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shiva worship</span>
+              <h3>NRI Rudrabhishek Pooja</h3>
+              <p>For Lord Shiva worship, peace, protection, Monday sankalp and family prayer.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Shanti</strong></div><div><span>Mode</span><strong>Temple proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Abhishek scope confirmed</li><li>Preferred date and time zone reviewed</li><li>Completion note or proof</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Rudrabhishek%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri durga pooja saptashati path navratri protection festival">
+            <div class="pooja-product-media media-focus-right"><img src="assets/real-kalash.jpg" alt="Real kalash used for Devi pooja and Navratri worship" loading="lazy" /><span>Durga</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Navratri / shakti</span>
+              <h3>NRI Durga Pooja / Saptashati Path</h3>
+              <p>For Navratri, shakti worship, family protection, strength and special Devi sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Navratri</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Path scope and day count discussed</li><li>Country timing coordinated</li><li>Proof update where applicable</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Durga%20Pooja%20%2F%20Saptashati%20Path&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri pitra dosh pooja ancestor family shanti shradh dosh">
+            <div class="pooja-product-media media-focus-left"><img src="assets/real-havan-kund.jpg" alt="Real hawan kund and pooja setup for family shanti ritual" loading="lazy" /><span>Pitra Dosh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family shanti</span>
+              <h3>NRI Pitra Dosh Nivaran Pooja</h3>
+              <p>For ancestor-related concerns, family peace, repeated obstacles and pitra shanti sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Family</strong></div><div><span>Needs</span><strong>Details</strong></div></div>
+              <ul class="pooja-product-list"><li>Family and purpose reviewed privately</li><li>Tithi/date preference discussed</li><li>Proof after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Pitra%20Dosh%20Nivaran%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri kaal sarp dosh pooja rahu ketu obstacles grah shanti">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-pooja-havan-kund.jpg" alt="Real hawan kund setup for dosh nivaran pooja" loading="lazy" /><span>Kaal Sarp</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Dosh nivaran</span>
+              <h3>NRI Kaal Sarp Dosh Pooja</h3>
+              <p>For Kaal Sarp concern, Rahu-Ketu effect, obstacles and remedy planning after review.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Dosh</strong></div><div><span>Review</span><strong>Kundli</strong></div></div>
+              <ul class="pooja-product-list"><li>Birth details requested</li><li>Ritual scope confirmed first</li><li>Quote and proof clearly shared</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Kaal%20Sarp%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri mangal dosh pooja marriage delay kundli matching relationship">
+            <div class="pooja-product-media media-focus-low"><img src="assets/real-samagri-thali.jpg" alt="Real pooja thali prepared for marriage and family ritual" loading="lazy" /><span>Mangal Dosh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Marriage concern</span>
+              <h3>NRI Mangal Dosh Pooja</h3>
+              <p>For marriage delay, mangal dosh concern, relationship remedies and family consultation support.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Marriage</strong></div><div><span>Review</span><strong>Kundli</strong></div></div>
+              <ul class="pooja-product-list"><li>Birth chart details reviewed</li><li>Pooja scope explained simply</li><li>Booking ID tracking</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Mangal%20Dosh%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri griha pravesh pooja vastu shanti new home house property">
+            <div class="pooja-product-media media-focus-right"><img src="assets/real-kalash.jpg" alt="Real kalash for griha pravesh and vastu shanti pooja" loading="lazy" /><span>Griha Pravesh</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">New home</span>
+              <h3>NRI Griha Pravesh / Vastu Shanti</h3>
+              <p>For new home, rented home, property blessing, vastu shanti and family settlement prayers.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Home</strong></div><div><span>Mode</span><strong>Remote/live</strong></div></div>
+              <ul class="pooja-product-list"><li>Home city and country collected</li><li>Time zone and family joining planned</li><li>Samagri guidance if family joins</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Griha%20Pravesh%20%2F%20Vastu%20Shanti&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri business opening pooja shop office lakshmi kuber prosperity">
+            <div class="pooja-product-media media-focus-left"><img src="assets/real-pooja-thali.jpg" alt="Real pooja thali for business opening and Lakshmi worship" loading="lazy" /><span>Business</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Shop / office</span>
+              <h3>NRI Business Opening Pooja</h3>
+              <p>For new business, shop, office, online venture, partnership or prosperity sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Business</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Business name and purpose included</li><li>Muhurat window support</li><li>Lakshmi/Ganesh option</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Business%20Opening%20Pooja&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri marriage engagement pooja vivah family blessing ganesh lakshmi">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-samagri-thali.jpg" alt="Real pooja thali for marriage and engagement blessing" loading="lazy" /><span>Marriage</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Family event</span>
+              <h3>NRI Marriage / Engagement Pooja</h3>
+              <p>For engagement, wedding blessing, family sankalp and shubh vivah prayers from abroad.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Marriage</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Couple and family details handled privately</li><li>Auspicious date support where needed</li><li>Proof or video participation</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Marriage%20%2F%20Engagement%20Pooja&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri naamkaran annaprashan baby child family pooja">
+            <div class="pooja-product-media media-focus-right"><img src="assets/real-kalash.jpg" alt="Real kalash for child and family sanskar pooja" loading="lazy" /><span>Sanskar</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Child ceremony</span>
+              <h3>NRI Naamkaran / Annaprashan Pooja</h3>
+              <p>For child naming, first food ceremony, family blessings and traditional sanskar support.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Child</strong></div><div><span>Mode</span><strong>Video/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Child and parent details collected</li><li>Family time zone planned</li><li>Simple home participation guide</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Naamkaran%20%2F%20Annaprashan%20Pooja&mode=Online%20video%20call">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri birthday ayush pooja health longevity family blessing">
+            <div class="pooja-product-media media-focus-left"><img src="assets/real-pooja-havan-kund.jpg" alt="Real pooja setup with hawan kund for birthday and ayush prayers" loading="lazy" /><span>Ayush</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Birthday blessing</span>
+              <h3>NRI Birthday / Ayush Pooja</h3>
+              <p>For birthday blessings, longevity prayers, health support and family gratitude sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Birthday</strong></div><div><span>Mode</span><strong>Proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Name and date details collected</li><li>Family members can be included</li><li>Proof shared after completion</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Birthday%20%2F%20Ayush%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri hawan homam navgraha vastu mahamrityunjay business family">
+            <div class="pooja-product-media media-focus-low"><img src="assets/real-havan-ritual.jpg" alt="Real hawan ritual with sacred fire and offerings" loading="lazy" /><span>Hawan / Homam</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Fire ritual</span>
+              <h3>NRI Hawan / Homam Booking</h3>
+              <p>For Navgraha, Vastu, Mahamrityunjay, business or family hawan with proof and clear samagri planning.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Shanti</strong></div><div><span>Mode</span><strong>Live/proof</strong></div></div>
+              <ul class="pooja-product-list"><li>Hawan type selected by purpose</li><li>Samagri and ahuti plan explained</li><li>Completion proof or video option</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Hawan%20%2F%20Homam%20Booking&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+          <article class="pooja-product-card nri-pooja-card" data-search-text="nri custom sankalp pooja festival family career education travel protection">
+            <div class="pooja-product-media media-focus-center"><img src="assets/real-pooja-thali.jpg" alt="Real pooja thali for custom family sankalp" loading="lazy" /><span>Custom Sankalp</span></div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Personal request</span>
+              <h3>NRI Custom Sankalp Pooja</h3>
+              <p>For career, education, travel, protection, family concern or any special personal sankalp.</p>
+              <div class="pooja-product-meta"><div><span>Best for</span><strong>Custom</strong></div><div><span>Mode</span><strong>Discuss first</strong></div></div>
+              <ul class="pooja-product-list"><li>Concern reviewed before suggesting ritual</li><li>No forced remedy or gemstone</li><li>Final quote before payment</li></ul>
+              <a class="text-button" href="book-online.html?service=NRI%20Custom%20Sankalp%20Pooja&mode=Temple%20pooja%20with%20proof">Create Booking ID</a>
+            </div>
+          </article>
+        </div>
+        <details class="photo-credit-note">
+          <summary>Real photo credits</summary>
+          <p>Photos from Wikimedia Commons: Havan duing Puja by Samir103, Pooja and Havan Kund by Yugaljoshi, Kalasha by Redtigerxyz, Pooja thali by Abhishek raj kalla, and Hindu pooja thali by suketdedhia. Licenses include CC BY, CC BY-SA and CC0.</p>
+        </details>
       </section>
       <section class="detail-section">
         <div class="detail-card-grid">

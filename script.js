@@ -59,11 +59,45 @@ const serviceStartingPrices = {
   "Buy Gemstone Online": "Certificate-based quote",
   "Vastu / Muhurat": "From Rs 2,100",
   "NRI Online Pooja": "Quote by time zone and ritual",
+  "NRI Ganesh Pooja": "Quote by time zone and proof option",
+  "NRI Lakshmi Pooja / Diwali Pooja": "Quote by festival date and proof option",
+  "NRI Satyanarayan Katha / Pooja": "Quote by live/proof mode",
+  "NRI Navgraha Shanti Pooja": "Quote by ritual depth and time zone",
+  "NRI Mahamrityunjay Jaap / Pooja": "Quote by mantra count and proof option",
+  "NRI Rudrabhishek Pooja": "Quote by temple and proof option",
+  "NRI Durga Pooja / Saptashati Path": "Quote by path scope and date",
+  "NRI Pitra Dosh Nivaran Pooja": "Quote by tithi, ritual and proof option",
+  "NRI Kaal Sarp Dosh Pooja": "Quote after kundli and ritual review",
+  "NRI Mangal Dosh Pooja": "Quote after kundli and ritual review",
+  "NRI Griha Pravesh / Vastu Shanti": "Quote by country, mode and samagri",
+  "NRI Business Opening Pooja": "Quote by muhurat and business scope",
+  "NRI Marriage / Engagement Pooja": "Quote by family participation mode",
+  "NRI Naamkaran / Annaprashan Pooja": "Quote by ceremony and time zone",
+  "NRI Birthday / Ayush Pooja": "Quote by sankalp and proof option",
+  "NRI Hawan / Homam Booking": "Quote by hawan type and samagri",
+  "NRI Custom Sankalp Pooja": "Quote after purpose review",
+  "Hawan Samagri Guidance": "Guidance quote after hawan type",
   "Marriage Guidance": "From Rs 1,501",
   "Business Guidance": "From Rs 2,100"
 };
 
 const serviceProfileRules = [
+  {
+    test: (service) => /^NRI /i.test(service),
+    title: "NRI pooja booking",
+    body: "Best for families outside India who need time-zone planning, sankalp details, live joining or temple proof after completion.",
+    quote: "Final quote by country, ritual, date and proof option",
+    proof: "Live video, pooja photos or short proof update as agreed",
+    details: "Country, time zone, name, gotra, purpose, family joining plan and preferred date"
+  },
+  {
+    test: (service) => /hawan samagri guidance/i.test(service),
+    title: "Hawan samagri guidance",
+    body: "Best for confirming the correct hawan kund, samidha, havan samagri, ghee, kalash, flowers and special items before the ritual.",
+    quote: "Guidance quote after hawan type and location",
+    proof: "Final checklist and coordination note before purchase",
+    details: "Hawan type, city/country, place of ritual, participant count and items already available"
+  },
   {
     test: (service) => /hawan|havan/i.test(service),
     title: "Hawan / Havan ritual booking",
@@ -124,11 +158,33 @@ menuToggle?.addEventListener("click", () => {
   primaryNav?.classList.toggle("is-open", !isOpen);
 });
 
+primaryNav?.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    menuToggle?.setAttribute("aria-expanded", "false");
+    primaryNav.classList.remove("is-open");
+  });
+});
+
 document.addEventListener("click", (event) => {
   if (!menuToggle || !primaryNav || menuToggle.contains(event.target) || primaryNav.contains(event.target)) return;
   menuToggle.setAttribute("aria-expanded", "false");
   primaryNav.classList.remove("is-open");
 });
+
+function markActiveHeaderLinks() {
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll(".international-nav a[href], .international-service-rail a[href], .header-actions a[href], .international-topline a[href]").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    const page = href.split("#")[0].split("?")[0] || "index.html";
+    const isCurrent = page === currentPage;
+    link.classList.toggle("is-active", isCurrent);
+    if (isCurrent && link.closest(".main-nav")) {
+      link.setAttribute("aria-current", "page");
+    }
+  });
+}
+
+markActiveHeaderLinks();
 
 function initPremiumSliders() {
   document.querySelectorAll("[data-premium-slider]").forEach((slider) => {
