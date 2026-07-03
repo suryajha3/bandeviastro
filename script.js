@@ -20,6 +20,7 @@ const adminSearchInput = document.querySelector("#adminSearch");
 const adminStatusFilter = document.querySelector("#adminStatusFilter");
 const adminPaymentFilter = document.querySelector("#adminPaymentFilter");
 const adminRefreshButton = document.querySelector("#adminRefresh");
+const adminExportButton = document.querySelector("#adminExport");
 const adminSourceStrip = document.querySelector("#adminSourceStrip");
 const backofficeAccessForm = document.querySelector("#backofficeAccessForm");
 const backofficePanel = document.querySelector("#backofficePanel");
@@ -27,6 +28,7 @@ const backofficeStats = document.querySelector("#backofficeStats");
 const backofficeSearchInput = document.querySelector("#backofficeSearch");
 const backofficeQueueFilter = document.querySelector("#backofficeQueueFilter");
 const backofficeRefreshButton = document.querySelector("#backofficeRefresh");
+const backofficeExportButton = document.querySelector("#backofficeExport");
 const backofficeSourceStrip = document.querySelector("#backofficeSourceStrip");
 const backofficeOperations = document.querySelector("#backofficeOperations");
 const backofficeCustomerList = document.querySelector("#backofficeCustomerList");
@@ -331,6 +333,62 @@ function safeExternalUrl(value) {
   } catch {
     return "#";
   }
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, "\"\"")}"`;
+}
+
+function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
+  const exportRows = [
+    [
+      "Booking ID",
+      "Customer",
+      "Phone",
+      "Email",
+      "Country",
+      "Service",
+      "Status",
+      "Payment",
+      "Quote",
+      "Date / Time",
+      "Mode",
+      "Concern",
+      "Staff Note",
+      "Proof Link",
+      "Created",
+      "Updated"
+    ],
+    ...bookings.map((booking) => [
+      booking.id,
+      booking.name,
+      booking.phone,
+      booking.email || "",
+      booking.country || "",
+      booking.service,
+      booking.status,
+      booking.paymentStatus,
+      booking.amount || "",
+      formatBookingDate(booking),
+      booking.mode || "",
+      booking.concern || "",
+      booking.staffNote || "",
+      booking.proofUrl || "",
+      booking.createdAt || "",
+      booking.updatedAt || ""
+    ])
+  ];
+  const csv = exportRows.map((row) => row.map(csvCell).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `${filenamePrefix}-${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function getServiceProfile(serviceName) {
@@ -1818,6 +1876,36 @@ function prefillPortalBookingFromUrl() {
   }
 }
 
+function applyPortalPreset(button) {
+  if (!portalBookingForm || !button) return;
+  const portalService = document.querySelector("#portalService");
+  const portalMode = document.querySelector("#portalMode");
+  const portalConcern = document.querySelector("#portalConcern");
+  const portalRitualPurpose = document.querySelector("#portalRitualPurpose");
+  const service = button.dataset.service || "";
+  const mode = button.dataset.mode || "";
+  const concern = button.dataset.concern || "";
+
+  setSelectValue(portalService, service);
+  if (portalMode && mode) {
+    portalMode.dataset.touched = "true";
+    setSelectValue(portalMode, mode);
+  }
+  if (portalConcern && concern && !portalConcern.value) {
+    portalConcern.value = concern;
+  }
+  if (portalRitualPurpose && service && !portalRitualPurpose.value) {
+    portalRitualPurpose.value = service;
+  }
+
+  document.querySelectorAll("[data-portal-preset]").forEach((preset) => {
+    preset.classList.toggle("is-selected", preset === button);
+  });
+
+  updateServicePreview();
+  portalBookingForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function normalizeCatalogText(value) {
   return (value || "").toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -2605,9 +2693,27 @@ adminSearchInput?.addEventListener("input", renderAdminDashboard);
 adminStatusFilter?.addEventListener("change", renderAdminDashboard);
 adminPaymentFilter?.addEventListener("change", renderAdminDashboard);
 adminRefreshButton?.addEventListener("click", renderAdminBookings);
+adminExportButton?.addEventListener("click", () => {
+  const bookings = getFilteredAdminBookings();
+  if (!bookings.length) {
+    setAdminStatus("No matching booking records to export.");
+    return;
+  }
+  downloadBookingsCsv(bookings, "bandevi-staff-bookings");
+  setAdminStatus(`${bookings.length} booking record${bookings.length === 1 ? "" : "s"} exported.`);
+});
 backofficeSearchInput?.addEventListener("input", renderBackofficeDashboard);
 backofficeQueueFilter?.addEventListener("change", renderBackofficeDashboard);
 backofficeRefreshButton?.addEventListener("click", renderBackofficeBookings);
+backofficeExportButton?.addEventListener("click", () => {
+  const bookings = getBackofficeFilteredBookings();
+  if (!bookings.length) {
+    setBackofficeStatus("No matching backoffice records to export.");
+    return;
+  }
+  downloadBookingsCsv(bookings, "bandevi-backoffice-bookings");
+  setBackofficeStatus(`${bookings.length} backoffice record${bookings.length === 1 ? "" : "s"} exported.`);
+});
 
 async function prefillPortalFromSession() {
   if (!portalBookingForm || !isCloudEnabled()) return;
@@ -2671,7 +2777,7 @@ async function renderAccountBookings() {
     const localBookings = readBookings().slice(0, 8);
     renderAccountSummary(localBookings, "Local booking preview");
     if (!localBookings.length) {
-      accountBookingList.innerHTML = `<article><h3>Secure account activation pending</h3><p>Customer login is ready on the website. Track by Booking ID while account history is activated.</p></article>`;
+      accountBookingList.innerHTML = `<article><h3>No booking history yet</h3><p>Create a Booking ID or track an existing request to see quote, payment, schedule and proof updates here.</p></article>`;
       return;
     }
     accountBookingList.innerHTML = localBookings.map(renderAccountBookingCard).join("");
@@ -2776,7 +2882,7 @@ async function refreshAuthState() {
   if (!customerAuthForm && !document.querySelector("#accountBookingList")) return;
 
   if (!isCloudEnabled()) {
-    setAuthStatus("Secure customer login is ready for activation. For now, track with Booking ID or WhatsApp support.");
+    setAuthStatus("Customer booking history is available on this device. Track by Booking ID or WhatsApp support for staff confirmation.");
     authLogoutButton?.classList.add("is-hidden");
     await renderAccountBookings();
     return;
@@ -2796,7 +2902,7 @@ async function refreshAuthState() {
 
 async function handleCustomerAuth(action) {
   if (!isCloudEnabled()) {
-    setAuthStatus("Secure customer login is being activated. Please track with Booking ID for now.");
+    setAuthStatus("Use Booking ID tracking on this device, or send the Booking ID on WhatsApp for staff confirmation.");
     return;
   }
 
@@ -2852,6 +2958,10 @@ authLogoutButton?.addEventListener("click", async () => {
 portalServiceField?.addEventListener("change", updateServicePreview);
 portalModeField?.addEventListener("change", () => {
   portalModeField.dataset.touched = "true";
+});
+
+document.querySelectorAll("[data-portal-preset]").forEach((button) => {
+  button.addEventListener("click", () => applyPortalPreset(button));
 });
 
 ticketCopyButton?.addEventListener("click", async () => {
