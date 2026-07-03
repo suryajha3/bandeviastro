@@ -178,7 +178,7 @@ const serviceProfileRules = [
     details: "Date, time and place of birth plus exact question"
   },
   {
-    test: (service) => /gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond/i.test(service),
+    test: (service) => /gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond|opal/i.test(service),
     title: "Gemstone guidance or buying request",
     body: "Best for ring, pendant or loose gemstone selection after kundali suitability, budget, certification and delivery discussion.",
     quote: "Certificate-based quote after kundali and stock check",
@@ -346,13 +346,17 @@ function getServiceProfile(serviceName) {
 
 function getStatusGuidance(booking) {
   const amount = booking?.amount || getServiceProfile(booking?.service).quote;
+  const scheduleLabel = formatBookingDate(booking);
+  const proofLabel = booking?.proofUrl
+    ? "Proof/update link is ready in your booking panel."
+    : "Proof, photos, video or completion note will be shared where applicable.";
   const guidance = {
     "Enquiry Received": "Your request is received. The team will review details and share the right quote, schedule and payment process.",
     "Quote Sent": `Quote is ready: ${amount}. Please confirm on WhatsApp before making payment.`,
     "Payment Pending": "Payment is pending after quote approval. Staff will confirm the payment method before collection.",
     "Confirmed": "Your booking is confirmed. The team is preparing the schedule, pandit assignment or consultation slot.",
-    "Pooja Scheduled": "Your service is scheduled. Please keep your phone available for final coordination and proof updates.",
-    "Completed": "Your service is marked completed. Check proof, notes and WhatsApp updates from the team."
+    "Pooja Scheduled": `Your service is scheduled for ${scheduleLabel}. Please keep your phone available for final coordination and proof updates.`,
+    "Completed": `Your service is marked completed. ${proofLabel}`
   };
   return guidance[booking?.status] || "The team will share the next update soon.";
 }
@@ -523,11 +527,54 @@ function renderCompactStatusRail(booking, className = "compact-status-rail") {
   `;
 }
 
+function renderCustomerStageBoard(booking, className = "customer-stage-board") {
+  const profile = getServiceProfile(booking?.service);
+  const amount = booking?.amount || profile.quote || "Quote under review";
+  const scheduleValue = formatBookingDate(booking);
+  const modeValue = booking?.mode || "Mode to be confirmed";
+  const proofValue = booking?.proofUrl
+    ? `<a href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open proof/update</a>`
+    : profile.proof || "Proof update pending";
+  const teamNote = booking?.staffNote || "Staff update will appear here after review.";
+  const cards = [
+    ["Quote", amount, booking?.status === "Enquiry Received" ? "Under staff review" : "Shared or ready for confirmation"],
+    ["Payment", booking?.paymentStatus || "Not Requested", "Collected only after clear quote confirmation"],
+    ["Schedule", scheduleValue, modeValue],
+    ["Proof", proofValue, booking?.proofUrl ? "Client proof is available" : "Photos, video, report or note where applicable"],
+    ["Team note", teamNote, "Latest staff-facing update for the client"]
+  ];
+
+  return `
+    <div class="${escapeHtml(className)}" aria-label="Booking operation details">
+      ${cards.map(([label, value, detail]) => {
+        const valueMarkup = String(value).startsWith("<a ") ? value : escapeHtml(value);
+        return `
+          <article>
+            <span>${escapeHtml(label)}</span>
+            <strong>${valueMarkup}</strong>
+            <p>${escapeHtml(detail)}</p>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 async function getCurrentUser() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getUser();
   if (error) return null;
   return data?.user || null;
+}
+
+function toCloudDateValue(value) {
+  const date = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null;
+}
+
+function toCloudTimeValue(value) {
+  const time = String(value || "").trim();
+  return /^\d{2}:\d{2}/.test(time) ? time.slice(0, 5) : null;
 }
 
 function toCloudBooking(booking, user) {
@@ -538,8 +585,8 @@ function toCloudBooking(booking, user) {
     email: booking.email || null,
     country: booking.country || null,
     service: booking.service,
-    preferred_date: booking.date || null,
-    preferred_time: booking.time || null,
+    preferred_date: toCloudDateValue(booking.date),
+    preferred_time: toCloudTimeValue(booking.time),
     mode: booking.mode || null,
     concern: booking.concern || null,
     status: booking.status,
@@ -651,6 +698,9 @@ async function updateBookingOnline(booking) {
   }
 
   const updatePayload = {
+    preferred_date: toCloudDateValue(booking.date),
+    preferred_time: toCloudTimeValue(booking.time),
+    mode: booking.mode || null,
     status: booking.status,
     payment_status: booking.paymentStatus,
     amount: booking.amount || null,
@@ -811,6 +861,7 @@ function renderStatusPanel(booking) {
   const statusMeta = document.querySelector("#statusMeta");
   const statusWhatsApp = document.querySelector("#statusWhatsApp");
   const statusNextAction = document.querySelector("#statusNextAction");
+  const statusStageBoard = document.querySelector("#statusStageBoard");
   if (!statusPanel || !statusMessage || !statusTimeline || !statusMeta || !statusWhatsApp) return;
 
   if (!booking) {
@@ -821,6 +872,7 @@ function renderStatusPanel(booking) {
     }
     statusTimeline.innerHTML = "";
     statusMeta.innerHTML = "";
+    if (statusStageBoard) statusStageBoard.innerHTML = "";
     statusWhatsApp.href = `https://wa.me/${businessWhatsApp}`;
     return;
   }
@@ -840,6 +892,9 @@ function renderStatusPanel(booking) {
       ${renderProgressBar(booking, "Overall status")}
       <span>${escapeHtml(serviceProfile.proof)}</span>
     `;
+  }
+  if (statusStageBoard) {
+    statusStageBoard.innerHTML = renderCustomerStageBoard(booking);
   }
   statusTimeline.innerHTML = bookingStatuses.map((status, index) => {
     const stateClass = index < currentIndex ? "is-complete" : index === currentIndex ? "is-current" : "";
@@ -1050,6 +1105,9 @@ function renderAdminDashboard() {
           <label>Status<select data-field="status">${statusOptions}</select></label>
           <label>Payment<select data-field="paymentStatus">${paymentOptions}</select></label>
           <label>Amount<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
+          <label>Schedule date<input data-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
+          <label>Schedule time<input data-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
+          <label>Service mode<input data-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Online, temple proof, delivery..." /></label>
         </div>
         <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         <label>Customer update note<textarea data-field="staffNote" rows="3" placeholder="This note appears in customer tracking">${escapeHtml(booking.staffNote || "")}</textarea></label>
@@ -1057,6 +1115,7 @@ function renderAdminDashboard() {
           <div><span>Proof plan</span><strong>${escapeHtml(serviceProfile.proof)}</strong></div>
           <div><span>Details needed</span><strong>${escapeHtml(serviceProfile.details)}</strong></div>
         </div>
+        ${renderCustomerStageBoard(booking, "admin-stage-board")}
         <div class="admin-note-box">
           <strong>Client concern</strong>
           <p>${escapeHtml(booking.concern || "No concern added.")}</p>
@@ -1106,7 +1165,7 @@ function isKundaliBooking(booking) {
 
 function isGemstoneBooking(booking) {
   const text = getBackofficeSearchText(booking);
-  return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera/.test(text);
+  return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera|opal/.test(text);
 }
 
 function isNriBooking(booking) {
@@ -1438,14 +1497,20 @@ function renderBackofficeOperations(bookings) {
           <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
+          <div><span>Quote</span><strong>${escapeHtml(booking.amount || serviceProfile.quote)}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
           <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
+          <div><span>Proof</span><strong>${escapeHtml(booking.proofUrl ? "Ready" : "Pending")}</strong></div>
         </div>
+        ${renderCustomerStageBoard(booking, "backoffice-stage-board")}
         ${renderBackofficeChecklist(booking)}
         <div class="backoffice-edit-grid">
           <label>Status<select data-backoffice-field="status">${statusOptions}</select></label>
           <label>Payment<select data-backoffice-field="paymentStatus">${paymentOptions}</select></label>
           <label>Quote amount<input data-backoffice-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="${escapeHtml(serviceProfile.quote)}" /></label>
+          <label>Schedule date<input data-backoffice-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
+          <label>Schedule time<input data-backoffice-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
+          <label>Service mode<input data-backoffice-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Temple proof, live video, delivery..." /></label>
           <label>Proof link<input data-backoffice-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         </div>
         <label class="backoffice-note-field">Staff work note<textarea data-backoffice-field="staffNote" rows="4" placeholder="Record Kundali birth details, sankalp, samagri, gemstone quote or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
@@ -1545,7 +1610,7 @@ function getPortalServiceType(serviceName) {
   if (/kundali|kundli|janam|birth chart|dosh|dasha|rahu|ketu|shani|mangal|pitra|kaal sarp|grahan|sade sati|marriage match|guna/.test(service)) {
     return "kundali";
   }
-  if (/gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|diamond|heera/.test(service)) {
+  if (/gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|diamond|heera|opal/.test(service)) {
     return "gemstone";
   }
   return "pooja";
@@ -1598,7 +1663,7 @@ function updateServicePreview() {
   if (details) details.textContent = profile.details;
 
   if (portalModeField && portalModeField.dataset.touched !== "true") {
-    if (/gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond/i.test(service)) {
+    if (/gemstone|ruby|emerald|sapphire|manik|panna|pukhraj|neelam|moonga|moti|gomed|lehsunia|diamond|opal/i.test(service)) {
       portalModeField.value = "Gemstone delivery";
     } else if (/kundali|kundli|hast rekha|palmistry|vastu|muhurat/i.test(service)) {
       portalModeField.value = "Online video call";
@@ -1691,6 +1756,77 @@ function initializeServiceFinders() {
 
     searchInput?.addEventListener("input", () => updateServiceFinder(finder));
     updateServiceFinder(finder);
+  });
+}
+
+function updateGemstoneProductFinder(finder) {
+  const cards = [...document.querySelectorAll("#ring-products .ring-product-card, #pendant-products .ring-product-card, #loose-stones .premium-product-card")];
+  if (!cards.length) return;
+
+  const activeFilter = finder.querySelector("[data-gemstone-filter][aria-pressed='true']");
+  const filter = activeFilter?.dataset.gemstoneFilter || "all";
+  const searchTerms = normalizeCatalogText(finder.querySelector("[data-gemstone-search]")?.value).split(" ").filter(Boolean);
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const cardText = card.dataset.searchText || normalizeCatalogText(card.textContent);
+    card.dataset.searchText = cardText;
+    const parentSection = card.closest("section");
+    const kind = parentSection?.id === "ring-products"
+      ? "rings"
+      : parentSection?.id === "pendant-products"
+        ? "pendants"
+        : "loose";
+    const isKindFilter = ["rings", "pendants", "loose"].includes(filter);
+    const matchesKind = filter === "all" || !isKindFilter || filter === kind;
+    const matchesCaution = filter !== "caution" || /high-caution|neelam|blue sapphire|cat.?s eye|lehsunia|ketu|shani/.test(cardText);
+    const matchesShukra = filter !== "shukra" || /shukra|diamond|heera|opal/.test(cardText);
+    const matchesSearch = !searchTerms.length || searchTerms.every((term) => cardText.includes(term));
+    const isVisible = matchesKind && matchesCaution && matchesShukra && matchesSearch;
+
+    card.hidden = !isVisible;
+    card.classList.toggle("is-filtered-out", !isVisible);
+    if (isVisible) visibleCount += 1;
+  });
+
+  ["ring-products", "pendant-products", "loose-stones"].forEach((sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    section.hidden = ![...section.querySelectorAll(".ring-product-card, .premium-product-card")].some((card) => !card.hidden);
+  });
+
+  const countEl = finder.querySelector("[data-gemstone-match-count]");
+  if (countEl) {
+    countEl.textContent = `${visibleCount} ${visibleCount === 1 ? "product" : "products"}`;
+  }
+
+  const emptyMessage = finder.querySelector("[data-gemstone-empty-message]");
+  if (emptyMessage) {
+    emptyMessage.hidden = visibleCount !== 0;
+  }
+}
+
+function initializeGemstoneProductFinder() {
+  document.querySelectorAll("[data-gemstone-finder]").forEach((finder) => {
+    const buttons = [...finder.querySelectorAll("[data-gemstone-filter]")];
+    const searchInput = finder.querySelector("[data-gemstone-search]");
+
+    buttons.forEach((button) => {
+      if (!button.hasAttribute("aria-pressed")) {
+        button.setAttribute("aria-pressed", "false");
+      }
+      button.addEventListener("click", () => {
+        buttons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+        updateGemstoneProductFinder(finder);
+      });
+    });
+
+    searchInput?.addEventListener("input", () => updateGemstoneProductFinder(finder));
+    updateGemstoneProductFinder(finder);
   });
 }
 
@@ -2149,6 +2285,7 @@ adminBookingList?.addEventListener("click", async (event) => {
   });
 
   saveButton.textContent = "Saving...";
+  saveButton.disabled = true;
   try {
     const result = await updateBookingOnline(booking);
     setAdminStatus(result.savedCloud ? "Booking update saved to secure cloud." : "Booking update saved locally.");
@@ -2157,6 +2294,7 @@ adminBookingList?.addEventListener("click", async (event) => {
     console.warn("Booking update failed", error);
     setAdminStatus(error.message || "Booking update could not be saved.");
     saveButton.textContent = "Save update";
+    saveButton.disabled = false;
   }
 });
 
@@ -2302,6 +2440,7 @@ function renderAccountBookingCard(booking) {
         ${renderProgressBar(booking, "Status progress")}
         ${renderCompactStatusRail(booking, "account-status-rail")}
         ${renderCustomerChecklist(booking)}
+        ${renderCustomerStageBoard(booking, "account-stage-board")}
         <div class="mini-booking-meta">
           <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
           <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>
@@ -2426,5 +2565,6 @@ ticketCopyButton?.addEventListener("click", async () => {
 prefillPortalBookingFromUrl();
 updateServicePreview();
 initializeServiceFinders();
+initializeGemstoneProductFinder();
 prefillPortalFromSession();
 refreshAuthState();

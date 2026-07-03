@@ -1205,6 +1205,12 @@ h3 {
   background: radial-gradient(circle at 32% 28%, #ffffff, #cdeafe 48%, #7c9db7);
 }
 
+.opal {
+  background:
+    radial-gradient(circle at 26% 26%, rgba(255, 255, 255, 0.95), transparent 24%),
+    conic-gradient(from 35deg, #f6d365, #a7f3d0, #bfdbfe, #fbcfe8, #f6d365);
+}
+
 .blue-sapphire {
   background: radial-gradient(circle at 32% 28%, #75a7ff, #1d4ed8 48%, #172554);
 }
@@ -2694,6 +2700,70 @@ details p {
   margin: 14px 0;
 }
 
+.customer-stage-board,
+.admin-stage-board,
+.backoffice-stage-board,
+.account-stage-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.customer-stage-board article,
+.admin-stage-board article,
+.backoffice-stage-board article,
+.account-stage-board article {
+  min-width: 0;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 8px;
+  padding: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(15, 118, 110, 0.055)),
+    #ffffff;
+}
+
+.customer-stage-board span,
+.admin-stage-board span,
+.backoffice-stage-board span,
+.account-stage-board span {
+  display: block;
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.customer-stage-board strong,
+.admin-stage-board strong,
+.backoffice-stage-board strong,
+.account-stage-board strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.customer-stage-board p,
+.admin-stage-board p,
+.backoffice-stage-board p,
+.account-stage-board p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.customer-stage-board a,
+.admin-stage-board a,
+.backoffice-stage-board a,
+.account-stage-board a {
+  color: var(--teal);
+}
+
 .status-timeline {
   display: grid;
   gap: 10px;
@@ -4102,7 +4172,11 @@ details p {
   .admin-stat-grid,
   .admin-client-grid,
   .service-preview-meta,
-  .mini-booking-meta {
+  .mini-booking-meta,
+  .customer-stage-board,
+  .admin-stage-board,
+  .backoffice-stage-board,
+  .account-stage-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -4287,6 +4361,10 @@ details p {
   .admin-service-hints,
   .admin-client-grid,
   .mini-booking-meta,
+  .customer-stage-board,
+  .admin-stage-board,
+  .backoffice-stage-board,
+  .account-stage-board,
   .account-summary-grid {
     grid-template-columns: 1fr;
   }
@@ -4753,46 +4831,135 @@ details p {
   border-radius: 8px;
   background-image:
     linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
-    url("assets/gemstone-ring-collection.png");
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_01_manik_ruby.jpg");
   background-repeat: no-repeat;
-  background-size: 310% auto;
+  background-position: center;
+  background-size: cover;
   box-shadow: inset 0 -28px 44px rgba(32, 16, 22, 0.12);
 }
 
+.ring-products-section:not(.pendant-products-section) .product-photo {
+  min-height: 188px;
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-ruby {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_01_manik_ruby_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-pearl {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_02_moti_pearl_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-coral {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_03_moonga_red_coral_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-emerald {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_04_panna_emerald_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-yellow {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_05_pukhraj_yellow_sapphire_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-diamond {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_06_heera_diamond_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-blue {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_07_neelam_blue_sapphire_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-hessonite {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_08_gomed_hessonite_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-catseye {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_09_lehsuniya_cats_eye_gold_silver_ring.jpg");
+}
+
+.ring-products-section:not(.pendant-products-section) .product-photo-opal {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_gold_silver_ring_single_pages_10_opal_gold_silver_ring.jpg");
+}
+
 .product-photo-ruby {
-  background-position: 1% 8%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_01_manik_ruby.jpg");
 }
 
 .product-photo-pearl {
-  background-position: 25% 8%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_02_moti_pearl.jpg");
 }
 
 .product-photo-coral {
-  background-position: 48% 8%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_03_moonga_red_coral.jpg");
 }
 
 .product-photo-emerald {
-  background-position: 70% 8%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_04_panna_emerald.jpg");
 }
 
 .product-photo-yellow {
-  background-position: 99% 8%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_05_pukhraj_yellow_sapphire.jpg");
 }
 
 .product-photo-diamond {
-  background-position: 5% 92%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_06_heera_diamond.jpg");
 }
 
 .product-photo-blue {
-  background-position: 36% 92%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_07_neelam_blue_sapphire.jpg");
 }
 
 .product-photo-hessonite {
-  background-position: 64% 92%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_08_gomed_hessonite.jpg");
 }
 
 .product-photo-catseye {
-  background-position: 97% 92%;
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_09_lehsuniya_cats_eye.jpg");
+}
+
+.product-photo-opal {
+  background-image:
+    linear-gradient(180deg, rgba(32, 16, 22, 0), rgba(32, 16, 22, 0.15)),
+    url("assets/gemstones/display/bandevi_one_by_one_stone_images_luxury_10_opal.jpg");
 }
 
 .product-spec-list {
@@ -4886,6 +5053,317 @@ details p {
   line-height: 1.5;
 }
 
+.gemstone-catalog-tools-section {
+  padding-top: 22px;
+  padding-bottom: 16px;
+}
+
+.gemstone-catalog-tools {
+  display: grid;
+  gap: 16px;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 250, 239, 0.95), rgba(247, 252, 250, 0.92)),
+    #fffdf9;
+  box-shadow: 0 18px 46px rgba(91, 18, 32, 0.08);
+}
+
+.gemstone-catalog-tools .service-finder-head {
+  align-items: center;
+}
+
+.gemstone-catalog-tools [data-gemstone-search] {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(91, 18, 32, 0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--maroon);
+  background: #fff;
+  font: inherit;
+  font-weight: 750;
+}
+
+.gemstone-catalog-tools [data-gemstone-search]:focus {
+  outline: 3px solid rgba(15, 118, 110, 0.16);
+  border-color: rgba(15, 118, 110, 0.42);
+}
+
+.gemstone-catalog-tools [data-gemstone-match-count] {
+  color: var(--teal);
+  font-weight: 950;
+}
+
+.gemstone-empty-message {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.product-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ring-product-card .product-card-actions .text-button,
+.premium-product-card .product-card-actions .text-button {
+  width: auto;
+  margin-top: 0;
+}
+
+.product-detail-link {
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.16);
+  border-color: rgba(245, 184, 75, 0.36);
+}
+
+.gemstone-product-detail-main {
+  background:
+    linear-gradient(180deg, #fffaf0 0%, #fffdf9 38%, #f7fbf8 100%);
+}
+
+.gemstone-product-hero {
+  padding: 58px 0 38px;
+  color: #fff;
+  background:
+    linear-gradient(120deg, rgba(45, 12, 22, 0.96), rgba(10, 92, 86, 0.9)),
+    #2d0c16;
+}
+
+.gemstone-product-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1fr);
+  gap: 36px;
+  align-items: center;
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.gemstone-product-hero .breadcrumb {
+  color: #ffe2a2;
+}
+
+.gemstone-product-copy h1 {
+  max-width: 760px;
+  margin: 12px 0 16px;
+  color: #fff;
+  font-size: clamp(2.4rem, 6vw, 5.6rem);
+  line-height: 0.96;
+}
+
+.gemstone-product-copy > p:not(.eyebrow) {
+  max-width: 680px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1.08rem;
+  line-height: 1.8;
+}
+
+.product-kicker-row,
+.gemstone-product-actions,
+.gemstone-product-trust-row,
+.related-product-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.product-kicker-row {
+  margin: 18px 0 24px;
+}
+
+.product-kicker-row span,
+.gemstone-product-trust-row span {
+  border: 1px solid rgba(255, 213, 140, 0.24);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #ffe2a2;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 900;
+}
+
+.gemstone-product-actions {
+  margin-top: 24px;
+}
+
+.gemstone-product-gallery {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.gemstone-product-gallery figure {
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgba(255, 213, 140, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.gemstone-product-gallery img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+}
+
+.gemstone-product-gallery .loose-stone-figure img {
+  aspect-ratio: 1;
+}
+
+.gemstone-product-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  background: rgba(91, 18, 32, 0.12);
+  transform: translateY(24px);
+}
+
+.gemstone-product-summary-strip div {
+  padding: 16px;
+  background: #fffdf9;
+}
+
+.gemstone-product-summary-strip span,
+.gemstone-product-summary-strip strong {
+  display: block;
+}
+
+.gemstone-product-summary-strip span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gemstone-product-summary-strip strong {
+  margin-top: 5px;
+  color: var(--maroon);
+  line-height: 1.35;
+}
+
+.gemstone-product-section {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0 18px;
+}
+
+.gemstone-product-section:first-of-type {
+  padding-top: 86px;
+}
+
+.gemstone-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.gemstone-detail-card,
+.gemstone-caution-panel,
+.gemstone-ring-spec-panel,
+.gemstone-related-panel {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background: #fffdf9;
+  box-shadow: 0 18px 46px rgba(91, 18, 32, 0.08);
+}
+
+.gemstone-detail-card strong,
+.gemstone-caution-panel strong,
+.gemstone-ring-spec-panel h2,
+.gemstone-related-panel h2 {
+  color: var(--maroon);
+}
+
+.gemstone-detail-card p,
+.gemstone-caution-panel p,
+.gemstone-ring-spec-panel p,
+.gemstone-related-panel p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.gemstone-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 32px 0 44px;
+}
+
+.gemstone-ring-spec-panel .product-spec-list {
+  margin-bottom: 0;
+}
+
+.product-step-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-step-list li {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.product-step-list span {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.18);
+  font-weight: 950;
+}
+
+.gemstone-caution-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 246, 223, 0.96), rgba(246, 252, 250, 0.96)),
+    #fffdf9;
+}
+
+.gemstone-related-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.related-product-links a {
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.07);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.related-product-links a:hover {
+  border-color: rgba(15, 118, 110, 0.36);
+  background: rgba(15, 118, 110, 0.12);
+}
+
 @media (max-width: 1180px) {
   .premium-header .main-nav a {
     padding-inline: 8px;
@@ -4898,6 +5376,18 @@ details p {
 
   .footer-contact-card {
     grid-column: 1 / -1;
+  }
+
+  .gemstone-product-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .gemstone-product-gallery {
+    max-width: 720px;
+  }
+
+  .gemstone-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -4959,6 +5449,15 @@ details p {
 
   .footer-cta-actions {
     justify-content: flex-start;
+  }
+
+  .gemstone-product-summary-strip,
+  .gemstone-two-column {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gemstone-catalog-tools .service-finder-head {
+    align-items: flex-start;
   }
 }
 
@@ -5029,6 +5528,38 @@ details p {
     width: min(100% - 28px, 1180px);
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .gemstone-catalog-tools,
+  .gemstone-product-hero-inner,
+  .gemstone-product-section,
+  .gemstone-two-column,
+  .gemstone-product-summary-strip {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .gemstone-product-hero {
+    padding-top: 36px;
+  }
+
+  .gemstone-product-copy h1 {
+    font-size: 2.35rem;
+  }
+
+  .gemstone-product-gallery,
+  .gemstone-product-summary-strip,
+  .gemstone-product-grid,
+  .gemstone-two-column,
+  .product-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .gemstone-product-gallery img {
+    min-height: 260px;
+  }
+
+  .gemstone-product-section:first-of-type {
+    padding-top: 62px;
   }
 
   .premium-footer .footer-inner {
@@ -7101,10 +7632,44 @@ details p {
   font-weight: 900;
 }
 
+.backoffice-private-nav a[aria-current="page"] {
+  border-color: rgba(245, 184, 75, 0.38);
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(91, 18, 32, 0.9), rgba(15, 118, 110, 0.7));
+}
+
 .backoffice-private-actions a.is-primary {
   border-color: rgba(245, 184, 75, 0.5);
   color: #251116;
   background: #f6c15c;
+}
+
+.backoffice-body .portal-main {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(255, 247, 236, 0.96)),
+    #fff8ee;
+}
+
+.backoffice-body .portal-hero {
+  padding: clamp(42px, 6vw, 76px) clamp(18px, 4vw, 60px);
+  background:
+    linear-gradient(90deg, rgba(32, 16, 22, 0.97), rgba(91, 18, 32, 0.88), rgba(15, 118, 110, 0.7)),
+    url("assets/real-pooja-havan-kund.jpg") center / cover;
+}
+
+.backoffice-body .portal-hero-inner,
+.backoffice-body .portal-shell {
+  width: min(1280px, 100%);
+}
+
+.backoffice-body .portal-shell {
+  padding-top: clamp(34px, 5vw, 58px);
+  padding-bottom: clamp(42px, 6vw, 72px);
+}
+
+.backoffice-body .admin-layout {
+  grid-template-columns: minmax(280px, 0.36fr) minmax(0, 1.64fr);
+  gap: clamp(18px, 3vw, 34px);
 }
 
 .backoffice-main {

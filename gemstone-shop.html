@@ -94,7 +94,7 @@
           <article class="service-package-card is-featured">
             <span class="quote-chip">Step 1</span>
             <h3>Kundli Suitability First</h3>
-            <p>Birth details or an existing recommendation are reviewed before suggesting Ruby, Pearl, Coral, Emerald, Pukhraj, Diamond, Neelam, Gomed or Lehsunia.</p>
+            <p>Birth details or an existing recommendation are reviewed before suggesting Ruby, Pearl, Coral, Emerald, Pukhraj, Diamond, Opal, Neelam, Gomed or Lehsunia.</p>
             <ul>
               <li>No forced stone purchase</li>
               <li>High-caution stones reviewed carefully</li>
@@ -145,10 +145,32 @@
 
       <section class="section gemstone-shop-nav-section" aria-label="Gemstone shop quick paths">
         <div class="gemstone-shop-nav">
-          <a href="#ring-products"><strong>Rings</strong><span>9 separate ring products</span></a>
-          <a href="#pendant-products"><strong>Pendants</strong><span>9 separate pendant products</span></a>
+          <a href="#ring-products"><strong>Rings</strong><span>10 separate ring products</span></a>
+          <a href="#pendant-products"><strong>Pendants</strong><span>10 separate pendant products</span></a>
           <a href="#loose-stones"><strong>Loose stones</strong><span>Certificate-based stone quote</span></a>
           <a href="#stoneOrder"><strong>Quote ID</strong><span>Trackable gemstone enquiry</span></a>
+        </div>
+      </section>
+
+      <section class="section gemstone-catalog-tools-section" aria-label="Gemstone product finder">
+        <div class="gemstone-catalog-tools service-finder" data-gemstone-finder>
+          <div class="service-finder-head">
+            <div>
+              <p class="eyebrow">Product finder</p>
+              <h3>Find the right ring, pendant or loose stone</h3>
+            </div>
+            <span data-gemstone-match-count>30 products</span>
+          </div>
+          <input type="search" data-gemstone-search placeholder="Search Ruby, Pukhraj, Opal, Shani, ring, pendant..." aria-label="Search gemstone products" />
+          <div class="service-filter-row" aria-label="Gemstone product filters">
+            <button type="button" class="is-active" data-gemstone-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-gemstone-filter="rings" aria-pressed="false">Rings</button>
+            <button type="button" data-gemstone-filter="pendants" aria-pressed="false">Pendants</button>
+            <button type="button" data-gemstone-filter="loose" aria-pressed="false">Loose Stones</button>
+            <button type="button" data-gemstone-filter="caution" aria-pressed="false">High Caution</button>
+            <button type="button" data-gemstone-filter="shukra" aria-pressed="false">Shukra</button>
+          </div>
+          <p class="gemstone-empty-message" data-gemstone-empty-message hidden>No product matched. Try Ruby, Emerald, Pukhraj, Neelam, Opal, ring or pendant.</p>
         </div>
       </section>
 
@@ -322,7 +344,10 @@
             <h3>Manik Ring / Ruby Ring</h3>
             <p>Ruby ring enquiry with carat/ratti, gold or panchdhatu suggestion and certificate check.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold / Panchdhatu</dd></div><div><dt>Need</dt><dd>Ring size and finger</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Manik Ring / Ruby Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="ruby-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Manik Ring / Ruby Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-pearl" role="img" aria-label="Moti pearl ring reference image"><span>Ring product</span></div>
@@ -330,7 +355,10 @@
             <h3>Moti Ring / Pearl Ring</h3>
             <p>Pearl ring enquiry with size, shape, luster, silver setting and certificate guidance.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver preferred</dd></div><div><dt>Need</dt><dd>Pearl size and shape</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Moti Ring / Pearl Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="pearl-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Moti Ring / Pearl Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-coral" role="img" aria-label="Moonga red coral ring reference image"><span>Ring product</span></div>
@@ -338,7 +366,10 @@
             <h3>Moonga Ring / Red Coral Ring</h3>
             <p>Red coral ring enquiry with shape, origin, metal and treatment note checked before quote.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold / Copper / Panchdhatu</dd></div><div><dt>Need</dt><dd>Shape and ratti</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Moonga Ring / Red Coral Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="red-coral-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Moonga Ring / Red Coral Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-emerald" role="img" aria-label="Panna emerald ring reference image"><span>Ring product</span></div>
@@ -346,7 +377,10 @@
             <h3>Panna Ring / Emerald Ring</h3>
             <p>Emerald ring enquiry with origin, clarity, oiling note, certificate and metal guidance.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold / Silver</dd></div><div><dt>Need</dt><dd>Clarity and budget</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Panna Ring / Emerald Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="emerald-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Panna Ring / Emerald Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-yellow" role="img" aria-label="Pukhraj yellow sapphire ring reference image"><span>Ring product</span></div>
@@ -354,15 +388,32 @@
             <h3>Pukhraj Ring / Yellow Sapphire Ring</h3>
             <p>Yellow sapphire ring enquiry with heat note, origin, carat/ratti and certificate confirmation.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold preferred</dd></div><div><dt>Need</dt><dd>Carat/ratti range</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Pukhraj Ring / Yellow Sapphire Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="yellow-sapphire-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Pukhraj Ring / Yellow Sapphire Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-diamond" role="img" aria-label="Heera diamond ring reference image"><span>Ring product</span></div>
             <span class="product-badge">Shukra</span>
             <h3>Heera Ring / Diamond Ring</h3>
-            <p>Diamond, opal or zircon ring enquiry with 4C, certificate, budget and suitability guidance.</p>
+            <p>Diamond ring enquiry with 4C, certificate, budget and suitability guidance.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold / White metal</dd></div><div><dt>Need</dt><dd>Certificate and budget</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Heera Ring / Diamond Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="diamond-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Heera Ring / Diamond Ring">Create quote</button>
+            </div>
+          </article>
+          <article class="ring-product-card">
+            <div class="product-photo product-photo-opal" role="img" aria-label="Opal gold silver ring reference image"><span>Ring product</span></div>
+            <span class="product-badge">Shukra</span>
+            <h3>Opal Ring / Opal Stone Ring</h3>
+            <p>Opal ring enquiry with play-of-color, clarity, metal, size, certificate and suitability guidance.</p>
+            <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver / Gold / White metal</dd></div><div><dt>Need</dt><dd>Color fire and budget</dd></div></dl>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="opal-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Opal Ring / Opal Stone Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card high-caution">
             <div class="product-photo product-photo-blue" role="img" aria-label="Neelam blue sapphire ring reference image"><span>Ring product</span></div>
@@ -370,7 +421,10 @@
             <h3>Neelam Ring / Blue Sapphire Ring</h3>
             <p>High-caution ring enquiry. Suitability and trial guidance must be discussed before wearing.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver / Panchdhatu</dd></div><div><dt>Need</dt><dd>Trial advice first</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Neelam Ring / Blue Sapphire Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="blue-sapphire-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Neelam Ring / Blue Sapphire Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card">
             <div class="product-photo product-photo-hessonite" role="img" aria-label="Gomed hessonite ring reference image"><span>Ring product</span></div>
@@ -378,7 +432,10 @@
             <h3>Gomed Ring / Hessonite Ring</h3>
             <p>Hessonite ring enquiry with color, inclusions, ratti, timing and certificate guidance.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver / Panchdhatu</dd></div><div><dt>Need</dt><dd>Chart need review</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Gomed Ring / Hessonite Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="hessonite-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Gomed Ring / Hessonite Ring">Create quote</button>
+            </div>
           </article>
           <article class="ring-product-card high-caution">
             <div class="product-photo product-photo-catseye" role="img" aria-label="Lehsunia cat's eye ring reference image"><span>Ring product</span></div>
@@ -386,7 +443,10 @@
             <h3>Lehsunia Ring / Cat's Eye Ring</h3>
             <p>High-caution ring enquiry with line effect, origin, suitability, trial and wearing method.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver / Panchdhatu</dd></div><div><dt>Need</dt><dd>Trial method first</dd></div></dl>
-            <button type="button" class="text-button" data-stone="Lehsunia Ring / Cat's Eye Ring">Create ring quote</button>
+            <div class="product-card-actions">
+              <a class="text-button product-detail-link" href="cats-eye-ring.html">View details</a>
+              <button type="button" class="text-button" data-stone="Lehsunia Ring / Cat's Eye Ring">Create quote</button>
+            </div>
           </article>
         </div>
         <div class="product-trust-strip ring-trust-strip" aria-label="Ring quote process">
@@ -447,9 +507,17 @@
             <div class="product-photo product-photo-diamond" role="img" aria-label="Heera diamond pendant reference image"><span>Pendant product</span></div>
             <span class="product-badge">Shukra</span>
             <h3>Heera Pendant / Diamond Pendant</h3>
-            <p>Diamond, opal or zircon pendant enquiry with 4C, certificate, budget and suitability guidance.</p>
+            <p>Diamond pendant enquiry with 4C, certificate, budget and suitability guidance.</p>
             <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Gold / White metal</dd></div><div><dt>Need</dt><dd>Certificate and budget</dd></div></dl>
             <button type="button" class="text-button" data-stone="Heera Pendant / Diamond Pendant">Create pendant quote</button>
+          </article>
+          <article class="ring-product-card">
+            <div class="product-photo product-photo-opal" role="img" aria-label="Opal pendant reference image"><span>Pendant product</span></div>
+            <span class="product-badge">Shukra</span>
+            <h3>Opal Pendant / Opal Stone Pendant</h3>
+            <p>Opal pendant enquiry with play-of-color, clarity, metal setting, certificate and suitability guidance.</p>
+            <dl class="ring-spec-list"><div><dt>Metal</dt><dd>Silver / Gold / White metal</dd></div><div><dt>Need</dt><dd>Pendant style and budget</dd></div></dl>
+            <button type="button" class="text-button" data-stone="Opal Pendant / Opal Stone Pendant">Create pendant quote</button>
           </article>
           <article class="ring-product-card high-caution">
             <div class="product-photo product-photo-blue" role="img" aria-label="Neelam blue sapphire pendant reference image"><span>Pendant product</span></div>
@@ -539,10 +607,19 @@
             <div class="product-photo product-photo-diamond" role="img" aria-label="Heera diamond loose stone reference image"><span>Loose stone</span></div>
             <div class="stone-card-top"><span class="stone-swatch diamond"></span><span class="product-badge">Shukra</span></div>
             <h3>Heera Loose Stone / Diamond Loose Stone</h3>
-            <p>For Shukra-related guidance, with diamond, opal or zircon options discussed responsibly.</p>
-            <dl class="product-spec-list product-detail-list"><div><dt>Stone</dt><dd>Diamond, opal or zircon options</dd></div><div><dt>Use</dt><dd>Loose stone for custom jewellery</dd></div><div><dt>Check</dt><dd>4C, certificate and budget</dd></div></dl>
+            <p>For Shukra-related guidance, with diamond options discussed responsibly after suitability review.</p>
+            <dl class="product-spec-list product-detail-list"><div><dt>Stone</dt><dd>Diamond options by 4C</dd></div><div><dt>Use</dt><dd>Loose stone for custom jewellery</dd></div><div><dt>Check</dt><dd>4C, certificate and budget</dd></div></dl>
             <ul class="product-ring-list"><li>Astrology suitability checked first</li><li>Certificate and stone photo required</li></ul>
             <button type="button" class="text-button" data-stone="Heera Loose Stone / Diamond Loose Stone">Create loose stone quote</button>
+          </article>
+          <article class="stone-card premium-product-card">
+            <div class="product-photo product-photo-opal" role="img" aria-label="Opal loose stone reference image"><span>Loose stone</span></div>
+            <div class="stone-card-top"><span class="stone-swatch opal"></span><span class="product-badge">Shukra</span></div>
+            <h3>Opal Loose Stone / Opal Stone</h3>
+            <p>For Shukra-related guidance where opal is preferred after chart review and budget discussion.</p>
+            <dl class="product-spec-list product-detail-list"><div><dt>Stone</dt><dd>Opal by color fire and carat</dd></div><div><dt>Use</dt><dd>Loose opal for ring or pendant</dd></div><div><dt>Check</dt><dd>Play-of-color, origin and certificate</dd></div></dl>
+            <ul class="product-ring-list"><li>Luxury stone photo before payment</li><li>Ring or pendant setting can be quoted</li></ul>
+            <button type="button" class="text-button" data-stone="Opal Loose Stone / Opal Stone">Create loose stone quote</button>
           </article>
           <article class="stone-card premium-product-card">
             <div class="product-photo product-photo-blue" role="img" aria-label="Neelam blue sapphire loose stone reference image"><span>Loose stone</span></div>
@@ -603,6 +680,7 @@
               <option value="Panna Ring / Emerald Ring">Panna Ring / Emerald Ring</option>
               <option value="Pukhraj Ring / Yellow Sapphire Ring">Pukhraj Ring / Yellow Sapphire Ring</option>
               <option value="Heera Ring / Diamond Ring">Heera Ring / Diamond Ring</option>
+              <option value="Opal Ring / Opal Stone Ring">Opal Ring / Opal Stone Ring</option>
               <option value="Neelam Ring / Blue Sapphire Ring">Neelam Ring / Blue Sapphire Ring</option>
               <option value="Gomed Ring / Hessonite Ring">Gomed Ring / Hessonite Ring</option>
               <option value="Lehsunia Ring / Cat's Eye Ring">Lehsunia Ring / Cat's Eye Ring</option>
@@ -612,6 +690,7 @@
               <option value="Panna Pendant / Emerald Pendant">Panna Pendant / Emerald Pendant</option>
               <option value="Pukhraj Pendant / Yellow Sapphire Pendant">Pukhraj Pendant / Yellow Sapphire Pendant</option>
               <option value="Heera Pendant / Diamond Pendant">Heera Pendant / Diamond Pendant</option>
+              <option value="Opal Pendant / Opal Stone Pendant">Opal Pendant / Opal Stone Pendant</option>
               <option value="Neelam Pendant / Blue Sapphire Pendant">Neelam Pendant / Blue Sapphire Pendant</option>
               <option value="Gomed Pendant / Hessonite Pendant">Gomed Pendant / Hessonite Pendant</option>
               <option value="Lehsunia Pendant / Cat's Eye Pendant">Lehsunia Pendant / Cat's Eye Pendant</option>
@@ -621,6 +700,7 @@
               <option value="Panna Loose Stone / Emerald Loose Stone">Panna Loose Stone / Emerald Loose Stone</option>
               <option value="Pukhraj Loose Stone / Yellow Sapphire Loose Stone">Pukhraj Loose Stone / Yellow Sapphire Loose Stone</option>
               <option value="Heera Loose Stone / Diamond Loose Stone">Heera Loose Stone / Diamond Loose Stone</option>
+              <option value="Opal Loose Stone / Opal Stone">Opal Loose Stone / Opal Stone</option>
               <option value="Neelam Loose Stone / Blue Sapphire Loose Stone">Neelam Loose Stone / Blue Sapphire Loose Stone</option>
               <option value="Gomed Loose Stone / Hessonite Loose Stone">Gomed Loose Stone / Hessonite Loose Stone</option>
               <option value="Lehsunia Loose Stone / Cat's Eye Loose Stone">Lehsunia Loose Stone / Cat's Eye Loose Stone</option>
@@ -760,10 +840,10 @@
     <nav class="footer-column" aria-label="Gemstone links">
       <h2>Gemstones</h2>
       <a href="gemstone.html">Gemstone Guidance</a>
-      <a href="gemstone-shop.html?stone=Manik%20%2F%20Ruby">Ruby / Manik</a>
-      <a href="gemstone-shop.html?stone=Panna%20%2F%20Emerald">Emerald / Panna</a>
-      <a href="gemstone-shop.html?stone=Pukhraj%20%2F%20Yellow%20Sapphire">Yellow Sapphire</a>
-      <a href="gemstone-shop.html?stone=Neelam%20%2F%20Blue%20Sapphire">Blue Sapphire</a>
+      <a href="ruby-ring.html">Ruby / Manik Ring</a>
+      <a href="emerald-ring.html">Emerald / Panna Ring</a>
+      <a href="yellow-sapphire-ring.html">Yellow Sapphire Ring</a>
+      <a href="blue-sapphire-ring.html">Blue Sapphire Ring</a>
       <a href="gemstone-shop.html">All Gemstones</a>
     </nav>
     <nav class="footer-column" aria-label="Client desk links">
