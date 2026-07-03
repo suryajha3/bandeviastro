@@ -43,6 +43,12 @@ const backofficePreview = document.querySelector("#backofficePreview");
 const backofficeWorkflowPreview = document.querySelector("#backofficeWorkflowPreview");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
+const authOpenAccountButton = document.querySelector("#authOpenAccountButton");
+const authSubmitButton = document.querySelector("#authSubmitButton");
+const authGoogleButton = document.querySelector("#authGoogleButton");
+const authForgotButton = document.querySelector("#authForgotButton");
+const authNameField = document.querySelector("#authNameField");
+const accountSection = document.querySelector("#accountSection");
 const accountSummary = document.querySelector("#accountSummary");
 const menuToggle = document.querySelector("#menuToggle");
 const primaryNav = document.querySelector("#primaryNav");
@@ -64,6 +70,8 @@ let adminBookingsSource = "local";
 let adminQuickFilter = "all";
 let backofficeBookingsCache = [];
 let backofficeBookingsSource = "local";
+let authMode = "sign-in";
+let accountPortalUnlocked = false;
 
 const bookingStatuses = [
   "Enquiry Received",
@@ -2974,6 +2982,68 @@ function setAuthStatus(message) {
   if (authStatus) authStatus.textContent = message;
 }
 
+function getAuthRedirectUrl() {
+  return `${window.location.origin}${window.location.pathname}`;
+}
+
+function setAuthMode(mode) {
+  authMode = mode === "sign-up" ? "sign-up" : "sign-in";
+  customerAuthForm?.setAttribute("data-auth-mode", authMode);
+  authNameField?.classList.toggle("is-hidden", authMode !== "sign-up");
+  if (authSubmitButton) {
+    authSubmitButton.textContent = authMode === "sign-up" ? "Create secure account" : "Sign in securely";
+  }
+  const passwordField = document.querySelector("#authPassword");
+  if (passwordField) {
+    passwordField.autocomplete = authMode === "sign-up" ? "new-password" : "current-password";
+  }
+  document.querySelectorAll(".auth-mode-tabs [data-auth-mode]").forEach((button) => {
+    const isActive = button.dataset.authMode === authMode;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+  setAuthStatus(authMode === "sign-up"
+    ? "Create an account with the same email used for your Booking ID."
+    : "Sign in to open private booking history for your email.");
+}
+
+function setAccountPrivacyState(isPrivate) {
+  accountSection?.classList.toggle("is-private", isPrivate);
+}
+
+function renderAccountLockedState(title, detail, actionLabel = "Login to view") {
+  const accountBookingList = document.querySelector("#accountBookingList");
+  setAccountPrivacyState(true);
+
+  if (accountSummary) {
+    accountSummary.innerHTML = `
+      <article class="account-summary-lead">
+        <span>Private account portal</span>
+        <strong>${escapeHtml(title)}</strong>
+      </article>
+      <article><span>Status</span><strong>Locked</strong></article>
+      <article><span>Privacy</span><strong>Email login required</strong></article>
+      <article><span>Action</span><strong>${escapeHtml(actionLabel)}</strong></article>
+    `;
+  }
+
+  if (accountBookingList) {
+    accountBookingList.innerHTML = `
+      <article class="account-privacy-card">
+        <span class="account-privacy-icon">BA</span>
+        <div>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(detail)}</p>
+          <div class="account-privacy-actions">
+            <a class="btn btn-primary" href="track-booking.html">Track by Booking ID</a>
+            <a class="btn btn-secondary" href="book-online.html">Create Booking ID</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+}
+
 function renderAccountSummary(bookings, sourceLabel = "Booking desk") {
   if (!accountSummary) return;
   const activeBookings = bookings.filter((booking) => booking.status !== "Completed").length;
@@ -3008,28 +3078,58 @@ async function renderAccountBookings() {
   const accountBookingList = document.querySelector("#accountBookingList");
   if (!accountBookingList) return;
 
-  if (!isCloudEnabled()) {
-    const localBookings = readBookings().slice(0, 8);
-    renderAccountSummary(localBookings, "Local booking preview");
-    if (!localBookings.length) {
-      accountBookingList.innerHTML = `<article><h3>No booking history yet</h3><p>Create a Booking ID or track an existing request to see quote, payment, schedule and proof updates here.</p></article>`;
-      return;
+  if (!accountPortalUnlocked) {
+    if (isCloudEnabled()) {
+      const user = await getCurrentUser();
+      if (user) {
+        renderAccountLockedState(
+          "Signed in. Open private bookings to view.",
+          "For customer privacy, booking history is hidden until you press Open my bookings in this session.",
+          "Open my bookings"
+        );
+      } else {
+        renderAccountLockedState(
+          "Booking history is private.",
+          "Sign in or create an account with the same email used in your Booking ID. No booking details are shown before login.",
+          "Sign in"
+        );
+      }
+    } else {
+      renderAccountLockedState(
+        "Secure account login is required.",
+        "Use Booking ID tracking or WhatsApp support. Local booking previews are hidden to protect customer privacy.",
+        "Track by ID"
+      );
     }
-    accountBookingList.innerHTML = localBookings.map(renderAccountBookingCard).join("");
+    return;
+  }
+
+  if (!isCloudEnabled()) {
+    renderAccountLockedState(
+      "Secure account login is not connected on this preview.",
+      "Please use Booking ID tracking or WhatsApp support for staff confirmation.",
+      "Track by ID"
+    );
     return;
   }
 
   const user = await getCurrentUser();
   if (!user) {
-    renderAccountSummary([], "Secure account portal");
-    accountBookingList.innerHTML = `<article><h3>Sign in to view bookings</h3><p>After login, matching bookings will appear here for tracking.</p></article>`;
+    accountPortalUnlocked = false;
+    renderAccountLockedState(
+      "Sign in to view bookings.",
+      "After login, matching bookings for your email will appear here for quote, payment, schedule and proof updates.",
+      "Sign in"
+    );
     return;
   }
 
   try {
+    setAccountPrivacyState(false);
     const { data, error } = await supabaseClient
       .from("bookings")
       .select("*")
+      .eq("email", user.email)
       .order("created_at", { ascending: false });
     if (error) throw error;
 
@@ -3123,19 +3223,25 @@ async function refreshAuthState() {
   if (!customerAuthForm && !document.querySelector("#accountBookingList")) return;
 
   if (!isCloudEnabled()) {
-    setAuthStatus("Customer booking history is available on this device. Track by Booking ID or WhatsApp support for staff confirmation.");
+    setAuthStatus("Secure account login is not connected on this preview. Track by Booking ID or WhatsApp support.");
     authLogoutButton?.classList.add("is-hidden");
+    authOpenAccountButton?.classList.add("is-hidden");
     await renderAccountBookings();
     return;
   }
 
   const user = await getCurrentUser();
   if (user) {
-    setAuthStatus(`Signed in as ${user.email}.`);
+    setAuthStatus(accountPortalUnlocked
+      ? `Private bookings opened for ${user.email}.`
+      : `Signed in as ${user.email}. Press Open my bookings to view private records.`);
     authLogoutButton?.classList.remove("is-hidden");
+    authOpenAccountButton?.classList.toggle("is-hidden", accountPortalUnlocked);
   } else {
+    accountPortalUnlocked = false;
     setAuthStatus("Sign in or create an account to view bookings saved with your email.");
     authLogoutButton?.classList.add("is-hidden");
+    authOpenAccountButton?.classList.add("is-hidden");
   }
 
   await renderAccountBookings();
@@ -3171,27 +3277,71 @@ async function handleCustomerAuth(action) {
     return;
   }
 
-  setAuthStatus(action === "sign-up" ? "Account created. If email confirmation is enabled, please confirm your email." : "Signed in successfully.");
+  accountPortalUnlocked = action === "sign-in" || Boolean(response.data?.session);
+  setAuthStatus(action === "sign-up" && !accountPortalUnlocked ? "Account created. If email confirmation is enabled, please confirm your email." : "Signed in successfully.");
   await refreshAuthState();
   await prefillPortalFromSession();
+  if (accountPortalUnlocked) {
+    accountSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 customerAuthForm?.addEventListener("submit", (event) => {
   event.preventDefault();
-  handleCustomerAuth("sign-in");
+  handleCustomerAuth(authMode);
 });
 
-document.querySelectorAll("[data-auth-action]").forEach((button) => {
+document.querySelectorAll(".auth-mode-tabs [data-auth-mode]").forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    handleCustomerAuth(button.dataset.authAction);
+    setAuthMode(button.dataset.authMode);
   });
+});
+
+authForgotButton?.addEventListener("click", async () => {
+  if (!isCloudEnabled()) {
+    setAuthStatus("Password reset is available after secure login is connected.");
+    return;
+  }
+
+  const email = document.querySelector("#authEmail")?.value.trim();
+  if (!email) {
+    setAuthStatus("Enter your email first, then click Forgot password.");
+    return;
+  }
+
+  setAuthStatus("Sending password reset email...");
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: getAuthRedirectUrl() });
+  setAuthStatus(error ? error.message || "Password reset could not be sent." : "Password reset link sent. Please check your email.");
+});
+
+authGoogleButton?.addEventListener("click", async () => {
+  if (!isCloudEnabled()) {
+    setAuthStatus("Google login is available after secure login is connected.");
+    return;
+  }
+
+  setAuthStatus("Opening Google login...");
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: getAuthRedirectUrl() }
+  });
+  if (error) {
+    setAuthStatus(error.message || "Google login could not be opened.");
+  }
+});
+
+authOpenAccountButton?.addEventListener("click", async () => {
+  accountPortalUnlocked = true;
+  await refreshAuthState();
+  accountSection?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 authLogoutButton?.addEventListener("click", async () => {
   if (supabaseClient) {
     await supabaseClient.auth.signOut();
   }
+  accountPortalUnlocked = false;
   setAuthStatus("Signed out.");
   await refreshAuthState();
 });
@@ -3215,6 +3365,16 @@ ticketCopyButton?.addEventListener("click", async () => {
     ticketCopyButton.textContent = bookingId;
   }
 });
+
+if (customerAuthForm) {
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+  setAuthMode("sign-in");
+  window.addEventListener("load", () => {
+    document.querySelector("#client-login")?.scrollIntoView({ behavior: "auto", block: "start" });
+  }, { once: true });
+}
 
 prefillPortalBookingFromUrl();
 updateServicePreview();

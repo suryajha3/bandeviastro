@@ -7,7 +7,7 @@
     <meta name="description" content="Login to Bandevi Astro customer portal to view booking status for online pooja, hawan, astrology, gemstone and hast rekha services." />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="login-page">
     <header class="site-header premium-header international-header" aria-label="Main header">
   <div class="header-topline international-topline">
     <span><strong>Global desk</strong> India, USA, UK, Canada, UAE and NRI families</span>
@@ -38,7 +38,7 @@
       <a href="about.html"><strong>Trust</strong><span>About us</span></a>
     </nav>
     <div class="header-actions" aria-label="Quick contact actions">
-      <a class="header-action login" href="login.html" aria-label="Open client login"><span>Login</span><strong>Client</strong></a>
+      <a class="header-action login" href="login.html" aria-label="Open client login"><span>Client</span><strong>Login</strong></a>
       <a class="header-action whatsapp" href="https://wa.me/918676846484" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
       <a class="header-action primary" href="book-online.html" aria-label="Create booking ID"><span>Book</span><strong>Now</strong></a>
     </div>
@@ -60,6 +60,48 @@
           <h1>Client portal for bookings, quote, payment and proof</h1>
           <p>Sign in to view all bookings connected to your email, follow the status timeline and keep pooja, Kundali, hawan and gemstone updates in one account.</p>
         </div>
+      </section>
+
+      <section class="portal-shell auth-layout" id="client-login">
+        <form class="portal-form auth-form" id="customerAuthForm">
+          <div class="auth-form-head full-span">
+            <div>
+              <p class="eyebrow">Secure client access</p>
+              <h2>Login or create account</h2>
+            </div>
+            <span>Private</span>
+          </div>
+          <div class="auth-mode-tabs full-span" role="tablist" aria-label="Account mode">
+            <button class="is-active" type="button" data-auth-mode="sign-in">Sign in</button>
+            <button type="button" data-auth-mode="sign-up">Sign up</button>
+          </div>
+          <label class="full-span is-hidden" id="authNameField">Full name<input id="authName" type="text" autocomplete="name" placeholder="Needed for new account" /></label>
+          <label>Email<input id="authEmail" type="email" autocomplete="email" required /></label>
+          <label>Password<input id="authPassword" type="password" autocomplete="current-password" required /></label>
+          <div class="auth-button-row full-span">
+            <button class="btn btn-primary" type="submit" id="authSubmitButton">Sign in securely</button>
+            <button class="btn btn-secondary" type="button" id="authGoogleButton">Continue with Google</button>
+            <button class="btn btn-secondary" type="button" id="authForgotButton">Forgot password</button>
+            <button class="btn btn-secondary is-hidden" type="button" id="authOpenAccountButton">Open my bookings</button>
+            <button class="btn btn-secondary is-hidden" type="button" id="authLogoutButton">Logout</button>
+          </div>
+          <p class="form-note" id="authStatus" aria-live="polite">Sign in or create an account to view bookings saved with your email. Private booking history stays locked until login.</p>
+        </form>
+
+        <aside class="portal-card auth-side-card">
+          <p class="eyebrow">Premium client portal</p>
+          <h2>Your spiritual service desk in one place</h2>
+          <ul class="portal-list">
+            <li><strong>Kundali:</strong> Birth details, dosh focus and remedy status can stay connected to the booking.</li>
+            <li><strong>Pooja/Hawan:</strong> Sankalp, gotra, proof preference and schedule updates are easier to track.</li>
+            <li><strong>Gemstones:</strong> Ring, pendant, certificate, quote and delivery status stay visible.</li>
+            <li><strong>Support:</strong> WhatsApp remains available for urgent help and confirmation.</li>
+          </ul>
+          <div class="ticket-actions">
+            <a class="btn btn-primary" href="book-online.html">Book service</a>
+            <a class="btn btn-secondary" href="track-booking.html">Track by ID</a>
+          </div>
+        </aside>
       </section>
 
       <section class="client-portal-command-strip" aria-label="Client portal features">
@@ -103,41 +145,11 @@
         </div>
       </section>
 
-      <section class="portal-shell auth-layout">
-        <form class="portal-form auth-form" id="customerAuthForm">
-          <h2>Login or create account</h2>
-          <label class="full-span">Full name<input id="authName" type="text" autocomplete="name" placeholder="Needed for new account" /></label>
-          <label>Email<input id="authEmail" type="email" autocomplete="email" required /></label>
-          <label>Password<input id="authPassword" type="password" autocomplete="current-password" required /></label>
-          <div class="auth-button-row full-span">
-            <button class="btn btn-primary" type="submit" data-auth-action="sign-in">Sign in</button>
-            <button class="btn btn-secondary" type="button" data-auth-action="sign-up">Create account</button>
-            <button class="btn btn-secondary is-hidden" type="button" id="authLogoutButton">Logout</button>
-          </div>
-          <p class="form-note" id="authStatus" aria-live="polite">Sign in or create an account to view bookings saved with your email.</p>
-        </form>
-
-        <aside class="portal-card auth-side-card">
-          <p class="eyebrow">Premium client portal</p>
-          <h2>Your spiritual service desk in one place</h2>
-          <ul class="portal-list">
-            <li><strong>Kundali:</strong> Birth details, dosh focus and remedy status can stay connected to the booking.</li>
-            <li><strong>Pooja/Hawan:</strong> Sankalp, gotra, proof preference and schedule updates are easier to track.</li>
-            <li><strong>Gemstones:</strong> Ring, pendant, certificate, quote and delivery status stay visible.</li>
-            <li><strong>Support:</strong> WhatsApp remains available for urgent help and confirmation.</li>
-          </ul>
-          <div class="ticket-actions">
-            <a class="btn btn-primary" href="book-online.html">Book service</a>
-            <a class="btn btn-secondary" href="track-booking.html">Track by ID</a>
-          </div>
-        </aside>
-      </section>
-
-      <section class="section account-section" aria-label="Account bookings">
+      <section class="section account-section is-private" id="accountSection" aria-label="Account bookings">
         <div class="section-heading compact">
           <p class="eyebrow">My bookings</p>
           <h2>Booking history and status</h2>
-          <p>Bookings connected to the logged-in email appear here with quote, payment, schedule and proof updates.</p>
+          <p>Private booking details appear only after secure login and customer confirmation.</p>
         </div>
         <div class="account-summary-grid" id="accountSummary" aria-label="Account booking summary"></div>
         <div class="mini-booking-list" id="accountBookingList"></div>
