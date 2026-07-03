@@ -75,9 +75,15 @@
             <button class="is-active" type="button" data-auth-mode="sign-in">Sign in</button>
             <button type="button" data-auth-mode="sign-up">Sign up</button>
           </div>
+          <div class="auth-contact-tabs full-span" role="tablist" aria-label="Login method">
+            <button class="is-active" type="button" data-auth-contact="email">Use email</button>
+            <button type="button" data-auth-contact="phone">Use mobile</button>
+          </div>
           <label class="full-span is-hidden" id="authNameField">Full name<input id="authName" type="text" autocomplete="name" placeholder="Needed for new account" /></label>
-          <label>Email<input id="authEmail" type="email" autocomplete="email" required /></label>
-          <label>Password<input id="authPassword" type="password" autocomplete="current-password" required /></label>
+          <label id="authEmailField">Email<input id="authEmail" type="email" autocomplete="email" required /></label>
+          <label id="authPasswordField">Password<input id="authPassword" type="password" autocomplete="current-password" required /></label>
+          <label class="is-hidden" id="authPhoneField">Mobile number<input id="authPhone" type="tel" autocomplete="tel" placeholder="+91 98765 43210" /></label>
+          <label class="is-hidden" id="authOtpField">Mobile OTP<input id="authOtp" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter OTP" /></label>
           <div class="auth-button-row full-span">
             <button class="btn btn-primary" type="submit" id="authSubmitButton">Sign in securely</button>
             <button class="btn btn-secondary" type="button" id="authGoogleButton">Continue with Google</button>

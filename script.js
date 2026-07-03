@@ -48,6 +48,10 @@ const authSubmitButton = document.querySelector("#authSubmitButton");
 const authGoogleButton = document.querySelector("#authGoogleButton");
 const authForgotButton = document.querySelector("#authForgotButton");
 const authNameField = document.querySelector("#authNameField");
+const authEmailField = document.querySelector("#authEmailField");
+const authPasswordField = document.querySelector("#authPasswordField");
+const authPhoneField = document.querySelector("#authPhoneField");
+const authOtpField = document.querySelector("#authOtpField");
 const accountSection = document.querySelector("#accountSection");
 const accountSummary = document.querySelector("#accountSummary");
 const menuToggle = document.querySelector("#menuToggle");
@@ -65,12 +69,111 @@ const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
+const headerPreferenceKeys = {
+  currency: "bandeviAstroDisplayCurrency",
+  language: "bandeviAstroDisplayLanguage"
+};
+const currencyApiUrl = "https://open.er-api.com/v6/latest/INR";
+const supportedCurrencies = {
+  INR: { label: "INR - India", locale: "en-IN", symbol: "Rs" },
+  USD: { label: "USD - USA", locale: "en-US" },
+  GBP: { label: "GBP - UK", locale: "en-GB" },
+  EUR: { label: "EUR - Europe", locale: "en-IE" },
+  CAD: { label: "CAD - Canada", locale: "en-CA" },
+  AED: { label: "AED - UAE", locale: "en-AE" },
+  AUD: { label: "AUD - Australia", locale: "en-AU" }
+};
+const fallbackCurrencyRates = {
+  INR: 1,
+  USD: 0.012,
+  GBP: 0.0088,
+  EUR: 0.0102,
+  CAD: 0.0163,
+  AED: 0.0441,
+  AUD: 0.0183
+};
+const supportedLanguages = {
+  en: "English",
+  hi: "Hindi",
+  ne: "Nepali",
+  es: "Spanish",
+  fr: "French",
+  de: "German",
+  ar: "Arabic"
+};
+const headerLanguageCopy = {
+  en: {
+    topStart: "<strong>Global desk</strong> India, USA, UK, Canada, UAE and NRI families",
+    topEnd: "Hindi and English | Quote before payment | Proof where applicable",
+    track: "Track Booking ID",
+    brandSmall: "Pdt. Jyotishacharya Kumodanand Jha (Shastri)",
+    brandLine: "Since 1981 Jyotish, Pooja and Gemstone Desk",
+    nav: {
+      "online-pooja.html": ["Pooja", "Proof"],
+      "hawan.html": ["Hawan", "Temple"],
+      "kundli.html": ["Kundli", "Dosh"],
+      "gemstone-shop.html": ["Gems", "Rings"],
+      "book-online.html": ["Book", "Create ID"],
+      "about.html": ["Trust", "About us"]
+    },
+    actions: {
+      login: ["Account", "Login"],
+      whatsapp: ["WA", "WhatsApp"],
+      primary: ["Book", "Now"]
+    },
+    rail: {
+      "online-pooja.html": ["Online Pooja", "Temple, live video or proof"],
+      "hawan.html": ["Hawan Services", "Grah, vastu and business"],
+      "kundli.html": ["Kundli and Dosh", "Marriage, career and remedies"],
+      "gemstone-shop.html": ["Gemstone Rings", "Certified quote after review"],
+      "track-booking.html": ["Login Desk", "Booking ID, login and updates"]
+    }
+  },
+  hi: {
+    topStart: "<strong>Global desk</strong> Bharat, USA, UK, Canada, UAE aur NRI parivar",
+    topEnd: "Hindi aur English | Payment se pehle quote | Jahan lagu ho proof",
+    track: "Booking ID Track karein",
+    brandSmall: "Pdt. Jyotishacharya Kumodanand Jha (Shastri)",
+    brandLine: "1981 se Jyotish, Pooja aur Gemstone Desk",
+    nav: {
+      "online-pooja.html": ["Pooja", "Proof"],
+      "hawan.html": ["Hawan", "Mandir"],
+      "kundli.html": ["Kundli", "Dosh"],
+      "gemstone-shop.html": ["Ratna", "Rings"],
+      "book-online.html": ["Book", "ID Banayein"],
+      "about.html": ["Trust", "About us"]
+    },
+    actions: {
+      login: ["Account", "Login"],
+      whatsapp: ["WA", "WhatsApp"],
+      primary: ["Book", "Now"]
+    },
+    rail: {
+      "online-pooja.html": ["Online Pooja", "Mandir, live video ya proof"],
+      "hawan.html": ["Hawan Seva", "Grah, vastu aur business"],
+      "kundli.html": ["Kundli aur Dosh", "Vivah, career aur upay"],
+      "gemstone-shop.html": ["Gemstone Rings", "Review ke baad certified quote"],
+      "track-booking.html": ["Login Desk", "Booking ID, login aur updates"]
+    }
+  }
+};
+const currencyTextSources = new WeakMap();
+let selectedCurrency = supportedCurrencies[readPreference(headerPreferenceKeys.currency, "INR")]
+  ? readPreference(headerPreferenceKeys.currency, "INR")
+  : "INR";
+let selectedLanguage = supportedLanguages[readPreference(headerPreferenceKeys.language, "en")]
+  ? readPreference(headerPreferenceKeys.language, "en")
+  : "en";
+let currencyRates = { ...fallbackCurrencyRates };
+let currencyObserverTimer = null;
 let adminBookingsCache = [];
 let adminBookingsSource = "local";
 let adminQuickFilter = "all";
 let backofficeBookingsCache = [];
 let backofficeBookingsSource = "local";
 let authMode = "sign-in";
+let authContactMode = "email";
+let authPhoneOtpSent = false;
 let accountPortalUnlocked = false;
 
 const bookingStatuses = [
@@ -263,6 +366,8 @@ function markActiveHeaderLinks() {
 }
 
 markActiveHeaderLinks();
+initHeaderGlobalTools();
+initCurrencyConversion();
 
 function initPremiumSliders() {
   document.querySelectorAll("[data-premium-slider]").forEach((slider) => {
@@ -335,6 +440,336 @@ function escapeHtml(value) {
     "\"": "&quot;",
     "'": "&#039;"
   }[character]));
+}
+
+function readPreference(key, fallback) {
+  try {
+    return localStorage.getItem(key) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writePreference(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Preference storage can be unavailable in some private browser modes.
+  }
+}
+
+function getPageFromHref(href) {
+  return (href || "").split("#")[0].split("?")[0] || "index.html";
+}
+
+function initHeaderGlobalTools() {
+  document.querySelectorAll(".international-header .header-main").forEach((headerMain) => {
+    if (headerMain.querySelector("[data-global-tools]")) return;
+    const actions = headerMain.querySelector(".header-actions");
+    if (!actions) return;
+
+    const tools = document.createElement("div");
+    tools.className = "header-global-tools notranslate";
+    tools.setAttribute("data-global-tools", "");
+    tools.setAttribute("aria-label", "Language and currency converter");
+    tools.innerHTML = `
+      <label>
+        <span>Language</span>
+        <select data-language-control aria-label="Select website language">
+          ${Object.entries(supportedLanguages).map(([code, label]) => `<option value="${escapeHtml(code)}">${escapeHtml(label)}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        <span>Currency</span>
+        <select data-currency-control aria-label="Select display currency">
+          ${Object.entries(supportedCurrencies).map(([code, item]) => `<option value="${escapeHtml(code)}">${escapeHtml(item.label)}</option>`).join("")}
+        </select>
+      </label>
+      <small data-currency-note>Display only. Final quote before payment.</small>
+    `;
+    headerMain.insertBefore(tools, actions);
+  });
+
+  document.querySelectorAll("[data-language-control]").forEach((select) => {
+    select.value = selectedLanguage;
+    select.addEventListener("change", () => {
+      selectedLanguage = supportedLanguages[select.value] ? select.value : "en";
+      writePreference(headerPreferenceKeys.language, selectedLanguage);
+      document.querySelectorAll("[data-language-control]").forEach((item) => {
+        item.value = selectedLanguage;
+      });
+      applyHeaderLanguage();
+      applyGoogleTranslateLanguage(selectedLanguage);
+    });
+  });
+
+  document.querySelectorAll("[data-currency-control]").forEach((select) => {
+    select.value = selectedCurrency;
+    select.addEventListener("change", () => {
+      selectedCurrency = supportedCurrencies[select.value] ? select.value : "INR";
+      writePreference(headerPreferenceKeys.currency, selectedCurrency);
+      document.querySelectorAll("[data-currency-control]").forEach((item) => {
+        item.value = selectedCurrency;
+      });
+      updateCurrencyNote();
+      applyCurrencyToPage();
+      refreshCurrencyRates();
+    });
+  });
+
+  applyHeaderLanguage();
+  updateCurrencyNote();
+  if (selectedLanguage !== "en") {
+    applyGoogleTranslateLanguage(selectedLanguage);
+  }
+}
+
+function applyHeaderLanguage() {
+  const copy = headerLanguageCopy[selectedLanguage] || headerLanguageCopy.en;
+  document.documentElement.lang = selectedLanguage === "en" ? "en" : selectedLanguage;
+
+  document.querySelectorAll(".international-topline").forEach((topline) => {
+    const spans = topline.querySelectorAll("span");
+    if (spans[0]) spans[0].innerHTML = copy.topStart;
+    if (spans[1]) spans[1].textContent = copy.topEnd;
+    const trackLink = topline.querySelector("a[href*='track-booking']");
+    if (trackLink) trackLink.textContent = copy.track;
+  });
+
+  document.querySelectorAll(".international-brand small").forEach((item) => {
+    item.textContent = copy.brandSmall;
+  });
+  document.querySelectorAll(".international-brand em").forEach((item) => {
+    item.textContent = copy.brandLine;
+  });
+
+  document.querySelectorAll(".international-nav a[href]").forEach((link) => {
+    const labels = copy.nav[getPageFromHref(link.getAttribute("href"))];
+    if (!labels) return;
+    const strong = link.querySelector("strong");
+    const span = link.querySelector("span");
+    if (strong) strong.textContent = labels[0];
+    if (span) span.textContent = labels[1];
+  });
+
+  document.querySelectorAll(".international-service-rail a[href]").forEach((link) => {
+    const labels = copy.rail[getPageFromHref(link.getAttribute("href"))];
+    if (!labels) return;
+    const strong = link.querySelector("strong");
+    const span = link.querySelector("span");
+    if (strong) strong.textContent = labels[0];
+    if (span) span.textContent = labels[1];
+  });
+
+  document.querySelectorAll(".international-header .header-action.login").forEach((link) => {
+    setHeaderActionLabel(link, copy.actions.login);
+  });
+  document.querySelectorAll(".international-header .header-action.whatsapp").forEach((link) => {
+    setHeaderActionLabel(link, copy.actions.whatsapp);
+  });
+  document.querySelectorAll(".international-header .header-action.primary").forEach((link) => {
+    setHeaderActionLabel(link, copy.actions.primary);
+  });
+}
+
+function setHeaderActionLabel(link, labels) {
+  const span = link.querySelector("span");
+  const strong = link.querySelector("strong");
+  if (span) span.textContent = labels[0];
+  if (strong) strong.textContent = labels[1];
+}
+
+function initCurrencyConversion() {
+  refreshCurrencyRates();
+  applyCurrencyToPage();
+  if (!document.body || window.MutationObserver === undefined) return;
+
+  const observer = new MutationObserver(() => {
+    window.clearTimeout(currencyObserverTimer);
+    currencyObserverTimer = window.setTimeout(applyCurrencyToPage, 80);
+  });
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true
+  });
+}
+
+async function refreshCurrencyRates() {
+  if (!window.fetch || selectedCurrency === "INR") return;
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeout = controller ? window.setTimeout(() => controller.abort(), 3500) : null;
+  try {
+    const response = await fetch(currencyApiUrl, {
+      cache: "no-store",
+      signal: controller?.signal
+    });
+    if (!response.ok) throw new Error("Currency rate request failed");
+    const data = await response.json();
+    if (data?.result !== "success" || !data.rates) throw new Error("Currency rate response unavailable");
+    currencyRates = { ...fallbackCurrencyRates, ...data.rates, INR: 1 };
+    updateCurrencyNote("Live display rates");
+    applyCurrencyToPage();
+  } catch (error) {
+    console.warn("Currency display rates unavailable", error);
+    currencyRates = { ...fallbackCurrencyRates };
+    updateCurrencyNote("Indicative display rates");
+  } finally {
+    if (timeout) window.clearTimeout(timeout);
+  }
+}
+
+function updateCurrencyNote(prefix = "Display only") {
+  const currencyLabel = selectedCurrency === "INR"
+    ? "INR"
+    : `${selectedCurrency} approx`;
+  document.querySelectorAll("[data-currency-note]").forEach((note) => {
+    note.textContent = `${prefix}: ${currencyLabel}. Final quote before payment.`;
+  });
+}
+
+function applyCurrencyToPage() {
+  applyCurrencyToTextNodes(document.body);
+  applyCurrencyToAttributes();
+}
+
+function applyCurrencyToTextNodes(root) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if ((!node.nodeValue || !/(Rs\.?|INR|₹)\s*[0-9]/.test(node.nodeValue)) && !currencyTextSources.has(node)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      const parent = node.parentElement;
+      if (!parent || parent.closest("script, style, noscript, textarea, select, [data-global-tools], .notranslate")) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    const source = currencyTextSources.get(node) || node.nodeValue;
+    if (!currencyTextSources.has(node)) currencyTextSources.set(node, source);
+    const nextText = convertCurrencyText(source);
+    if (node.nodeValue !== nextText) node.nodeValue = nextText;
+  });
+}
+
+function applyCurrencyToAttributes() {
+  document.querySelectorAll("[placeholder]").forEach((element) => {
+    const placeholder = element.getAttribute("placeholder") || "";
+    const source = element.dataset.currencyPlaceholderSource || placeholder;
+    if (!/(Rs\.?|INR|₹)\s*[0-9]/.test(source)) return;
+    element.dataset.currencyPlaceholderSource = source;
+    const nextText = convertCurrencyText(source);
+    if (placeholder !== nextText) element.setAttribute("placeholder", nextText);
+  });
+}
+
+function convertCurrencyText(source) {
+  if (selectedCurrency === "INR") return source;
+  return source.replace(/(?:Rs\.?|INR|₹)\s*([0-9][0-9,]*(?:\.\d+)?)/g, (match, amountText) => {
+    const inrAmount = Number(amountText.replace(/,/g, ""));
+    if (!Number.isFinite(inrAmount)) return match;
+    return formatConvertedCurrency(inrAmount);
+  });
+}
+
+function formatConvertedCurrency(inrAmount) {
+  const currency = supportedCurrencies[selectedCurrency] ? selectedCurrency : "INR";
+  if (currency === "INR") {
+    return `Rs ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(inrAmount)}`;
+  }
+  const convertedAmount = inrAmount * (currencyRates[currency] || fallbackCurrencyRates[currency] || 1);
+  return new Intl.NumberFormat(supportedCurrencies[currency].locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0
+  }).format(convertedAmount);
+}
+
+function applyGoogleTranslateLanguage(languageCode) {
+  if (languageCode === "en") {
+    clearGoogleTranslateCookie();
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = "";
+      combo.dispatchEvent(new Event("change"));
+    }
+    return;
+  }
+
+  setGoogleTranslateCookie(languageCode);
+  loadGoogleTranslateElement(() => {
+    let attempts = 0;
+    const applyLanguage = () => {
+      const combo = document.querySelector(".goog-te-combo");
+      if (combo) {
+        combo.value = languageCode;
+        combo.dispatchEvent(new Event("change"));
+        return;
+      }
+      attempts += 1;
+      if (attempts < 12) window.setTimeout(applyLanguage, 250);
+    };
+    applyLanguage();
+  });
+}
+
+function loadGoogleTranslateElement(callback) {
+  let shell = document.querySelector("#google_translate_element");
+  if (!shell) {
+    shell = document.createElement("div");
+    shell.id = "google_translate_element";
+    shell.className = "google-translate-shell notranslate";
+    document.body.appendChild(shell);
+  }
+
+  const previousInit = window.googleTranslateElementInit;
+  window.googleTranslateElementInit = () => {
+    if (typeof previousInit === "function") previousInit();
+    if (window.google?.translate?.TranslateElement) {
+      new window.google.translate.TranslateElement({
+        pageLanguage: "en",
+        includedLanguages: Object.keys(supportedLanguages).filter((code) => code !== "en").join(","),
+        autoDisplay: false
+      }, "google_translate_element");
+    }
+    callback?.();
+  };
+
+  if (window.google?.translate?.TranslateElement) {
+    window.googleTranslateElementInit();
+    return;
+  }
+
+  if (!document.querySelector("script[data-google-translate]")) {
+    const script = document.createElement("script");
+    script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.async = true;
+    script.dataset.googleTranslate = "true";
+    document.head.appendChild(script);
+  } else {
+    window.setTimeout(callback, 500);
+  }
+}
+
+function setGoogleTranslateCookie(languageCode) {
+  const value = `/en/${languageCode}`;
+  document.cookie = `googtrans=${value}; path=/`;
+  if (location.hostname.includes(".")) {
+    document.cookie = `googtrans=${value}; path=/; domain=.${location.hostname.replace(/^www\./, "")}`;
+  }
+}
+
+function clearGoogleTranslateCookie() {
+  document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  if (location.hostname.includes(".")) {
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.${location.hostname.replace(/^www\./, "")}`;
+  }
 }
 
 function safeExternalUrl(value) {
@@ -2986,13 +3421,68 @@ function getAuthRedirectUrl() {
   return `${window.location.origin}${window.location.pathname}`;
 }
 
+function getAuthSubmitLabel() {
+  if (authContactMode === "phone") {
+    return authPhoneOtpSent ? "Verify mobile OTP" : "Send mobile OTP";
+  }
+  return authMode === "sign-up" ? "Create secure account" : "Sign in securely";
+}
+
+function normalizeAuthPhone(phone) {
+  const raw = String(phone || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("+")) return `+${raw.slice(1).replace(/\D/g, "")}`;
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 10) return `+91${digits}`;
+  return digits ? `+${digits}` : "";
+}
+
+function setAuthSubmitLabel() {
+  if (authSubmitButton) {
+    authSubmitButton.textContent = getAuthSubmitLabel();
+  }
+}
+
+function setAuthContactMode(mode) {
+  authContactMode = mode === "phone" ? "phone" : "email";
+  authPhoneOtpSent = false;
+  customerAuthForm?.setAttribute("data-auth-contact", authContactMode);
+
+  const emailInput = document.querySelector("#authEmail");
+  const passwordInput = document.querySelector("#authPassword");
+  const phoneInput = document.querySelector("#authPhone");
+  const otpInput = document.querySelector("#authOtp");
+  authEmailField?.classList.toggle("is-hidden", authContactMode !== "email");
+  authPasswordField?.classList.toggle("is-hidden", authContactMode !== "email");
+  authPhoneField?.classList.toggle("is-hidden", authContactMode !== "phone");
+  authOtpField?.classList.toggle("is-hidden", authContactMode !== "phone");
+  emailInput?.toggleAttribute("required", authContactMode === "email");
+  passwordInput?.toggleAttribute("required", authContactMode === "email");
+  phoneInput?.toggleAttribute("required", authContactMode === "phone");
+  otpInput?.removeAttribute("required");
+  if (otpInput) otpInput.value = "";
+  authGoogleButton?.classList.toggle("is-hidden", authContactMode !== "email");
+  authForgotButton?.classList.toggle("is-hidden", authContactMode !== "email");
+
+  document.querySelectorAll(".auth-contact-tabs [data-auth-contact]").forEach((button) => {
+    const isActive = button.dataset.authContact === authContactMode;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+
+  setAuthSubmitLabel();
+  setAuthStatus(authContactMode === "phone"
+    ? "Enter mobile number to receive OTP. Use country code, for example +91."
+    : authMode === "sign-up"
+      ? "Create an account with the same email used for your Booking ID."
+      : "Sign in to open private booking history for your email.");
+}
+
 function setAuthMode(mode) {
   authMode = mode === "sign-up" ? "sign-up" : "sign-in";
   customerAuthForm?.setAttribute("data-auth-mode", authMode);
   authNameField?.classList.toggle("is-hidden", authMode !== "sign-up");
-  if (authSubmitButton) {
-    authSubmitButton.textContent = authMode === "sign-up" ? "Create secure account" : "Sign in securely";
-  }
+  setAuthSubmitLabel();
   const passwordField = document.querySelector("#authPassword");
   if (passwordField) {
     passwordField.autocomplete = authMode === "sign-up" ? "new-password" : "current-password";
@@ -3002,9 +3492,11 @@ function setAuthMode(mode) {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
-  setAuthStatus(authMode === "sign-up"
-    ? "Create an account with the same email used for your Booking ID."
-    : "Sign in to open private booking history for your email.");
+  setAuthStatus(authContactMode === "phone"
+    ? "Enter mobile number to receive OTP. Use country code, for example +91."
+    : authMode === "sign-up"
+      ? "Create an account with the same email used for your Booking ID."
+      : "Sign in to open private booking history for your email.");
 }
 
 function setAccountPrivacyState(isPrivate) {
@@ -3022,7 +3514,7 @@ function renderAccountLockedState(title, detail, actionLabel = "Login to view") 
         <strong>${escapeHtml(title)}</strong>
       </article>
       <article><span>Status</span><strong>Locked</strong></article>
-      <article><span>Privacy</span><strong>Email login required</strong></article>
+      <article><span>Privacy</span><strong>Email or mobile required</strong></article>
       <article><span>Action</span><strong>${escapeHtml(actionLabel)}</strong></article>
     `;
   }
@@ -3126,11 +3618,24 @@ async function renderAccountBookings() {
 
   try {
     setAccountPrivacyState(false);
-    const { data, error } = await supabaseClient
+    let bookingQuery = supabaseClient
       .from("bookings")
-      .select("*")
-      .eq("email", user.email)
-      .order("created_at", { ascending: false });
+      .select("*");
+
+    if (user.email) {
+      bookingQuery = bookingQuery.eq("email", user.email);
+    } else if (user.phone) {
+      bookingQuery = bookingQuery.eq("phone", user.phone);
+    } else {
+      renderAccountLockedState(
+        "Account contact is not available.",
+        "Please track with Booking ID or contact WhatsApp support so staff can verify the booking.",
+        "Track by ID"
+      );
+      return;
+    }
+
+    const { data, error } = await bookingQuery.order("created_at", { ascending: false });
     if (error) throw error;
 
     const bookings = (data || []).map(fromCloudBooking);
@@ -3232,9 +3737,10 @@ async function refreshAuthState() {
 
   const user = await getCurrentUser();
   if (user) {
+    const userContact = user.email || user.phone || "this account";
     setAuthStatus(accountPortalUnlocked
-      ? `Private bookings opened for ${user.email}.`
-      : `Signed in as ${user.email}. Press Open my bookings to view private records.`);
+      ? `Private bookings opened for ${userContact}.`
+      : `Signed in as ${userContact}. Press Open my bookings to view private records.`);
     authLogoutButton?.classList.remove("is-hidden");
     authOpenAccountButton?.classList.toggle("is-hidden", accountPortalUnlocked);
   } else {
@@ -3250,6 +3756,11 @@ async function refreshAuthState() {
 async function handleCustomerAuth(action) {
   if (!isCloudEnabled()) {
     setAuthStatus("Use Booking ID tracking on this device, or send the Booking ID on WhatsApp for staff confirmation.");
+    return;
+  }
+
+  if (authContactMode === "phone") {
+    await handleCustomerPhoneAuth();
     return;
   }
 
@@ -3286,6 +3797,61 @@ async function handleCustomerAuth(action) {
   }
 }
 
+async function handleCustomerPhoneAuth() {
+  const phone = normalizeAuthPhone(document.querySelector("#authPhone")?.value);
+  const otp = document.querySelector("#authOtp")?.value.trim();
+  const fullName = document.querySelector("#authName")?.value.trim();
+
+  if (!phone) {
+    setAuthStatus("Enter mobile number with country code, for example +91.");
+    return;
+  }
+
+  if (!authPhoneOtpSent || !otp) {
+    setAuthStatus("Sending mobile OTP...");
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      phone,
+      options: {
+        shouldCreateUser: true,
+        data: { full_name: fullName || phone }
+      }
+    });
+
+    if (error) {
+      setAuthStatus(error.message || "Mobile OTP could not be sent.");
+      return;
+    }
+
+    authPhoneOtpSent = true;
+    document.querySelector("#authOtp")?.setAttribute("required", "required");
+    setAuthSubmitLabel();
+    setAuthStatus("OTP sent. Enter the mobile OTP to open your private bookings.");
+    document.querySelector("#authOtp")?.focus();
+    return;
+  }
+
+  setAuthStatus("Verifying mobile OTP...");
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    phone,
+    token: otp,
+    type: "sms"
+  });
+
+  if (error) {
+    setAuthStatus(error.message || "Mobile OTP was not accepted.");
+    return;
+  }
+
+  accountPortalUnlocked = Boolean(data?.session);
+  authPhoneOtpSent = false;
+  setAuthSubmitLabel();
+  setAuthStatus("Mobile login successful.");
+  await refreshAuthState();
+  if (accountPortalUnlocked) {
+    accountSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 customerAuthForm?.addEventListener("submit", (event) => {
   event.preventDefault();
   handleCustomerAuth(authMode);
@@ -3295,6 +3861,13 @@ document.querySelectorAll(".auth-mode-tabs [data-auth-mode]").forEach((button) =
   button.addEventListener("click", (event) => {
     event.preventDefault();
     setAuthMode(button.dataset.authMode);
+  });
+});
+
+document.querySelectorAll(".auth-contact-tabs [data-auth-contact]").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    setAuthContactMode(button.dataset.authContact);
   });
 });
 
@@ -3342,6 +3915,8 @@ authLogoutButton?.addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
   }
   accountPortalUnlocked = false;
+  authPhoneOtpSent = false;
+  setAuthSubmitLabel();
   setAuthStatus("Signed out.");
   await refreshAuthState();
 });
@@ -3371,6 +3946,7 @@ if (customerAuthForm) {
     history.scrollRestoration = "manual";
   }
   setAuthMode("sign-in");
+  setAuthContactMode("email");
   window.addEventListener("load", () => {
     document.querySelector("#client-login")?.scrollIntoView({ behavior: "auto", block: "start" });
   }, { once: true });
