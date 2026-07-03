@@ -1,5 +1,5 @@
 const siteConfig = window.BANDEVI_CONFIG || {};
-const businessWhatsApp = siteConfig.whatsappNumber || "919876543210";
+const businessWhatsApp = siteConfig.whatsappNumber || "918676846484";
 const supabaseClient = createSupabaseClient();
 
 const serviceSelect = document.querySelector("#clientService");
@@ -610,7 +610,7 @@ async function updateBookingOnline(booking) {
 
 function bookingWhatsAppUrl(booking) {
   const message = [
-    "Namaste Pdt. Jyotishya Acharya Kumodanand Jha team,",
+    "Namaste Pdt. Jyotishacharya Kumodanand Jha (Shastri) team,",
     "",
     "I created a booking request on bandeviastro.com.",
     `Booking ID: ${booking.id}`,
@@ -1129,7 +1129,7 @@ form?.addEventListener("submit", (event) => {
   };
 
   const message = [
-    "Namaste Pdt. Jyotishya Acharya Kumodanand Jha team,",
+    "Namaste Pdt. Jyotishacharya Kumodanand Jha (Shastri) team,",
     "",
     `Name: ${details.name}`,
     `Phone: ${details.phone}`,

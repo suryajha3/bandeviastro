@@ -1,9 +1,18 @@
 const fs = require("fs");
 
+const defaultSupabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aWt5cG94YWtoZmV0aGt4dnByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5ODgxMDUsImV4cCI6MjA5ODU2NDEwNX0.LZYhxzngP40h0ocBIH31WUyQ9Az9p9BYu3VQmqniET0";
+const configuredSupabaseAnonKey = process.env.SUPABASE_ANON_KEY || defaultSupabaseAnonKey;
+const defaultWhatsappNumber = "918676846484";
+const configuredWhatsappNumber = process.env.WHATSAPP_NUMBER || defaultWhatsappNumber;
+
 const config = {
   supabaseUrl: process.env.SUPABASE_URL || "https://ftikypoxakhfethkxvpr.supabase.co",
-  supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "sb_publishable__gxlRcBibn5IgjeM4376WQ_jSupyQ6b",
-  whatsappNumber: process.env.WHATSAPP_NUMBER || "919876543210"
+  supabaseAnonKey: configuredSupabaseAnonKey.startsWith("sb_publishable__")
+    ? defaultSupabaseAnonKey
+    : configuredSupabaseAnonKey,
+  whatsappNumber: configuredWhatsappNumber === "919876543210"
+    ? defaultWhatsappNumber
+    : configuredWhatsappNumber
 };
 
 fs.writeFileSync(

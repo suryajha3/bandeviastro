@@ -12,4 +12,4 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
       - key: WHATSAPP_NUMBER
-        value: "919876543210"
+        value: "918676846484"
