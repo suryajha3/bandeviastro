@@ -2962,6 +2962,11 @@ function renderAccountBookingCard(booking) {
           <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>
           <span><strong>Proof plan</strong>${escapeHtml(serviceProfile.proof)}</span>
         </div>
+        <div class="account-action-rail" aria-label="Client next action summary">
+          <div><span>Current desk</span><strong>${escapeHtml(serviceProfile.title)}</strong></div>
+          <div><span>Client action</span><strong>${escapeHtml(priority.label)}</strong></div>
+          <div><span>Support</span><strong>WhatsApp with Booking ID</strong></div>
+        </div>
         <div class="account-next-card is-${escapeHtml(priority.tone)}">
           <strong>${escapeHtml(priority.label)}</strong>
           <p>${escapeHtml(getStatusGuidance(booking))}</p>
