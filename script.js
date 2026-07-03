@@ -32,6 +32,9 @@ const backofficeCustomerList = document.querySelector("#backofficeCustomerList")
 const backofficeKundaliQueue = document.querySelector("#backofficeKundaliQueue");
 const backofficeGemstoneQueue = document.querySelector("#backofficeGemstoneQueue");
 const backofficeReportList = document.querySelector("#backofficeReportList");
+const backofficeLogin = document.querySelector("#backofficeLogin");
+const backofficePreview = document.querySelector("#backofficePreview");
+const backofficeWorkflowPreview = document.querySelector("#backofficeWorkflowPreview");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
 const accountSummary = document.querySelector("#accountSummary");
@@ -1286,6 +1289,79 @@ function renderBackofficeQueue(container, bookings, emptyTitle, emptyText) {
   }).join("");
 }
 
+function getBackofficeServiceChecklist(booking) {
+  if (isKundaliBooking(booking)) {
+    return [
+      ["Birth date", "Confirm date of birth"],
+      ["Birth time", "Exact time or approximate"],
+      ["Birth place", "City, state and country"],
+      ["Gotra", "Family gotra if available"],
+      ["Problem type", "Marriage, career, health, dosh or dasha"]
+    ];
+  }
+
+  if (isGemstoneBooking(booking)) {
+    return [
+      ["Stone", "Ruby, emerald, sapphire or required ratna"],
+      ["Form", "Ring, pendant or loose stone"],
+      ["Metal", "Gold, silver or panchdhatu preference"],
+      ["Size", "Ring size or pendant size"],
+      ["Certificate", "Lab/certification and final quote"]
+    ];
+  }
+
+  return [
+    ["Sankalp", "Name, gotra and purpose"],
+    ["Ritual type", "Pooja, hawan, jaap or path"],
+    ["Mode", "Temple proof, live video or consultation"],
+    ["Samagri", "Items needed or provided by temple"],
+    ["Schedule", "Preferred date, muhurat and time zone"]
+  ];
+}
+
+function renderBackofficeChecklist(booking) {
+  return `
+    <div class="backoffice-checklist" aria-label="Service work checklist">
+      ${getBackofficeServiceChecklist(booking).map(([label, value]) => `
+        <div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderBackofficeWorkflowButtons(booking) {
+  return `
+    <div class="admin-workflow-strip backoffice-workflow-strip" aria-label="Backoffice quick workflow">
+      <span>Direct workflow</span>
+      ${adminWorkflowActions.map((action) => `
+        <button type="button" data-backoffice-workflow="${escapeHtml(action.key)}" data-booking-id="${escapeHtml(booking.id)}">
+          ${escapeHtml(action.label)}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderBackofficeTemplateLinks(booking) {
+  const templates = [
+    ["quote", "Quote"],
+    ["payment", "Payment"],
+    ["received", "Receipt"],
+    ["scheduled", "Schedule"],
+    ["proof", "Proof"],
+    ["completed", "Complete"]
+  ];
+
+  return `
+    <div class="admin-template-row backoffice-template-row" aria-label="Backoffice WhatsApp templates">
+      <span>WhatsApp templates</span>
+      ${templates.map(([key, label]) => `
+        <a href="${escapeHtml(staffWhatsAppUrl(booking, key))}" target="_blank" rel="noopener">${escapeHtml(label)}</a>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderBackofficeReports(bookings) {
   if (!backofficeReportList) return;
   const now = new Date();
@@ -1334,9 +1410,12 @@ function renderBackofficeOperations(bookings) {
 
   backofficeOperations.innerHTML = bookings.slice(0, 18).map((booking) => {
     const priority = getBookingPriority(booking);
+    const serviceProfile = getServiceProfile(booking.service);
+    const statusOptions = bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
+    const paymentOptions = paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
 
     return `
-      <article>
+      <article data-backoffice-id="${escapeHtml(booking.id)}">
         <div class="backoffice-card-head">
           <div>
             <h3>${escapeHtml(booking.name)}</h3>
@@ -1349,18 +1428,31 @@ function renderBackofficeOperations(bookings) {
           <p>${escapeHtml(priority.detail)}</p>
         </div>
         ${renderCompactStatusRail(booking, "admin-status-rail")}
+        ${renderBackofficeWorkflowButtons(booking)}
         <div class="backoffice-mini-grid">
           <div><span>Phone</span><strong>${escapeHtml(booking.phone)}</strong></div>
+          <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
+          <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
         </div>
+        ${renderBackofficeChecklist(booking)}
+        <div class="backoffice-edit-grid">
+          <label>Status<select data-backoffice-field="status">${statusOptions}</select></label>
+          <label>Payment<select data-backoffice-field="paymentStatus">${paymentOptions}</select></label>
+          <label>Quote amount<input data-backoffice-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="${escapeHtml(serviceProfile.quote)}" /></label>
+          <label>Proof link<input data-backoffice-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
+        </div>
+        <label class="backoffice-note-field">Staff work note<textarea data-backoffice-field="staffNote" rows="4" placeholder="Record Kundali birth details, sankalp, samagri, gemstone quote or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
         <p>${escapeHtml(booking.concern || "No concern added yet.")}</p>
+        ${renderBackofficeTemplateLinks(booking)}
         <div class="backoffice-action-row">
-          <a href="admin-bookings.html">Open staff desk</a>
+          <button type="button" data-backoffice-save="${escapeHtml(booking.id)}">Save update</button>
           <a href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
           <a href="${escapeHtml(staffWhatsAppUrl(booking, "quote"))}" target="_blank" rel="noopener">Quote WA</a>
           <a href="${escapeHtml(staffWhatsAppUrl(booking, "payment"))}" target="_blank" rel="noopener">Payment WA</a>
+          <a href="admin-bookings.html">Staff desk</a>
         </div>
       </article>
     `;
@@ -1789,6 +1881,9 @@ async function openAdminPanel(message = "Staff dashboard opened.") {
 async function openBackofficePanel(message = "Backoffice opened.") {
   sessionStorage.setItem(backofficeAccessKey, "true");
   backofficePanel?.classList.add("is-visible");
+  backofficeLogin?.classList.add("is-hidden");
+  backofficePreview?.classList.add("is-hidden");
+  backofficeWorkflowPreview?.classList.add("is-hidden");
   setBackofficeStatus(message);
   await renderBackofficeBookings();
 }
@@ -1887,6 +1982,53 @@ if (backofficePanel) {
     openBackofficePanel("Backoffice opened in local mode.");
   }
 }
+
+backofficeOperations?.addEventListener("click", async (event) => {
+  const workflowButton = event.target.closest("[data-backoffice-workflow]");
+  if (workflowButton) {
+    const bookingId = workflowButton.dataset.bookingId;
+    const booking = backofficeBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !applyAdminWorkflow(booking, workflowButton.dataset.backofficeWorkflow)) return;
+
+    workflowButton.textContent = "Saving...";
+    workflowButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setBackofficeStatus(result.savedCloud ? "Backoffice workflow saved to secure booking desk." : "Backoffice workflow saved locally.");
+      await renderBackofficeBookings();
+    } catch (error) {
+      console.warn("Backoffice workflow update failed", error);
+      setBackofficeStatus("Backoffice workflow update failed. Please try again.");
+      workflowButton.disabled = false;
+    }
+    return;
+  }
+
+  const saveButton = event.target.closest("[data-backoffice-save]");
+  if (!saveButton) return;
+
+  const bookingId = saveButton.dataset.backofficeSave;
+  const card = saveButton.closest("[data-backoffice-id]");
+  const booking = backofficeBookingsCache.find((item) => item.id === bookingId);
+  if (!booking || !card) return;
+
+  card.querySelectorAll("[data-backoffice-field]").forEach((field) => {
+    booking[field.dataset.backofficeField] = field.value;
+  });
+
+  saveButton.textContent = "Saving...";
+  saveButton.disabled = true;
+  try {
+    const result = await updateBookingOnline(booking);
+    setBackofficeStatus(result.savedCloud ? "Backoffice update saved to secure cloud." : "Backoffice update saved locally.");
+    await renderBackofficeBookings();
+  } catch (error) {
+    console.warn("Backoffice update failed", error);
+    setBackofficeStatus(error.message || "Backoffice update could not be saved.");
+    saveButton.textContent = "Save update";
+    saveButton.disabled = false;
+  }
+});
 
 adminBookingList?.addEventListener("click", async (event) => {
   const workflowButton = event.target.closest("[data-admin-workflow]");
