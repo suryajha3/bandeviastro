@@ -1797,6 +1797,208 @@ details p {
   font-weight: 900;
 }
 
+.client-portal-upgrade-section {
+  background:
+    linear-gradient(135deg, rgba(91, 18, 32, 0.07), rgba(15, 118, 110, 0.1)),
+    #fffdf9;
+}
+
+.client-portal-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr);
+  gap: clamp(24px, 5vw, 58px);
+  align-items: center;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.client-portal-copy p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 1.03rem;
+  line-height: 1.75;
+}
+
+.client-portal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.client-portal-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.client-portal-metrics div {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.client-portal-metrics strong,
+.client-portal-metrics span {
+  display: block;
+}
+
+.client-portal-metrics strong {
+  color: var(--maroon);
+  font-size: 1.1rem;
+}
+
+.client-portal-metrics span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.client-portal-board {
+  display: grid;
+  gap: 16px;
+  border: 1px solid rgba(91, 18, 32, 0.14);
+  border-radius: 8px;
+  padding: clamp(18px, 4vw, 28px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 238, 0.94)),
+    #ffffff;
+  box-shadow: 0 24px 58px rgba(91, 18, 32, 0.12);
+}
+
+.client-portal-board-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+
+.client-portal-board-head span,
+.client-service-lanes span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.client-portal-board-head strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  line-height: 1.1;
+}
+
+.client-portal-board-head em {
+  border-radius: 999px;
+  padding: 8px 11px;
+  color: #ffffff;
+  background: var(--teal);
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.client-portal-progress {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.client-portal-progress span {
+  min-height: 44px;
+  border: 1px solid rgba(91, 18, 32, 0.1);
+  border-radius: 8px;
+  padding: 10px 8px;
+  color: var(--muted);
+  background: #fffdf9;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.client-portal-progress span.is-complete,
+.client-portal-progress span.is-current {
+  border-color: rgba(15, 118, 110, 0.3);
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.client-portal-note {
+  border-left: 4px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  padding: 13px 15px;
+  background: rgba(15, 118, 110, 0.07);
+}
+
+.client-portal-note strong {
+  display: block;
+  color: var(--maroon);
+}
+
+.client-portal-note p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.client-service-lanes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.client-service-lanes a {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 13px;
+  background: #fffdf9;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.client-service-lanes a:hover {
+  border-color: rgba(15, 118, 110, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(91, 18, 32, 0.1);
+}
+
+.client-service-lanes strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  line-height: 1.28;
+}
+
+@media (max-width: 980px) {
+  .client-portal-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .client-portal-board {
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 680px) {
+  .client-portal-metrics,
+  .client-portal-progress,
+  .client-service-lanes {
+    grid-template-columns: 1fr;
+  }
+
+  .client-portal-actions {
+    display: grid;
+  }
+
+  .client-portal-board-head {
+    display: grid;
+  }
+}
+
 .policy-main {
   background: linear-gradient(180deg, #ffffff, var(--cream));
 }
@@ -1962,6 +2164,57 @@ details p {
   line-height: 1.45;
 }
 
+.portal-command-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: min(1120px, 100%);
+  margin: 22px auto 0;
+  padding: 0 18px;
+}
+
+.portal-command-strip article {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 238, 0.92)),
+    #ffffff;
+  box-shadow: 0 14px 36px rgba(91, 18, 32, 0.07);
+}
+
+.portal-command-strip span {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.08);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.portal-command-strip strong {
+  display: block;
+  color: var(--maroon);
+  line-height: 1.25;
+}
+
+.portal-command-strip p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.track-command-strip {
+  margin-top: -24px;
+  position: relative;
+  z-index: 2;
+}
+
 .portal-shell {
   display: grid;
   grid-template-columns: minmax(300px, 0.9fr) minmax(320px, 1.1fr);
@@ -2013,6 +2266,32 @@ details p {
   padding: 10px 12px;
   border-radius: 0 8px 8px 0;
   background: #fffdf9;
+}
+
+.client-handoff-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fffdf9;
+}
+
+.client-handoff-card strong {
+  flex: 1 1 100%;
+  color: var(--maroon);
+}
+
+.client-handoff-card span {
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.07);
+  font-size: 0.8rem;
+  font-weight: 850;
 }
 
 .service-preview {
@@ -2131,6 +2410,89 @@ details p {
   margin: 14px 0;
 }
 
+.ticket-next-steps {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.ticket-step-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ticket-step-grid div {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.ticket-step-grid span {
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.ticket-step-grid strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--maroon);
+}
+
+.ticket-step-grid p {
+  margin: 5px 0 0;
+  font-size: 0.86rem;
+}
+
+.portal-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.portal-progress-head,
+.status-progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.portal-progress-head span,
+.status-progress-head span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.portal-progress-head strong,
+.status-progress-head strong {
+  color: var(--maroon);
+}
+
+.portal-progress-track {
+  display: block;
+  overflow: hidden;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(91, 18, 32, 0.1);
+}
+
+.portal-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+}
+
 .ticket-actions,
 .admin-actions {
   display: flex;
@@ -2171,6 +2533,10 @@ details p {
 .status-next-card span {
   color: var(--teal);
   font-weight: 900;
+}
+
+.status-next-card .portal-progress {
+  margin: 14px 0;
 }
 
 .status-timeline {
@@ -2241,6 +2607,65 @@ details p {
   color: var(--teal);
 }
 
+.compact-status-rail,
+.admin-status-rail {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-status-rail li,
+.admin-status-rail li {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(91, 18, 32, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fffdf9;
+}
+
+.compact-status-rail span,
+.admin-status-rail span {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(91, 18, 32, 0.08);
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.compact-status-rail strong,
+.admin-status-rail strong {
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
+.compact-status-rail li.is-complete span,
+.compact-status-rail li.is-current span,
+.admin-status-rail li.is-complete span,
+.admin-status-rail li.is-current span {
+  color: #ffffff;
+  background: var(--teal);
+}
+
+.compact-status-rail li.is-current,
+.admin-status-rail li.is-current {
+  border-color: rgba(15, 118, 110, 0.32);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.compact-status-rail li.is-current strong,
+.admin-status-rail li.is-current strong {
+  color: var(--maroon);
+}
+
 .auth-layout {
   grid-template-columns: minmax(320px, 1fr) minmax(300px, 0.85fr);
 }
@@ -2262,6 +2687,43 @@ details p {
 .account-section {
   padding-top: 18px;
   background: #ffffff;
+}
+
+.account-summary-grid {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, minmax(120px, 0.7fr));
+  gap: 12px;
+  width: min(1040px, calc(100% - 36px));
+  margin: 0 auto 18px;
+}
+
+.account-summary-grid article {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 15px;
+  background: #fffdf9;
+  box-shadow: 0 10px 28px rgba(91, 18, 32, 0.06);
+}
+
+.account-summary-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-summary-grid strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--maroon);
+  line-height: 1.3;
+}
+
+.account-summary-lead {
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(245, 184, 75, 0.12)),
+    #ffffff;
 }
 
 .mini-booking-list {
@@ -2300,6 +2762,10 @@ details p {
   color: var(--muted);
 }
 
+.mini-booking-list .portal-progress {
+  margin-top: 12px;
+}
+
 .mini-booking-meta {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 12px;
@@ -2309,6 +2775,33 @@ details p {
   color: var(--muted);
   font-size: 0.84rem;
   line-height: 1.45;
+}
+
+.mini-proof-row {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  border-left: 4px solid var(--teal);
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  background: #ffffff;
+}
+
+.mini-proof-row span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mini-proof-row strong,
+.mini-proof-row a {
+  color: var(--teal);
+}
+
+.mini-proof-row p {
+  margin-top: 4px;
+  white-space: pre-wrap;
 }
 
 .is-hidden {
@@ -2337,8 +2830,24 @@ details p {
   margin: 18px 0;
 }
 
+.admin-source-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.07);
+  font-weight: 900;
+}
+
+.admin-source-strip span {
+  color: var(--maroon);
+}
+
 .admin-stat-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .admin-stat-grid strong {
@@ -2348,7 +2857,7 @@ details p {
 
 .admin-filter-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.55fr) auto;
+  grid-template-columns: minmax(220px, 1fr) minmax(160px, 0.5fr) minmax(160px, 0.5fr) auto;
   gap: 12px;
   align-items: end;
 }
@@ -2369,6 +2878,40 @@ details p {
   margin-bottom: 4px;
 }
 
+.admin-priority-card {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-left-width: 4px;
+  border-left-color: var(--teal);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #fffdf9;
+}
+
+.admin-priority-card strong {
+  display: block;
+  color: var(--maroon);
+}
+
+.admin-priority-card p {
+  margin: 5px 0 0;
+}
+
+.admin-priority-card.is-urgent {
+  border-left-color: #b91c1c;
+  background: #fff7f7;
+}
+
+.admin-priority-card.is-payment,
+.admin-priority-card.is-quote {
+  border-left-color: var(--gold);
+  background: #fffaf0;
+}
+
+.admin-priority-card.is-complete {
+  border-left-color: var(--teal);
+  background: rgba(15, 118, 110, 0.06);
+}
+
 .status-pill {
   display: inline-flex;
   border-radius: 999px;
@@ -2387,6 +2930,34 @@ details p {
 
 .admin-client-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-service-hints {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-service-hints div {
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(15, 118, 110, 0.06);
+}
+
+.admin-service-hints span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-service-hints strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  line-height: 1.4;
 }
 
 .admin-note-box {
@@ -2659,7 +3230,9 @@ details p {
     .remedy-grid,
     .confidence-grid,
     .about-panel,
-    .policy-layout {
+    .policy-layout,
+    .portal-command-strip,
+    .account-summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -2696,7 +3269,9 @@ details p {
   .status-lookup,
   .admin-edit-grid,
   .service-preview,
-  .admin-filter-row {
+  .admin-filter-row,
+  .ticket-step-grid,
+  .admin-service-hints {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -2705,6 +3280,11 @@ details p {
   .service-preview-meta,
   .mini-booking-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compact-status-rail,
+  .admin-status-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .admin-toolbar {
@@ -2841,6 +3421,7 @@ details p {
   }
 
   .trust-strip,
+  .portal-command-strip,
   .service-grid,
   .package-grid,
   .proof-section,
@@ -2870,10 +3451,15 @@ details p {
   .service-preview,
   .service-preview-meta,
   .ticket-detail-grid,
+  .ticket-step-grid,
+  .compact-status-rail,
+  .admin-status-rail,
   .admin-stat-grid,
   .admin-filter-row,
+  .admin-service-hints,
   .admin-client-grid,
-  .mini-booking-meta {
+  .mini-booking-meta,
+  .account-summary-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3010,6 +3596,15 @@ details p {
 
   .portal-status-band {
     margin-top: -16px;
+  }
+
+  .portal-command-strip {
+    margin-top: 16px;
+    padding: 0 14px;
+  }
+
+  .track-command-strip {
+    margin-top: -12px;
   }
 
   .portal-status-band div {
@@ -4809,7 +5404,7 @@ details p {
 
 .international-header .header-action {
   display: grid;
-  min-width: 82px;
+  min-width: 88px;
   min-height: 50px;
   align-content: center;
   gap: 2px;
@@ -4842,6 +5437,12 @@ details p {
   border-color: rgba(15, 118, 110, 0.34);
   color: #ffffff;
   background: var(--teal);
+}
+
+.international-header .header-action.primary.is-active {
+  border-color: rgba(245, 184, 75, 0.52);
+  color: #311009;
+  background: linear-gradient(135deg, #ffd27a, var(--gold));
 }
 
 .international-service-rail {

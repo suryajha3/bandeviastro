@@ -17,9 +17,12 @@ const adminBookingList = document.querySelector("#adminBookingList");
 const adminStats = document.querySelector("#adminStats");
 const adminSearchInput = document.querySelector("#adminSearch");
 const adminStatusFilter = document.querySelector("#adminStatusFilter");
+const adminPaymentFilter = document.querySelector("#adminPaymentFilter");
 const adminRefreshButton = document.querySelector("#adminRefresh");
+const adminSourceStrip = document.querySelector("#adminSourceStrip");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
+const accountSummary = document.querySelector("#accountSummary");
 const menuToggle = document.querySelector("#menuToggle");
 const primaryNav = document.querySelector("#primaryNav");
 const portalServiceField = document.querySelector("#portalService");
@@ -355,6 +358,111 @@ function statusIndex(status) {
   return Math.max(0, bookingStatuses.indexOf(status));
 }
 
+function getBookingProgressPercent(booking) {
+  const currentIndex = statusIndex(booking?.status);
+  return Math.round(((currentIndex + 1) / bookingStatuses.length) * 100);
+}
+
+function getDaysUntilBooking(booking) {
+  if (!booking?.date) return null;
+  const targetDate = new Date(`${booking.date}T00:00:00`);
+  if (Number.isNaN(targetDate.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.ceil((targetDate - today) / 86400000);
+}
+
+function getBookingPriority(booking) {
+  const daysUntilBooking = getDaysUntilBooking(booking);
+
+  if (booking?.status === "Completed") {
+    return {
+      label: "Completed",
+      detail: "Proof, notes and booking history can stay available for the client.",
+      tone: "complete"
+    };
+  }
+
+  if (booking?.paymentStatus === "Refund Requested") {
+    return {
+      label: "Refund attention",
+      detail: "Review the refund request and update the customer note clearly.",
+      tone: "urgent"
+    };
+  }
+
+  if (daysUntilBooking !== null && daysUntilBooking < 0) {
+    return {
+      label: "Date passed",
+      detail: "Check whether this service is completed, rescheduled or still pending.",
+      tone: "urgent"
+    };
+  }
+
+  if (daysUntilBooking !== null && daysUntilBooking <= 1 && booking?.status !== "Pooja Scheduled") {
+    return {
+      label: "Due soon",
+      detail: "Preferred date is close. Confirm quote, payment and schedule quickly.",
+      tone: "urgent"
+    };
+  }
+
+  if (booking?.status === "Enquiry Received") {
+    return {
+      label: "New enquiry",
+      detail: "Review details, confirm quote and move the client to Quote Sent.",
+      tone: "new"
+    };
+  }
+
+  if (booking?.paymentStatus === "Payment Pending") {
+    return {
+      label: "Payment follow-up",
+      detail: "Client has reached the payment stage; confirm method and receipt.",
+      tone: "payment"
+    };
+  }
+
+  if (booking?.status === "Quote Sent") {
+    return {
+      label: "Quote follow-up",
+      detail: "Confirm client approval on WhatsApp before moving to payment.",
+      tone: "quote"
+    };
+  }
+
+  return {
+    label: "On track",
+    detail: "Keep the status, proof link and customer note updated.",
+    tone: "normal"
+  };
+}
+
+function renderProgressBar(booking, label = "Booking progress") {
+  const progress = getBookingProgressPercent(booking);
+  return `
+    <div class="portal-progress" role="progressbar" aria-label="${escapeHtml(label)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}">
+      <div class="portal-progress-head">
+        <span>${escapeHtml(label)}</span>
+        <strong>${progress}%</strong>
+      </div>
+      <span class="portal-progress-track"><span style="width: ${progress}%"></span></span>
+    </div>
+  `;
+}
+
+function renderCompactStatusRail(booking, className = "compact-status-rail") {
+  const currentIndex = statusIndex(booking?.status);
+  return `
+    <ol class="${escapeHtml(className)}" aria-label="Booking status progress">
+      ${bookingStatuses.map((status, index) => {
+        const stateClass = index < currentIndex ? "is-complete" : index === currentIndex ? "is-current" : "";
+        return `<li class="${stateClass}"><span>${index + 1}</span><strong>${escapeHtml(status)}</strong></li>`;
+      }).join("")}
+    </ol>
+  `;
+}
+
 async function getCurrentUser() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getUser();
@@ -545,6 +653,7 @@ function renderTicket(booking, syncResult = {}) {
   const ticketTrackLink = document.querySelector("#ticketTrackLink");
   const ticketWhatsApp = document.querySelector("#ticketWhatsApp");
   const ticketSyncNote = document.querySelector("#ticketSyncNote");
+  const ticketNextSteps = document.querySelector("#ticketNextSteps");
   if (!ticket || !ticketId || !ticketSummary || !ticketTrackLink || !ticketWhatsApp) return;
 
   ticket.classList.add("is-visible");
@@ -563,6 +672,7 @@ function renderTicket(booking, syncResult = {}) {
       ["Quote", booking.amount || "Quote pending"],
       ["Date / time", formatBookingDate(booking)],
       ["Mode", booking.mode],
+      ["Payment", booking.paymentStatus],
       ["Next action", getStatusGuidance(booking)]
     ];
     ticketDetails.innerHTML = detailItems.map(([label, value]) => `
@@ -571,6 +681,17 @@ function renderTicket(booking, syncResult = {}) {
         <strong>${escapeHtml(value)}</strong>
       </div>
     `).join("");
+  }
+
+  if (ticketNextSteps) {
+    ticketNextSteps.innerHTML = `
+      ${renderProgressBar(booking, "Booking flow")}
+      <div class="ticket-step-grid" aria-label="Next booking steps">
+        <div><span>1</span><strong>Send ID on WhatsApp</strong><p>Share ${escapeHtml(booking.id)} so staff can confirm quickly.</p></div>
+        <div><span>2</span><strong>Wait for quote</strong><p>Amount, payment method and schedule are confirmed before payment.</p></div>
+        <div><span>3</span><strong>Track status</strong><p>Use this ID anytime for quote, payment, schedule and proof updates.</p></div>
+      </div>
+    `;
   }
 
   if (ticketSyncNote) {
@@ -607,12 +728,17 @@ function renderStatusPanel(booking) {
 
   const currentIndex = statusIndex(booking.status);
   const serviceProfile = getServiceProfile(booking.service);
+  const priority = getBookingPriority(booking);
   statusPanel.classList.add("is-visible");
   statusMessage.textContent = `Booking ${booking.id} is currently: ${booking.status}.`;
   if (statusNextAction) {
     statusNextAction.innerHTML = `
-      <strong>Next action</strong>
+      <div class="status-progress-head">
+        <strong>Next action</strong>
+        <span>${escapeHtml(priority.label)}</span>
+      </div>
       <p>${escapeHtml(getStatusGuidance(booking))}</p>
+      ${renderProgressBar(booking, "Overall status")}
       <span>${escapeHtml(serviceProfile.proof)}</span>
     `;
   }
@@ -632,6 +758,7 @@ function renderStatusPanel(booking) {
     ["Amount", booking.amount || "Quote pending"],
     ["Date / time", formatBookingDate(booking)],
     ["Mode", booking.mode],
+    ["Staff priority", `${priority.label}: ${priority.detail}`],
     ["Updated", new Date(booking.updatedAt).toLocaleString()]
   ];
 
@@ -651,17 +778,27 @@ function renderStatusPanel(booking) {
 }
 
 function initAdminStatusFilter() {
-  if (!adminStatusFilter || adminStatusFilter.dataset.ready === "true") return;
-  adminStatusFilter.innerHTML = [
-    `<option value="">All statuses</option>`,
-    ...bookingStatuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`)
-  ].join("");
-  adminStatusFilter.dataset.ready = "true";
+  if (adminStatusFilter && adminStatusFilter.dataset.ready !== "true") {
+    adminStatusFilter.innerHTML = [
+      `<option value="">All statuses</option>`,
+      ...bookingStatuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`)
+    ].join("");
+    adminStatusFilter.dataset.ready = "true";
+  }
+
+  if (adminPaymentFilter && adminPaymentFilter.dataset.ready !== "true") {
+    adminPaymentFilter.innerHTML = [
+      `<option value="">All payment</option>`,
+      ...paymentStatuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`)
+    ].join("");
+    adminPaymentFilter.dataset.ready = "true";
+  }
 }
 
 function getFilteredAdminBookings() {
   const query = normalizeContact(adminSearchInput?.value || "");
   const status = adminStatusFilter?.value || "";
+  const paymentStatus = adminPaymentFilter?.value || "";
 
   return adminBookingsCache.filter((booking) => {
     const searchable = normalizeContact([
@@ -676,19 +813,24 @@ function getFilteredAdminBookings() {
     ].join(" "));
     const matchesQuery = !query || searchable.includes(query);
     const matchesStatus = !status || booking.status === status;
-    return matchesQuery && matchesStatus;
+    const matchesPayment = !paymentStatus || booking.paymentStatus === paymentStatus;
+    return matchesQuery && matchesStatus && matchesPayment;
   });
 }
 
 function renderAdminStats(visibleBookings) {
   if (!adminStats) return;
   const total = adminBookingsCache.length;
+  const newEnquiries = adminBookingsCache.filter((booking) => booking.status === "Enquiry Received").length;
   const pendingPayment = adminBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const quotesSent = adminBookingsCache.filter((booking) => booking.status === "Quote Sent").length;
   const scheduled = adminBookingsCache.filter((booking) => booking.status === "Pooja Scheduled").length;
   const completed = adminBookingsCache.filter((booking) => booking.status === "Completed").length;
   const stats = [
     ["Total", total],
     ["Visible", visibleBookings.length],
+    ["New", newEnquiries],
+    ["Quote sent", quotesSent],
     ["Payment pending", pendingPayment],
     ["Scheduled", scheduled],
     ["Completed", completed]
@@ -700,6 +842,19 @@ function renderAdminStats(visibleBookings) {
       <strong>${escapeHtml(value)}</strong>
     </div>
   `).join("");
+
+  if (adminSourceStrip) {
+    const sourceLabel = adminBookingsSource === "cloud"
+      ? "Secure shared booking desk connected"
+      : "Local preview mode - connect shared database for staff devices";
+    const visibleLabel = visibleBookings.length === total
+      ? "Showing all bookings"
+      : `Showing ${visibleBookings.length} of ${total}`;
+    adminSourceStrip.innerHTML = `
+      <span>${escapeHtml(sourceLabel)}</span>
+      <strong>${escapeHtml(visibleLabel)}</strong>
+    `;
+  }
 }
 
 function renderAdminDashboard() {
@@ -722,6 +877,8 @@ function renderAdminDashboard() {
   }
 
   adminBookingList.innerHTML = bookings.map((booking) => {
+    const priority = getBookingPriority(booking);
+    const serviceProfile = getServiceProfile(booking.service);
     const statusOptions = bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
     const paymentOptions = paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
     return `
@@ -733,6 +890,11 @@ function renderAdminDashboard() {
           </div>
           <span class="status-pill">${escapeHtml(booking.status)}</span>
         </div>
+        <div class="admin-priority-card is-${escapeHtml(priority.tone)}">
+          <strong>${escapeHtml(priority.label)}</strong>
+          <p>${escapeHtml(priority.detail)}</p>
+        </div>
+        ${renderCompactStatusRail(booking, "admin-status-rail")}
         <div class="admin-client-grid">
           <div><span>Phone</span><strong>${escapeHtml(booking.phone)}</strong></div>
           <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
@@ -748,6 +910,10 @@ function renderAdminDashboard() {
         </div>
         <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         <label>Customer update note<textarea data-field="staffNote" rows="3" placeholder="This note appears in customer tracking">${escapeHtml(booking.staffNote || "")}</textarea></label>
+        <div class="admin-service-hints">
+          <div><span>Proof plan</span><strong>${escapeHtml(serviceProfile.proof)}</strong></div>
+          <div><span>Details needed</span><strong>${escapeHtml(serviceProfile.details)}</strong></div>
+        </div>
         <div class="admin-note-box">
           <strong>Client concern</strong>
           <p>${escapeHtml(booking.concern || "No concern added.")}</p>
@@ -1214,6 +1380,7 @@ adminBookingList?.addEventListener("click", async (event) => {
 
 adminSearchInput?.addEventListener("input", renderAdminDashboard);
 adminStatusFilter?.addEventListener("change", renderAdminDashboard);
+adminPaymentFilter?.addEventListener("change", renderAdminDashboard);
 adminRefreshButton?.addEventListener("click", renderAdminBookings);
 
 async function prefillPortalFromSession() {
@@ -1240,12 +1407,39 @@ function setAuthStatus(message) {
   if (authStatus) authStatus.textContent = message;
 }
 
+function renderAccountSummary(bookings, sourceLabel = "Booking desk") {
+  if (!accountSummary) return;
+  const activeBookings = bookings.filter((booking) => booking.status !== "Completed").length;
+  const paymentPending = bookings.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const completed = bookings.filter((booking) => booking.status === "Completed").length;
+  const summaryItems = [
+    ["Total requests", bookings.length],
+    ["Active", activeBookings],
+    ["Payment pending", paymentPending],
+    ["Completed", completed]
+  ];
+
+  accountSummary.innerHTML = `
+    <article class="account-summary-lead">
+      <span>${escapeHtml(sourceLabel)}</span>
+      <strong>Track quote, payment, schedule and proof from one place.</strong>
+    </article>
+    ${summaryItems.map(([label, value]) => `
+      <article>
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+      </article>
+    `).join("")}
+  `;
+}
+
 async function renderAccountBookings() {
   const accountBookingList = document.querySelector("#accountBookingList");
   if (!accountBookingList) return;
 
   if (!isCloudEnabled()) {
     const localBookings = readBookings().slice(0, 8);
+    renderAccountSummary(localBookings, "Local booking preview");
     if (!localBookings.length) {
       accountBookingList.innerHTML = `<article><h3>Secure account activation pending</h3><p>Customer login is ready on the website. Track by Booking ID while account history is activated.</p></article>`;
       return;
@@ -1256,6 +1450,7 @@ async function renderAccountBookings() {
 
   const user = await getCurrentUser();
   if (!user) {
+    renderAccountSummary([], "Secure account portal");
     accountBookingList.innerHTML = `<article><h3>Sign in to view bookings</h3><p>After login, matching bookings will appear here for tracking.</p></article>`;
     return;
   }
@@ -1268,6 +1463,7 @@ async function renderAccountBookings() {
     if (error) throw error;
 
     const bookings = (data || []).map(fromCloudBooking);
+    renderAccountSummary(bookings, "Secure account portal");
     if (!bookings.length) {
       accountBookingList.innerHTML = `<article><h3>No bookings in this account yet</h3><p>Create a booking with this email, or track an existing Booking ID manually.</p></article>`;
       return;
@@ -1276,11 +1472,16 @@ async function renderAccountBookings() {
     accountBookingList.innerHTML = bookings.map(renderAccountBookingCard).join("");
   } catch (error) {
     console.warn("Account booking list failed", error);
+    renderAccountSummary([], "Booking desk");
     accountBookingList.innerHTML = `<article><h3>Booking history unavailable</h3><p>Please use Booking ID tracking or WhatsApp support while staff checks the account.</p></article>`;
   }
 }
 
 function renderAccountBookingCard(booking) {
+  const priority = getBookingPriority(booking);
+  const proofMarkup = booking.proofUrl
+    ? `<a href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open proof</a>`
+    : "Proof link pending";
   return `
     <article>
       <div>
@@ -1289,10 +1490,16 @@ function renderAccountBookingCard(booking) {
           <span class="status-pill">${escapeHtml(booking.status)}</span>
         </div>
         <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.paymentStatus)} | ${escapeHtml(booking.amount || "Quote pending")}</p>
+        ${renderProgressBar(booking, "Status progress")}
         <div class="mini-booking-meta">
           <span>${escapeHtml(formatBookingDate(booking))}</span>
           <span>${escapeHtml(booking.mode || "Mode pending")}</span>
-          <span>${escapeHtml(getStatusGuidance(booking))}</span>
+          <span>${escapeHtml(priority.label)}: ${escapeHtml(getStatusGuidance(booking))}</span>
+        </div>
+        <div class="mini-proof-row">
+          <span>Proof / note</span>
+          <strong>${proofMarkup}</strong>
+          ${booking.staffNote ? `<p>${escapeHtml(booking.staffNote)}</p>` : ""}
         </div>
       </div>
       <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
