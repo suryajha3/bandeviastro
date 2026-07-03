@@ -53,6 +53,44 @@ const paymentStatuses = [
   "Refund Processed"
 ];
 
+const adminWorkflowActions = [
+  {
+    key: "quote",
+    label: "Quote sent",
+    status: "Quote Sent",
+    paymentStatus: "Not Requested",
+    note: "Quote shared. Please confirm service, date and amount before payment."
+  },
+  {
+    key: "payment",
+    label: "Payment pending",
+    status: "Payment Pending",
+    paymentStatus: "Payment Pending",
+    note: "Payment details shared after quote approval. Please confirm once paid."
+  },
+  {
+    key: "received",
+    label: "Payment received",
+    status: "Confirmed",
+    paymentStatus: "Payment Received",
+    note: "Payment received. Team will confirm schedule and preparation details."
+  },
+  {
+    key: "scheduled",
+    label: "Scheduled",
+    status: "Pooja Scheduled",
+    paymentStatus: "Payment Received",
+    note: "Service scheduled. Team will share proof or completion update where applicable."
+  },
+  {
+    key: "completed",
+    label: "Completed",
+    status: "Completed",
+    paymentStatus: "Payment Received",
+    note: "Service completed. Proof, notes or delivery update shared where applicable."
+  }
+];
+
 const serviceStartingPrices = {
   "Online Pooja": "From Rs 1,501",
   "Hawan / Havan": "From Rs 5,100",
@@ -629,20 +667,59 @@ function bookingWhatsAppUrl(booking) {
   return `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
 }
 
-function staffWhatsAppUrl(booking) {
-  const phone = normalizeContact(booking.phone).replace(/[^0-9]/g, "");
-  const message = [
+function getStaffTemplateMessage(booking, templateKey = "status") {
+  const amount = booking.amount || getServiceProfile(booking.service).quote;
+  const baseLines = [
     `Namaste ${booking.name},`,
     "",
     "Bandevi Astro booking update:",
     `Booking ID: ${booking.id}`,
-    `Service: ${booking.service}`,
-    `Current status: ${booking.status}`,
-    `Payment status: ${booking.paymentStatus}`,
-    `Amount / quote: ${booking.amount || "Quote pending"}`,
-    "",
-    getStatusGuidance(booking)
-  ].join("\n");
+    `Service: ${booking.service}`
+  ];
+
+  const templateLines = {
+    quote: [
+      "Your details have been reviewed and the quote is ready.",
+      `Amount / quote: ${amount}`,
+      "Please confirm the service, date and payment process on WhatsApp before making payment."
+    ],
+    payment: [
+      "Your booking has reached the payment stage.",
+      `Amount / quote: ${amount}`,
+      "Please share payment confirmation after transfer so the team can update your booking."
+    ],
+    received: [
+      "Payment confirmation has been received.",
+      "The team will now confirm schedule, preparation details and next steps."
+    ],
+    scheduled: [
+      "Your service has been scheduled.",
+      `Date / time: ${formatBookingDate(booking)}`,
+      "Please keep your Booking ID ready for any follow-up."
+    ],
+    proof: [
+      "Proof or completion update is ready where applicable.",
+      booking.proofUrl ? `Proof link: ${booking.proofUrl}` : "The team will share proof/link shortly if applicable."
+    ],
+    completed: [
+      "Your service is marked completed.",
+      "Please check the proof/update and message us if you need any follow-up."
+    ],
+    status: [
+      `Current status: ${booking.status}`,
+      `Payment status: ${booking.paymentStatus}`,
+      `Amount / quote: ${amount}`,
+      "",
+      getStatusGuidance(booking)
+    ]
+  };
+
+  return [...baseLines, "", ...(templateLines[templateKey] || templateLines.status)].join("\n");
+}
+
+function staffWhatsAppUrl(booking, templateKey = "status") {
+  const phone = normalizeContact(booking.phone).replace(/[^0-9]/g, "");
+  const message = getStaffTemplateMessage(booking, templateKey);
   return `https://wa.me/${phone || businessWhatsApp}?text=${encodeURIComponent(message)}`;
 }
 
@@ -857,6 +934,49 @@ function renderAdminStats(visibleBookings) {
   }
 }
 
+function renderAdminWorkflowButtons(booking) {
+  return `
+    <div class="admin-workflow-strip" aria-label="Quick booking workflow">
+      <span>Quick workflow</span>
+      ${adminWorkflowActions.map((action) => `
+        <button type="button" data-admin-workflow="${escapeHtml(action.key)}" data-booking-id="${escapeHtml(booking.id)}">
+          ${escapeHtml(action.label)}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminTemplateLinks(booking) {
+  const templates = [
+    ["quote", "Quote"],
+    ["payment", "Payment"],
+    ["received", "Receipt"],
+    ["scheduled", "Schedule"],
+    ["proof", "Proof"],
+    ["completed", "Complete"]
+  ];
+
+  return `
+    <div class="admin-template-row" aria-label="WhatsApp message templates">
+      <span>WhatsApp templates</span>
+      ${templates.map(([key, label]) => `
+        <a href="${escapeHtml(staffWhatsAppUrl(booking, key))}" target="_blank" rel="noopener">${escapeHtml(label)}</a>
+      `).join("")}
+    </div>
+  `;
+}
+
+function applyAdminWorkflow(booking, actionKey) {
+  const action = adminWorkflowActions.find((item) => item.key === actionKey);
+  if (!action) return false;
+  booking.status = action.status;
+  booking.paymentStatus = action.paymentStatus;
+  booking.amount = booking.amount || getServiceProfile(booking.service).quote;
+  booking.staffNote = action.note;
+  return true;
+}
+
 function renderAdminDashboard() {
   if (!adminBookingList) return;
   initAdminStatusFilter();
@@ -894,6 +1014,7 @@ function renderAdminDashboard() {
           <strong>${escapeHtml(priority.label)}</strong>
           <p>${escapeHtml(priority.detail)}</p>
         </div>
+        ${renderAdminWorkflowButtons(booking)}
         ${renderCompactStatusRail(booking, "admin-status-rail")}
         <div class="admin-client-grid">
           <div><span>Phone</span><strong>${escapeHtml(booking.phone)}</strong></div>
@@ -918,9 +1039,10 @@ function renderAdminDashboard() {
           <strong>Client concern</strong>
           <p>${escapeHtml(booking.concern || "No concern added.")}</p>
         </div>
+        ${renderAdminTemplateLinks(booking)}
         <div class="admin-actions">
           <button class="btn btn-primary" type="button" data-admin-save="${escapeHtml(booking.id)}">Save update</button>
-          <a class="btn btn-secondary" href="${escapeHtml(staffWhatsAppUrl(booking))}">Message client</a>
+          <a class="btn btn-secondary" href="${escapeHtml(staffWhatsAppUrl(booking))}" target="_blank" rel="noopener">Message client</a>
           <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">View tracking</a>
         </div>
       </article>
@@ -1354,6 +1476,26 @@ if (adminPanel) {
 }
 
 adminBookingList?.addEventListener("click", async (event) => {
+  const workflowButton = event.target.closest("[data-admin-workflow]");
+  if (workflowButton) {
+    const bookingId = workflowButton.dataset.bookingId;
+    const booking = adminBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !applyAdminWorkflow(booking, workflowButton.dataset.adminWorkflow)) return;
+
+    workflowButton.textContent = "Saving...";
+    workflowButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setAdminStatus(result.savedCloud ? "Workflow update saved to secure booking desk." : "Workflow update saved locally.");
+      await renderAdminBookings();
+    } catch (error) {
+      console.warn("Admin workflow update failed", error);
+      setAdminStatus("Workflow update failed. Please try again.");
+      workflowButton.disabled = false;
+    }
+    return;
+  }
+
   const saveButton = event.target.closest("[data-admin-save]");
   if (!saveButton) return;
 
@@ -1479,30 +1621,44 @@ async function renderAccountBookings() {
 
 function renderAccountBookingCard(booking) {
   const priority = getBookingPriority(booking);
+  const serviceProfile = getServiceProfile(booking.service);
   const proofMarkup = booking.proofUrl
     ? `<a href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open proof</a>`
     : "Proof link pending";
   return `
-    <article>
-      <div>
+    <article class="account-booking-card">
+      <div class="account-booking-main">
         <div class="mini-booking-head">
           <h3>${escapeHtml(booking.service)}</h3>
           <span class="status-pill">${escapeHtml(booking.status)}</span>
         </div>
-        <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.paymentStatus)} | ${escapeHtml(booking.amount || "Quote pending")}</p>
+        <p>${escapeHtml(booking.id)} | ${escapeHtml(formatBookingDate(booking))} | ${escapeHtml(booking.mode || "Mode pending")}</p>
         ${renderProgressBar(booking, "Status progress")}
+        ${renderCompactStatusRail(booking, "account-status-rail")}
         <div class="mini-booking-meta">
-          <span>${escapeHtml(formatBookingDate(booking))}</span>
-          <span>${escapeHtml(booking.mode || "Mode pending")}</span>
-          <span>${escapeHtml(priority.label)}: ${escapeHtml(getStatusGuidance(booking))}</span>
+          <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
+          <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>
+          <span><strong>Proof plan</strong>${escapeHtml(serviceProfile.proof)}</span>
         </div>
-        <div class="mini-proof-row">
-          <span>Proof / note</span>
-          <strong>${proofMarkup}</strong>
-          ${booking.staffNote ? `<p>${escapeHtml(booking.staffNote)}</p>` : ""}
+        <div class="account-next-card is-${escapeHtml(priority.tone)}">
+          <strong>${escapeHtml(priority.label)}</strong>
+          <p>${escapeHtml(getStatusGuidance(booking))}</p>
+        </div>
+        <div class="mini-proof-row account-proof-row">
+          <div>
+            <span>Proof / update</span>
+            <strong>${proofMarkup}</strong>
+          </div>
+          <div>
+            <span>Team note</span>
+            <strong>${escapeHtml(booking.staffNote || "Staff note will appear here after update.")}</strong>
+          </div>
         </div>
       </div>
-      <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
+      <div class="account-card-actions">
+        <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
+        <a class="btn btn-primary" href="${escapeHtml(bookingWhatsAppUrl(booking))}" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
     </article>
   `;
 }

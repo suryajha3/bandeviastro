@@ -1825,6 +1825,34 @@ details p {
   }
 }
 
+@media (max-width: 980px) {
+  .kundali-spotlight-layout,
+  .kundali-command-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .account-status-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .kundali-signal-grid,
+  .kundali-command-grid,
+  .account-proof-row,
+  .account-status-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .mini-booking-list article.account-booking-card {
+    display: grid;
+  }
+
+  .account-card-actions {
+    min-width: 0;
+  }
+}
+
 .truth-list,
 .policy-list {
   display: grid;
@@ -2818,6 +2846,18 @@ details p {
   box-shadow: 0 12px 30px rgba(91, 18, 32, 0.06);
 }
 
+.mini-booking-list article.account-booking-card {
+  align-items: stretch;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.06), rgba(245, 184, 75, 0.08)),
+    #fffdf9;
+}
+
+.account-booking-main {
+  min-width: 0;
+  flex: 1;
+}
+
 .mini-booking-head {
   display: flex;
   flex-wrap: wrap;
@@ -2850,6 +2890,115 @@ details p {
   line-height: 1.45;
 }
 
+.mini-booking-meta strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--maroon);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.account-status-rail {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-status-rail li {
+  border: 1px solid rgba(91, 18, 32, 0.1);
+  border-radius: 8px;
+  padding: 9px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.account-status-rail span {
+  display: inline-grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(91, 18, 32, 0.08);
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 950;
+}
+
+.account-status-rail strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.22;
+}
+
+.account-status-rail li.is-complete span,
+.account-status-rail li.is-current span {
+  color: #ffffff;
+  background: var(--teal);
+}
+
+.account-status-rail li.is-current {
+  border-color: rgba(15, 118, 110, 0.3);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.account-next-card,
+.account-proof-row {
+  margin-top: 12px;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.account-next-card strong,
+.account-proof-row span {
+  color: var(--maroon);
+  font-weight: 900;
+}
+
+.account-next-card p {
+  margin-top: 4px;
+}
+
+.account-next-card.is-urgent {
+  border-color: rgba(183, 28, 28, 0.22);
+  background: rgba(183, 28, 28, 0.06);
+}
+
+.account-next-card.is-payment,
+.account-next-card.is-quote {
+  border-color: rgba(245, 184, 75, 0.38);
+  background: rgba(245, 184, 75, 0.11);
+}
+
+.account-proof-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.account-proof-row strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.account-proof-row a {
+  color: var(--teal);
+}
+
+.account-card-actions {
+  display: grid;
+  min-width: 150px;
+  align-content: start;
+  gap: 10px;
+}
+
 .mini-proof-row {
   display: grid;
   gap: 4px;
@@ -2875,6 +3024,21 @@ details p {
 .mini-proof-row p {
   margin-top: 4px;
   white-space: pre-wrap;
+}
+
+.mini-proof-row.account-proof-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  padding: 12px;
+  background: #ffffff;
+}
+
+@media (max-width: 620px) {
+  .mini-proof-row.account-proof-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .is-hidden {
@@ -2983,6 +3147,51 @@ details p {
 .admin-priority-card.is-complete {
   border-left-color: var(--teal);
   background: rgba(15, 118, 110, 0.06);
+}
+
+.admin-workflow-strip,
+.admin-template-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffdf9;
+}
+
+.admin-workflow-strip span,
+.admin-template-row span {
+  flex: 1 1 100%;
+  color: var(--maroon);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.admin-workflow-strip button,
+.admin-template-row a {
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--teal);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-workflow-strip button:hover,
+.admin-template-row a:hover {
+  border-color: rgba(15, 118, 110, 0.42);
+  background: rgba(15, 118, 110, 0.14);
+}
+
+.admin-workflow-strip button:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 .status-pill {
@@ -4977,6 +5186,93 @@ details p {
 #hawan-catalog,
 #kundli-catalog {
   scroll-margin-top: 138px;
+}
+
+.kundali-spotlight-section,
+.kundali-command-section {
+  background:
+    linear-gradient(180deg, #ffffff, #fffdf7);
+}
+
+.kundali-spotlight-layout,
+.kundali-command-panel {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+  gap: clamp(22px, 5vw, 54px);
+  align-items: center;
+  border: 1px solid rgba(91, 18, 32, 0.14);
+  border-radius: 8px;
+  padding: clamp(22px, 5vw, 42px);
+  background:
+    radial-gradient(circle at top right, rgba(245, 184, 75, 0.2), transparent 32%),
+    linear-gradient(135deg, rgba(91, 18, 32, 0.06), rgba(15, 118, 110, 0.08)),
+    #ffffff;
+  box-shadow: 0 18px 44px rgba(91, 18, 32, 0.09);
+}
+
+.kundali-spotlight-copy h2,
+.kundali-command-panel h2 {
+  max-width: 760px;
+}
+
+.kundali-spotlight-copy p:not(.eyebrow),
+.kundali-command-panel p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.kundali-highlight-actions,
+.kundali-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.kundali-signal-grid,
+.kundali-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.kundali-signal-grid a,
+.kundali-command-grid article {
+  display: grid;
+  gap: 8px;
+  min-height: 148px;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.kundali-signal-grid span,
+.kundali-command-grid span {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--maroon);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.kundali-signal-grid strong,
+.kundali-command-grid strong {
+  color: var(--maroon);
+  line-height: 1.25;
+}
+
+.kundali-signal-grid small,
+.kundali-command-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
 .detail-offer-grid,
