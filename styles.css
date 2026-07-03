@@ -3655,7 +3655,7 @@ details p {
 
 .backoffice-two-column {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -5098,6 +5098,104 @@ details p {
   font-weight: 950;
 }
 
+.gemstone-filter-row {
+  align-items: stretch;
+}
+
+.gemstone-filter-row button {
+  min-height: 42px;
+}
+
+.gemstone-filter-insight {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.gemstone-filter-insight span,
+.stone-quote-summary span {
+  display: block;
+  color: var(--teal);
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.gemstone-filter-insight strong,
+.stone-quote-summary strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--maroon);
+  font-size: 1.02rem;
+}
+
+.gemstone-filter-insight p,
+.stone-quote-summary p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+  line-height: 1.6;
+}
+
+.gemstone-curated-section {
+  padding-top: 18px;
+}
+
+.gemstone-curated-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.gemstone-curated-grid article {
+  display: flex;
+  min-height: 246px;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(91, 18, 32, 0.14);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(247, 251, 248, 0.94)),
+    #fffdf9;
+  box-shadow: 0 16px 34px rgba(91, 18, 32, 0.07);
+}
+
+.gemstone-curated-grid article > span {
+  width: fit-content;
+  border: 1px solid rgba(245, 184, 75, 0.42);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.16);
+  font-weight: 950;
+}
+
+.gemstone-curated-grid h3 {
+  margin: 0;
+  color: var(--maroon);
+  font-size: 1.08rem;
+}
+
+.gemstone-curated-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.gemstone-curated-grid .text-button {
+  width: 100%;
+  margin-top: auto;
+}
+
 .gemstone-empty-message {
   margin: 0;
   color: var(--muted);
@@ -5111,6 +5209,10 @@ details p {
   margin-top: auto;
 }
 
+.product-card-actions.single-action {
+  grid-template-columns: 1fr;
+}
+
 .ring-product-card .product-card-actions .text-button,
 .premium-product-card .product-card-actions .text-button {
   width: auto;
@@ -5121,6 +5223,51 @@ details p {
   color: var(--maroon);
   background: rgba(245, 184, 75, 0.16);
   border-color: rgba(245, 184, 75, 0.36);
+}
+
+.stone-quote-summary {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+  gap: 16px;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(247, 252, 250, 0.98), rgba(255, 250, 239, 0.96)),
+    #fffdf9;
+}
+
+.stone-quote-summary dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.stone-quote-summary dl div {
+  border: 1px solid rgba(91, 18, 32, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.stone-quote-summary dt,
+.stone-quote-summary dd {
+  margin: 0;
+}
+
+.stone-quote-summary dt {
+  color: var(--teal);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.stone-quote-summary dd {
+  margin-top: 5px;
+  color: var(--maroon);
+  font-weight: 900;
+  line-height: 1.45;
 }
 
 .gemstone-product-detail-main {
@@ -5217,6 +5364,21 @@ details p {
 
 .gemstone-product-gallery .loose-stone-figure img {
   aspect-ratio: 1;
+}
+
+.product-detail-gallery {
+  grid-template-columns: 1fr;
+}
+
+.product-detail-gallery img {
+  aspect-ratio: 3 / 4;
+  height: auto;
+  min-height: 0;
+  max-height: 720px;
+  object-fit: contain;
+  object-position: center top;
+  padding: 10px;
+  background: #fffdf9;
 }
 
 .gemstone-product-summary-strip {
@@ -6145,6 +6307,33 @@ details p {
 
 .pooja-product-card:hover .pooja-product-media img {
   transform: scale(1.08);
+}
+
+.pooja-kit-section {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(247, 251, 248, 0.94));
+}
+
+.pooja-kit-card .pooja-product-media {
+  min-height: 280px;
+  background: #fffdf9;
+}
+
+.pooja-kit-card .pooja-product-media::after {
+  background: linear-gradient(180deg, transparent 58%, rgba(45, 12, 22, 0.58));
+}
+
+.pooja-kit-card .pooja-product-media img {
+  min-height: 280px;
+  object-fit: contain;
+  object-position: center top;
+  padding: 8px;
+  background: #fffdf9;
+  transform: none;
+}
+
+.pooja-kit-card:hover .pooja-product-media img {
+  transform: none;
 }
 
 .pooja-product-media span {
@@ -7200,6 +7389,14 @@ details p {
   background: #241217;
 }
 
+.samagri-card.is-product-item img {
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  object-position: top;
+  padding: 8px;
+  background: #fffdf9;
+}
+
 .samagri-card div {
   padding: 16px;
 }
@@ -7225,6 +7422,11 @@ details p {
   color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.58;
+}
+
+.samagri-card .text-button {
+  width: 100%;
+  margin-top: 12px;
 }
 
 .samagri-note-panel {
@@ -8078,5 +8280,39 @@ details p {
   .backoffice-panel-head,
   .backoffice-shell-footer {
     display: grid;
+  }
+}
+
+@media (max-width: 980px) {
+  .gemstone-curated-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gemstone-filter-insight,
+  .stone-quote-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .stone-quote-summary dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .gemstone-curated-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gemstone-curated-grid article {
+    min-height: auto;
+  }
+
+  .gemstone-filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gemstone-filter-row button {
+    width: 100%;
   }
 }

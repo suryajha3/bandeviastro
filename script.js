@@ -9,6 +9,7 @@ const yearEl = document.querySelector("#year");
 const stoneOrderForm = document.querySelector("#stoneOrderForm");
 const stoneSelect = document.querySelector("#stoneName");
 const stoneStatusEl = document.querySelector("#stoneOrderStatus");
+const stoneQuoteSummary = document.querySelector("#stoneQuoteSummary");
 const portalBookingForm = document.querySelector("#portalBookingForm");
 const trackBookingForm = document.querySelector("#trackBookingForm");
 const adminAccessForm = document.querySelector("#adminAccessForm");
@@ -31,6 +32,7 @@ const backofficeOperations = document.querySelector("#backofficeOperations");
 const backofficeCustomerList = document.querySelector("#backofficeCustomerList");
 const backofficeKundaliQueue = document.querySelector("#backofficeKundaliQueue");
 const backofficeGemstoneQueue = document.querySelector("#backofficeGemstoneQueue");
+const backofficeProductQueue = document.querySelector("#backofficeProductQueue");
 const backofficeReportList = document.querySelector("#backofficeReportList");
 const backofficeLogin = document.querySelector("#backofficeLogin");
 const backofficePreview = document.querySelector("#backofficePreview");
@@ -1168,6 +1170,11 @@ function isGemstoneBooking(booking) {
   return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera|opal/.test(text);
 }
 
+function isProductQuoteBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /pooja kit|puja kit|hindi pooja kit|hawan samagri|samagri -|product category|product quote|delivery country|durga pooja kit|lakshmi pooja kit|ganesh pooja kit|navgrah pooja kit/.test(text);
+}
+
 function isNriBooking(booking) {
   const country = (booking.country || "").trim().toLowerCase();
   const isIndia = !country || ["india", "in", "bharat"].includes(country);
@@ -1187,6 +1194,7 @@ function getBackofficeFilteredBookings() {
     if (queue === "payment") matchesQueue = booking.paymentStatus === "Payment Pending";
     if (queue === "kundali") matchesQueue = isKundaliBooking(booking);
     if (queue === "gemstone") matchesQueue = isGemstoneBooking(booking);
+    if (queue === "products") matchesQueue = isProductQuoteBooking(booking);
     if (queue === "nri") matchesQueue = isNriBooking(booking);
     if (queue === "scheduled") matchesQueue = booking.status === "Pooja Scheduled";
     if (queue === "completed") matchesQueue = booking.status === "Completed";
@@ -1203,6 +1211,7 @@ function renderBackofficeStats(visibleBookings) {
   const pendingPayment = backofficeBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
   const kundaliQueue = backofficeBookingsCache.filter(isKundaliBooking).length;
   const gemstoneQueue = backofficeBookingsCache.filter(isGemstoneBooking).length;
+  const productQueue = backofficeBookingsCache.filter(isProductQuoteBooking).length;
   const nriQueue = backofficeBookingsCache.filter(isNriBooking).length;
   const completed = backofficeBookingsCache.filter((booking) => booking.status === "Completed").length;
   const stats = [
@@ -1213,6 +1222,7 @@ function renderBackofficeStats(visibleBookings) {
     ["Payment pending", pendingPayment],
     ["Kundali", kundaliQueue],
     ["Gemstones", gemstoneQueue],
+    ["Kits/Samagri", productQueue],
     ["Global/NRI", nriQueue],
     ["Completed", completed]
   ];
@@ -1370,6 +1380,16 @@ function getBackofficeServiceChecklist(booking) {
       ["Metal", "Gold, silver or panchdhatu preference"],
       ["Size", "Ring size or pendant size"],
       ["Certificate", "Lab/certification and final quote"]
+    ];
+  }
+
+  if (isProductQuoteBooking(booking)) {
+    return [
+      ["Product", "Kit or samagri item name"],
+      ["Category", "Pooja kit or hawan samagri"],
+      ["Delivery", "Country, city and dispatch option"],
+      ["Availability", "Stock, quantity and alternatives"],
+      ["Quote", "Final product quote before payment"]
     ];
   }
 
@@ -1546,6 +1566,12 @@ function renderBackofficeDashboard() {
     "No gemstone queue",
     "Gemstone, ring, pendant and certified quote requests will be highlighted here."
   );
+  renderBackofficeQueue(
+    backofficeProductQueue,
+    bookings.filter(isProductQuoteBooking),
+    "No kit or samagri queue",
+    "Hindi pooja kit, hawan samagri and product quote requests will be highlighted here."
+  );
   renderBackofficeReports(bookings);
 }
 
@@ -1571,7 +1597,59 @@ document.querySelectorAll("[data-service]").forEach((button) => {
   button.addEventListener("click", () => setService(button.dataset.service));
 });
 
-function setStone(stoneName) {
+function getStoneQuoteProfile(stoneName) {
+  const text = normalizeCatalogText(stoneName);
+  const isPendant = text.includes("pendant");
+  const isLoose = text.includes("loose");
+  const isHighCaution = /neelam|blue sapphire|lehsunia|cat.?s eye|shani|ketu/.test(text);
+  const profile = {
+    form: isPendant ? "Pendant" : isLoose ? "Loose stone" : "Ring",
+    metal: "Need guidance",
+    badge: "Certificate quote",
+    check: "Kundli suitability, product proof and final quote before payment",
+    note: "Staff will confirm available stone photo/video, certificate detail, carat or ratti, metal, delivery and policy clarity before payment."
+  };
+
+  if (/ruby|manik|pukhraj|yellow sapphire|emerald|panna|coral|moonga/.test(text)) {
+    profile.metal = "Gold";
+  }
+  if (/pearl|moti|neelam|blue sapphire|gomed|hessonite|lehsunia|cat.?s eye/.test(text)) {
+    profile.metal = "Silver";
+  }
+  if (/diamond|heera|opal/.test(text)) {
+    profile.metal = "Need guidance";
+  }
+  if (isLoose) {
+    profile.metal = "Need guidance";
+    profile.check = "Loose stone quality, certificate and optional setting quote";
+  }
+  if (isHighCaution) {
+    profile.badge = "High-caution review";
+    profile.check = "Suitability and trial guidance before wearing";
+    profile.note = "This stone should be discussed carefully. Staff should review suitability, trial guidance, wearing method and proof before any payment.";
+  }
+  return profile;
+}
+
+function updateStoneQuoteSummary(stoneName) {
+  if (!stoneQuoteSummary) return;
+  const selectedStone = stoneName || stoneSelect?.value || "Select a gemstone product";
+  const profile = getStoneQuoteProfile(selectedStone);
+  stoneQuoteSummary.innerHTML = `
+    <div>
+      <span>${escapeHtml(profile.badge)}</span>
+      <strong>${escapeHtml(selectedStone)}</strong>
+      <p>${escapeHtml(profile.note)}</p>
+    </div>
+    <dl>
+      <div><dt>Form</dt><dd>${escapeHtml(profile.form)}</dd></div>
+      <div><dt>Metal</dt><dd>${escapeHtml(profile.metal)}</dd></div>
+      <div><dt>Check</dt><dd>${escapeHtml(profile.check)}</dd></div>
+    </dl>
+  `;
+}
+
+function setStone(stoneName, options = {}) {
   if (!stoneName) return;
   if (!stoneSelect) {
     window.location.href = `gemstone-shop.html?stone=${encodeURIComponent(stoneName)}`;
@@ -1583,14 +1661,28 @@ function setStone(stoneName) {
   }
   stoneSelect.value = stoneName;
   const stoneFormField = document.querySelector("#stoneForm");
-  if (stoneFormField && /ring/i.test(stoneName)) {
-    stoneFormField.value = "Ring";
-  } else if (stoneFormField && /pendant/i.test(stoneName)) {
-    stoneFormField.value = "Pendant";
-  } else if (stoneFormField && /loose/i.test(stoneName)) {
-    stoneFormField.value = "Loose stone";
+  const stoneMetalField = document.querySelector("#stoneMetal");
+  const stonePurposeField = document.querySelector("#stonePurpose");
+  const stoneDeliveryField = document.querySelector("#stoneDelivery");
+  const profile = getStoneQuoteProfile(stoneName);
+
+  setSelectValue(stoneFormField, profile.form);
+  setSelectValue(stoneMetalField, profile.metal);
+  if (stonePurposeField) {
+    stonePurposeField.placeholder = profile.badge === "High-caution review"
+      ? "Birth date/time/place, current concern, existing recommendation and whether trial guidance is needed"
+      : "Birth date/time/place, existing recommendation, purpose and any budget or certificate preference";
   }
-  document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (stoneDeliveryField) {
+    stoneDeliveryField.placeholder = "India, USA, UK, Canada, UAE, Australia, etc.";
+  }
+  updateStoneQuoteSummary(stoneName);
+  if (stoneStatusEl) {
+    stoneStatusEl.textContent = `${stoneName} selected. Add name, WhatsApp, budget and delivery country to create the quote ID.`;
+  }
+  if (options.scroll !== false) {
+    document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 document.querySelectorAll("[data-stone]").forEach((button) => {
@@ -1681,9 +1773,16 @@ function prefillPortalBookingFromUrl() {
   const requestedService = params.get("service");
   const requestedMode = params.get("mode");
   const requestedConcern = params.get("concern");
+  const requestedProduct = params.get("product");
+  const requestedCategory = params.get("category");
+  const requestedQuoteType = params.get("quoteType");
+  const requestedDelivery = params.get("delivery");
   const portalService = document.querySelector("#portalService");
   const portalMode = document.querySelector("#portalMode");
   const portalConcern = document.querySelector("#portalConcern");
+  const portalSamagri = document.querySelector("#portalSamagri");
+  const portalRitualPurpose = document.querySelector("#portalRitualPurpose");
+  const portalCountry = document.querySelector("#portalCountry");
 
   setSelectValue(portalService, requestedService);
   if (portalMode && requestedMode) {
@@ -1694,6 +1793,28 @@ function prefillPortalBookingFromUrl() {
 
   if (portalConcern && requestedConcern && !portalConcern.value) {
     portalConcern.value = requestedConcern;
+  }
+
+  if (requestedProduct) {
+    const productLines = [
+      requestedCategory ? `Product category: ${requestedCategory}` : "",
+      `Product name: ${requestedProduct}`,
+      requestedQuoteType ? `Quote type: ${requestedQuoteType}` : "Quote type: Product quote before payment",
+      requestedDelivery ? `Delivery country: ${requestedDelivery}` : "Delivery country: To be confirmed"
+    ].filter(Boolean);
+
+    if (portalSamagri && !portalSamagri.value) {
+      portalSamagri.value = productLines.join("\n");
+    }
+    if (portalRitualPurpose && !portalRitualPurpose.value) {
+      portalRitualPurpose.value = `Product quote for ${requestedProduct}`;
+    }
+    if (portalCountry && requestedDelivery && requestedDelivery !== "To be confirmed" && !portalCountry.value) {
+      portalCountry.value = requestedDelivery;
+    }
+    if (portalConcern && !portalConcern.value) {
+      portalConcern.value = `${productLines.join("\n")}\nPlease confirm availability, delivery, payment step and policies before payment.`;
+    }
   }
 }
 
@@ -1759,6 +1880,45 @@ function initializeServiceFinders() {
   });
 }
 
+const gemstoneFilterCopy = {
+  all: ["Full catalogue", "Showing rings, pendants and loose stones for every gemstone product."],
+  rings: ["Ring products", "Use this when the customer already wants a wearable ring with metal and finger size guidance."],
+  pendants: ["Pendant products", "Use this for customers who prefer a pendant, chain option or non-ring wearing path."],
+  loose: ["Loose stones", "Use this when the buyer wants certificate, carat/ratti and proof before deciding ring or pendant setting."],
+  caution: ["High-caution review", "Neelam and Lehsunia enquiries need suitability, trial guidance and wearing method before payment."],
+  authority: ["Authority and growth", "Ruby, Pukhraj and Emerald paths are useful for confidence, learning, career and business discussions."],
+  calm: ["Calm and courage", "Pearl and Red Coral paths support Chandra or Mangal-related enquiries after kundli review."],
+  marriage: ["Marriage and prosperity", "Pukhraj, Diamond and Opal paths are commonly discussed for Guru or Shukra-related guidance."],
+  shukra: ["Shukra products", "Diamond and Opal enquiries need certificate, quality, budget and suitability clarity."],
+  "rahu-ketu": ["Rahu and Ketu", "Gomed and Lehsunia require careful chart need, timing, proof and wearing guidance."],
+  international: ["NRI ready quote", "Every visible product can be quoted with delivery country, policy clarity and Booking ID tracking."]
+};
+
+function matchesGemstoneFilter(filter, cardText, kind) {
+  if (filter === "all") return true;
+  if (filter === "rings") return kind === "rings";
+  if (filter === "pendants") return kind === "pendants";
+  if (filter === "loose") return kind === "loose";
+  if (filter === "international") return true;
+  if (filter === "caution") return /high-caution|neelam|blue sapphire|cat.?s eye|lehsunia|ketu|shani/.test(cardText);
+  if (filter === "authority") return /ruby|manik|pukhraj|yellow sapphire|panna|emerald|surya|guru|budh|career|business|study|prosperity|confidence|authority/.test(cardText);
+  if (filter === "calm") return /moti|pearl|chandra|moonga|red coral|mangal|calm|emotional|courage|balance/.test(cardText);
+  if (filter === "marriage") return /pukhraj|yellow sapphire|heera|diamond|opal|shukra|guru|marriage|relationship|prosperity/.test(cardText);
+  if (filter === "shukra") return /shukra|diamond|heera|opal/.test(cardText);
+  if (filter === "rahu-ketu") return /gomed|hessonite|rahu|lehsunia|cat.?s eye|ketu/.test(cardText);
+  return true;
+}
+
+function renderGemstoneFilterInsight(finder, filter, visibleCount) {
+  const insight = finder.querySelector("[data-gemstone-filter-insight]");
+  if (!insight) return;
+  const [title, body] = gemstoneFilterCopy[filter] || gemstoneFilterCopy.all;
+  insight.innerHTML = `
+    <div><span>Active view</span><strong>${escapeHtml(title)}</strong></div>
+    <p>${escapeHtml(body)} ${visibleCount} ${visibleCount === 1 ? "product is" : "products are"} visible.</p>
+  `;
+}
+
 function updateGemstoneProductFinder(finder) {
   const cards = [...document.querySelectorAll("#ring-products .ring-product-card, #pendant-products .ring-product-card, #loose-stones .premium-product-card")];
   if (!cards.length) return;
@@ -1777,12 +1937,9 @@ function updateGemstoneProductFinder(finder) {
       : parentSection?.id === "pendant-products"
         ? "pendants"
         : "loose";
-    const isKindFilter = ["rings", "pendants", "loose"].includes(filter);
-    const matchesKind = filter === "all" || !isKindFilter || filter === kind;
-    const matchesCaution = filter !== "caution" || /high-caution|neelam|blue sapphire|cat.?s eye|lehsunia|ketu|shani/.test(cardText);
-    const matchesShukra = filter !== "shukra" || /shukra|diamond|heera|opal/.test(cardText);
+    const matchesFilter = matchesGemstoneFilter(filter, cardText, kind);
     const matchesSearch = !searchTerms.length || searchTerms.every((term) => cardText.includes(term));
-    const isVisible = matchesKind && matchesCaution && matchesShukra && matchesSearch;
+    const isVisible = matchesFilter && matchesSearch;
 
     card.hidden = !isVisible;
     card.classList.toggle("is-filtered-out", !isVisible);
@@ -1804,6 +1961,8 @@ function updateGemstoneProductFinder(finder) {
   if (emptyMessage) {
     emptyMessage.hidden = visibleCount !== 0;
   }
+
+  renderGemstoneFilterInsight(finder, filter, visibleCount);
 }
 
 function initializeGemstoneProductFinder() {
@@ -1828,6 +1987,149 @@ function initializeGemstoneProductFinder() {
     searchInput?.addEventListener("input", () => updateGemstoneProductFinder(finder));
     updateGemstoneProductFinder(finder);
   });
+
+  document.querySelectorAll("[data-gemstone-filter-target]").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const targetFilter = trigger.dataset.gemstoneFilterTarget;
+      const finder = document.querySelector("[data-gemstone-finder]");
+      const targetButton = finder?.querySelector(`[data-gemstone-filter="${targetFilter}"]`);
+      if (targetButton) {
+        targetButton.click();
+        finder.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  });
+}
+
+const poojaKitProducts = [
+  ["Durga Pooja Kit", "assets/pooja-kits/display/01-durga-puja-kit-hindi.jpg", "Shakti worship", "Durga upasana kit with core pooja items, useful for Navratri, strength and protection sankalp."],
+  ["Lakshmi Pooja Kit", "assets/pooja-kits/display/02-lakshmi-puja-kit-hindi.jpg", "Prosperity", "Lakshmi worship kit for home, shop, business blessing and Diwali-style pooja preparation."],
+  ["Ganesh Pooja Kit", "assets/pooja-kits/display/03-ganesh-puja-kit-hindi.jpg", "Shubh aarambh", "Ganesh kit for new work, obstacle-removal prayers and auspicious beginning rituals."],
+  ["Saraswati Pooja Kit", "assets/pooja-kits/display/04-saraswati-puja-kit-hindi.jpg", "Education", "Saraswati kit for students, exams, learning, arts and knowledge-related sankalp."],
+  ["Shiv Pooja Kit", "assets/pooja-kits/display/05-shiv-puja-kit-hindi.jpg", "Shiva worship", "Shiv pooja kit for Monday worship, Rudra sankalp and family peace prayers."],
+  ["Hanuman Pooja Kit", "assets/pooja-kits/display/06-hanuman-puja-kit-hindi.jpg", "Strength", "Hanuman kit for courage, protection, discipline and Tuesday or Saturday worship."],
+  ["Satyanarayan Pooja Kit", "assets/pooja-kits/display/07-satyanarayan-puja-kit-hindi.jpg", "Family blessing", "Satyanarayan kit for family katha, gratitude, birthdays, anniversaries and griha shanti."],
+  ["Navgrah Pooja Kit", "assets/pooja-kits/display/08-navgrah-puja-kit-hindi.jpg", "Grah shanti", "Navgrah kit for nine-planet shanti, dasha concern and kundli-based remedy preparation."],
+  ["Kali Pooja Kit", "assets/pooja-kits/display/09-kali-puja-kit-hindi.jpg", "Protection", "Kali kit for shakti worship, protection prayers and special spiritual sankalp."],
+  ["Griha Pravesh Pooja Kit", "assets/pooja-kits/display/10-griha-pravesh-puja-kit-hindi.jpg", "Home blessing", "Griha Pravesh kit for new home entry, vastu shanti and family blessing preparation."]
+];
+
+const hawanSamagriProducts = [
+  ["Surya Wood", "assets/hawan-samagri/items/01-surya-wood-single-item.png", "Navgrah wood", "Used where Surya-related grah hawan items are advised."],
+  ["Chandra Wood", "assets/hawan-samagri/items/02-chandra-wood-single-item.png", "Navgrah wood", "For Chandra-related hawan planning after purpose and ritual type are confirmed."],
+  ["Mangal Wood", "assets/hawan-samagri/items/03-mangal-wood-single-item.png", "Navgrah wood", "For Mangal, courage or marriage-remedy hawan planning where applicable."],
+  ["Budh Wood", "assets/hawan-samagri/items/04-budh-wood-single-item.png", "Navgrah wood", "For Budh-related worship, business, study or communication sankalp where advised."],
+  ["Guru Wood", "assets/hawan-samagri/items/05-guru-wood-single-item.png", "Navgrah wood", "For Guru-related hawan planning, wisdom, prosperity or marriage guidance."],
+  ["Shukra Wood", "assets/hawan-samagri/items/06-shukra-wood-single-item.png", "Navgrah wood", "For Shukra-related prayers, relationship, luxury or harmony sankalp."],
+  ["Shani Wood", "assets/hawan-samagri/items/07-shani-wood-single-item.png", "Navgrah wood", "For Shani shanti hawan planning after date, sankalp and guidance are confirmed."],
+  ["Rahu Wood", "assets/hawan-samagri/items/08-rahu-wood-single-item.png", "Navgrah wood", "For Rahu-related hawan scope only after concern and ritual requirement are reviewed."],
+  ["Ketu Wood", "assets/hawan-samagri/items/09-ketu-wood-single-item.png", "Navgrah wood", "For Ketu-related worship and shanti hawan where the Acharya advises it."],
+  ["Hawan Samagri Premium Mix", "assets/hawan-samagri/items/10-hawan-samagri-single-item.png", "Premium mix", "Core herbal hawan mix for ahuti; quantity depends on mantra count and duration."],
+  ["Navgrah Hawan Samagri", "assets/hawan-samagri/items/11-nav-grah-hawan-samagri-single-item.png", "Grah shanti", "Prepared for Navgrah hawan enquiries with nine-planet shanti focus."],
+  ["Lakshmi Hawan Samagri", "assets/hawan-samagri/items/12-lakshmi-hawan-samagri-single-item.png", "Prosperity", "For Lakshmi or Kuber hawan planning for home, shop or business sankalp."],
+  ["Durga Hawan Samagri", "assets/hawan-samagri/items/13-durga-hawan-samagri-single-item.png", "Shakti", "For Durga, Navratri, protection and strength-related hawan preparation."],
+  ["Ganesh Hawan Samagri", "assets/hawan-samagri/items/14-ganesh-hawan-samagri-single-item.png", "New beginning", "For Ganesh hawan, obstacle-removal prayers and shubh aarambh rituals."],
+  ["Mahamrityunjay Hawan Samagri", "assets/hawan-samagri/items/15-mahamrityunjay-hawan-samagri-single-item.png", "Health prayer", "For Mahamrityunjay hawan and protection sankalp after scope is confirmed."],
+  ["Satyanarayan Hawan Samagri", "assets/hawan-samagri/items/16-satyanarayan-hawan-samagri-single-item.png", "Family blessing", "For Satyanarayan pooja and hawan support where family ritual scope requires it."],
+  ["Vastu Shanti Hawan Samagri", "assets/hawan-samagri/items/17-vastu-shanti-hawan-samagri-single-item.png", "Home shanti", "For vastu shanti, griha pravesh, home, shop or office hawan planning."],
+  ["Samidha Sticks", "assets/hawan-samagri/items/18-samidha-sticks-single-item.png", "Ahuti base", "Dry sticks used as hawan base where safe and suitable for the place."],
+  ["Mango Wood Sticks", "assets/hawan-samagri/items/19-mango-wood-sticks-single-item.png", "Ahuti base", "Common hawan wood option; local alternatives can be discussed for NRI families."],
+  ["Peepal Wood Sticks", "assets/hawan-samagri/items/20-peepal-wood-sticks-single-item.png", "Sacred wood", "Used only where the ritual list and family tradition require it."],
+  ["Dry Coconut", "assets/hawan-samagri/items/21-dry-coconut-single-item.png", "Offering", "Coconut may be used for kalash, offering or specific ritual completion."],
+  ["Guggul", "assets/hawan-samagri/items/22-guggul-single-item.png", "Fragrance", "Resin item often used for sacred fragrance and hawan offerings."],
+  ["Loban", "assets/hawan-samagri/items/23-loban-single-item.png", "Fragrance", "Used for fragrance and shuddhi where smoke rules and safety allow."],
+  ["Kapoor", "assets/hawan-samagri/items/24-kapoor-single-item.png", "Lighting", "Camphor for aarti or lighting support, confirmed with fire-safety guidance."],
+  ["Desi Cow Ghee", "assets/hawan-samagri/items/25-desi-cow-ghee-single-item.png", "Ahuti", "Ghee for ahuti and diya use; quantity depends on hawan duration."],
+  ["Neem Leaves", "assets/hawan-samagri/items/26-neem-leaves-single-item.png", "Leaves", "Used in select shuddhi or protection-related rituals where advised."],
+  ["Bel Patra", "assets/hawan-samagri/items/27-bel-patra-single-item.png", "Shiva offering", "Bel patra is commonly connected with Shiva worship and Rudra-related rituals."],
+  ["Ashoka Leaves", "assets/hawan-samagri/items/28-ashoka-leaves-single-item.png", "Leaves", "Used where the ritual list calls for auspicious leaves or local alternatives."],
+  ["Tulsi Leaves", "assets/hawan-samagri/items/29-tulsi-leaves-single-item.png", "Sacred leaves", "Tulsi may be used for Vishnu, Satyanarayan or family worship where appropriate."],
+  ["Red Chandan Powder", "assets/hawan-samagri/items/30-red-chandan-powder-single-item.png", "Tilak", "Chandan powder for tilak, offering and ritual preparation."],
+  ["Yellow Chandan Powder", "assets/hawan-samagri/items/31-yellow-chandan-powder-single-item.png", "Tilak", "Used in select pooja and hawan preparation as per deity and ritual type."],
+  ["Kumkum", "assets/hawan-samagri/items/32-kumkum-single-item.png", "Pooja item", "For tilak, Devi worship and family sankalp preparation."],
+  ["Haldi Powder", "assets/hawan-samagri/items/33-haldi-powder-single-item.png", "Pooja item", "Turmeric for shubh ritual preparation, tilak and offering support."],
+  ["Akshat Raw Rice", "assets/hawan-samagri/items/34-akshat-raw-rice-single-item.png", "Akshat", "Rice used for sankalp, offering and completion where required."],
+  ["Kala Til", "assets/hawan-samagri/items/35-kala-til-single-item.png", "Til offering", "Black sesame may be used in Shani, pitra or special shanti rituals."],
+  ["Laung", "assets/hawan-samagri/items/36-laung-single-item.png", "Offering", "Cloves are included in select pooja and hawan offerings."],
+  ["Dry Rose Petals", "assets/hawan-samagri/items/37-dry-rose-petals-single-item.png", "Flowers", "For fragrance and offering where flower items are included."],
+  ["Marigold Flower", "assets/hawan-samagri/items/38-marigold-flower-single-item.png", "Flowers", "Common flower option for worship, decoration and offering."],
+  ["Kamal Gatta", "assets/hawan-samagri/items/39-kamal-gatta-single-item.png", "Lakshmi item", "Often connected with Lakshmi worship and prosperity sankalp."],
+  ["Shankh Pushpi", "assets/hawan-samagri/items/40-shankh-pushpi-single-item.png", "Herbal item", "Used where the final hawan samagri list specifically includes it."],
+  ["Jau Barley", "assets/hawan-samagri/items/41-jau-barley-single-item.png", "Grain offering", "Barley is a common hawan grain; quantity depends on the ritual plan."]
+];
+
+const mainSamagriDetailNames = new Set([
+  "Hawan Samagri Premium Mix",
+  "Navgrah Hawan Samagri",
+  "Lakshmi Hawan Samagri",
+  "Durga Hawan Samagri",
+  "Ganesh Hawan Samagri",
+  "Mahamrityunjay Hawan Samagri",
+  "Vastu Shanti Hawan Samagri"
+]);
+
+function productDetailUrl(name) {
+  return `${String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.html`;
+}
+
+function bookingUrl(service, mode = "Temple pooja with proof", productOptions = {}) {
+  const params = new URLSearchParams({ service, mode });
+  if (productOptions.product) params.set("product", productOptions.product);
+  if (productOptions.category) params.set("category", productOptions.category);
+  if (productOptions.quoteType) params.set("quoteType", productOptions.quoteType);
+  if (productOptions.delivery) params.set("delivery", productOptions.delivery);
+  if (productOptions.concern) params.set("concern", productOptions.concern);
+  return `book-online.html?${params.toString()}`;
+}
+
+function productConcern(product, category) {
+  return [
+    `Product category: ${category}`,
+    `Product name: ${product}`,
+    "Quote type: Product quote before payment",
+    "Delivery country: To be confirmed",
+    "Please confirm availability, item list, delivery option, policy and final quote."
+  ].join("\n");
+}
+
+function renderPoojaKitCatalog() {
+  const catalog = document.querySelector("[data-pooja-kit-catalog]");
+  if (!catalog) return;
+  catalog.innerHTML = poojaKitProducts.map(([name, image, badge, body]) => `
+    <article class="pooja-product-card pooja-kit-card">
+      <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product kit image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
+      <div class="pooja-product-body">
+        <span class="quote-chip">Hindi pooja kit</span>
+        <h3>${escapeHtml(name)}</h3>
+        <p>${escapeHtml(body)}</p>
+        <div class="pooja-product-meta"><div><span>Quote</span><strong>Before payment</strong></div><div><span>Support</span><strong>Kit + guidance</strong></div></div>
+        <ul class="pooja-product-list"><li>Real kit image shown</li><li>Item list confirmed by ritual</li><li>Booking ID for follow-up</li></ul>
+        <div class="product-card-actions">
+          <a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>
+          <a class="text-button" href="${escapeHtml(bookingUrl(`${name} Enquiry`, "Pooja kit guidance", { product: name, category: "Hindi Pooja Kit", quoteType: "Product quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Hindi Pooja Kit") }))}">Create Quote</a>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderHawanSamagriCatalog() {
+  const catalog = document.querySelector("[data-hawan-samagri-catalog]");
+  if (!catalog) return;
+  catalog.innerHTML = hawanSamagriProducts.map(([name, image, badge, body]) => `
+    <article class="samagri-card is-product-item">
+      <img src="${escapeHtml(image)}" alt="${escapeHtml(name)} hawan samagri product image" loading="lazy" />
+      <div>
+        <span>${escapeHtml(badge)}</span>
+        <h3>${escapeHtml(name)}</h3>
+        <p>${escapeHtml(body)}</p>
+        <div class="product-card-actions ${mainSamagriDetailNames.has(name) ? "" : "single-action"}">
+          ${mainSamagriDetailNames.has(name) ? `<a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>` : ""}
+          <a class="text-button" href="${escapeHtml(bookingUrl(`Hawan Samagri - ${name}`, "Hawan samagri guidance", { product: name, category: "Hawan Samagri", quoteType: "Product quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Hawan Samagri") }))}">Ask for this item</a>
+        </div>
+      </div>
+    </article>
+  `).join("");
 }
 
 function getPortalFieldValue(selector) {
@@ -1883,11 +2185,11 @@ function buildPortalConcern() {
 if (stoneSelect) {
   const requestedStone = new URLSearchParams(window.location.search).get("stone");
   if (requestedStone) {
-    if (![...stoneSelect.options].some((option) => option.value === requestedStone)) {
-      stoneSelect.add(new Option(requestedStone, requestedStone), 0);
-    }
-    stoneSelect.value = requestedStone;
+    setStone(requestedStone, { scroll: false });
+  } else {
+    updateStoneQuoteSummary(stoneSelect.value);
   }
+  stoneSelect.addEventListener("change", () => setStone(stoneSelect.value, { scroll: false }));
 }
 
 form?.addEventListener("submit", (event) => {
@@ -1977,6 +2279,7 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
   const syncResult = await saveBookingOnline(booking);
   renderTicket(booking, syncResult);
   stoneOrderForm.reset();
+  updateStoneQuoteSummary(stoneSelect?.value || "");
 
   if (stoneStatusEl) {
     stoneStatusEl.textContent = syncResult.savedCloud
@@ -2564,6 +2867,8 @@ ticketCopyButton?.addEventListener("click", async () => {
 
 prefillPortalBookingFromUrl();
 updateServicePreview();
+renderPoojaKitCatalog();
+renderHawanSamagriCatalog();
 initializeServiceFinders();
 initializeGemstoneProductFinder();
 prefillPortalFromSession();

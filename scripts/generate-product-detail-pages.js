@@ -1,0 +1,310 @@
+const fs = require("fs");
+
+const header = `<header class="site-header premium-header international-header" aria-label="Main header">
+  <div class="header-topline international-topline">
+    <span><strong>Global desk</strong> India, USA, UK, Canada, UAE and NRI families</span>
+    <a href="track-booking.html">Track Booking ID</a>
+    <span>Hindi and English | Quote before payment | Proof where applicable</span>
+  </div>
+  <div class="header-main">
+    <a class="brand international-brand" href="index.html#top" aria-label="Bandevi Astro home">
+      <span class="brand-mark" aria-hidden="true">BA</span>
+      <span class="brand-copy">
+        <strong>Bandevi Astro</strong>
+        <small>Pdt. Jyotishacharya Kumodanand Jha (Shastri)</small>
+        <em>Since 1981 Jyotish, Pooja and Gemstone Desk</em>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open menu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <strong>Menu</strong>
+    </button>
+    <nav class="main-nav international-nav" id="primaryNav" aria-label="Primary navigation">
+      <a href="online-pooja.html"><strong>Pooja</strong><span>Proof</span></a>
+      <a href="hawan.html"><strong>Hawan</strong><span>Temple</span></a>
+      <a href="kundli.html"><strong>Kundli</strong><span>Dosh</span></a>
+      <a href="gemstone-shop.html"><strong>Gems</strong><span>Rings</span></a>
+      <a href="book-online.html"><strong>Book</strong><span>Create ID</span></a>
+      <a href="about.html"><strong>Trust</strong><span>About us</span></a>
+    </nav>
+    <div class="header-actions" aria-label="Quick contact actions">
+      <a class="header-action login" href="login.html" aria-label="Open client login"><span>Login</span><strong>Client</strong></a>
+      <a class="header-action whatsapp" href="https://wa.me/918676846484" aria-label="Open WhatsApp enquiry"><span>WA</span><strong>WhatsApp</strong></a>
+      <a class="header-action primary" href="book-online.html" aria-label="Create booking ID"><span>Book</span><strong>Now</strong></a>
+    </div>
+  </div>
+  <div class="header-trust-row international-service-rail" aria-label="International service shortcuts">
+    <a href="online-pooja.html"><strong>Online Pooja</strong><span>Temple, live video or proof</span></a>
+    <a href="hawan.html"><strong>Hawan Services</strong><span>Grah, vastu and business</span></a>
+    <a href="kundli.html"><strong>Kundli and Dosh</strong><span>Marriage, career and remedies</span></a>
+    <a href="gemstone-shop.html"><strong>Gemstone Rings</strong><span>Certified quote after review</span></a>
+    <a href="track-booking.html"><strong>Client Desk</strong><span>Booking ID, login and updates</span></a>
+  </div>
+</header>`;
+
+const footer = `<a class="floating-whatsapp" href="https://wa.me/918676846484" aria-label="Open WhatsApp chat">WA</a>
+<footer class="site-footer premium-footer">
+  <section class="footer-cta" aria-label="Booking call to action">
+    <div>
+      <p class="eyebrow">Premium spiritual service</p>
+      <h2>Book online, confirm on WhatsApp, track every stage.</h2>
+      <p>Clients can request pooja, hawan, kundli, hast rekha, vastu, muhurat and gemstone guidance with a clear Booking ID before any payment.</p>
+    </div>
+    <div class="footer-cta-actions">
+      <a class="btn btn-primary" href="book-online.html">Create Booking ID</a>
+      <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+    </div>
+  </section>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-brand-mark">BA</span>
+      <strong>Pdt. Jyotishacharya Kumodanand Jha (Shastri)</strong>
+      <p>Jyotishacharya, Vedacharya and Shastri-led guidance for online pooja, hawan, kundli, hast rekha, gemstones, vastu and muhurat support since 1981.</p>
+      <div class="footer-badges" aria-label="Trust highlights">
+        <span>Since 1981</span>
+        <span>Jyotishacharya</span>
+        <span>Vedacharya</span>
+      </div>
+    </div>
+    <nav class="footer-column" aria-label="Footer services">
+      <h2>Services</h2>
+      <a href="online-pooja.html">Online Pooja</a>
+      <a href="hawan.html">Hawan / Havan</a>
+      <a href="kundli.html">Kundli Consultation</a>
+      <a href="hast-rekha.html">Hast Rekha</a>
+      <a href="vastu-muhurat.html">Vastu & Muhurat</a>
+      <a href="nri-pooja.html">NRI Pooja</a>
+      <a href="marriage-problem.html">Marriage Guidance</a>
+      <a href="business-problem.html">Business Guidance</a>
+    </nav>
+    <nav class="footer-column" aria-label="Product links">
+      <h2>Products</h2>
+      <a href="online-pooja.html#pooja-kit-title">Hindi Pooja Kits</a>
+      <a href="hawan.html#hawan-samagri">Hawan Samagri</a>
+      <a href="gemstone-shop.html">All Gemstones</a>
+      <a href="book-online.html">Create Quote ID</a>
+    </nav>
+    <nav class="footer-column" aria-label="Client desk links">
+      <h2>Client Desk</h2>
+      <a href="book-online.html">Book Online</a>
+      <a href="track-booking.html">Track Booking</a>
+      <a href="login.html">Customer Login</a>
+      <a href="about.html">About and Trust</a>
+      <a href="faq.html">FAQ</a>
+      <a href="admin-bookings.html">Staff Desk</a>
+    </nav>
+    <div class="footer-contact-card" aria-label="Contact details">
+      <h2>Contact</h2>
+      <p>For urgent enquiry, send service name, city/country, preferred date and concern on WhatsApp.</p>
+      <a class="footer-contact-link" href="https://wa.me/918676846484">WhatsApp: +91 86768 46484 / +91 62046 41845</a>
+      <a class="footer-contact-link" href="mailto:bandeviglobalgroup@gmail.com">bandeviglobalgroup@gmail.com</a>
+      <p class="footer-note">Spiritual services are faith-based and do not replace medical, legal, financial or safety advice.</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright <span id="year"></span> Bandevi Astro. Clear quote before payment. Privacy, cancellation, refund and shipping terms apply.</p>
+    <div class="footer-bottom-links">
+      <a href="terms-and-conditions.html">Terms</a>
+      <a href="privacy-policy.html">Privacy</a>
+      <a href="cancellation-policy.html">Cancellation</a>
+      <a href="refund-policy.html">Refund</a>
+      <a href="shipping-policy.html">Shipping</a>
+    </div>
+  </div>
+</footer>`;
+
+const poojaKits = [
+  ["Durga Pooja Kit", "durga-pooja-kit.html", "assets/pooja-kits/display/01-durga-puja-kit-hindi.jpg", "Shakti worship", "Durga upasana kit with core pooja items, useful for Navratri, strength and protection sankalp."],
+  ["Lakshmi Pooja Kit", "lakshmi-pooja-kit.html", "assets/pooja-kits/display/02-lakshmi-puja-kit-hindi.jpg", "Prosperity", "Lakshmi worship kit for home, shop, business blessing and Diwali-style pooja preparation."],
+  ["Ganesh Pooja Kit", "ganesh-pooja-kit.html", "assets/pooja-kits/display/03-ganesh-puja-kit-hindi.jpg", "Shubh aarambh", "Ganesh kit for new work, obstacle-removal prayers and auspicious beginning rituals."],
+  ["Saraswati Pooja Kit", "saraswati-pooja-kit.html", "assets/pooja-kits/display/04-saraswati-puja-kit-hindi.jpg", "Education", "Saraswati kit for students, exams, learning, arts and knowledge-related sankalp."],
+  ["Shiv Pooja Kit", "shiv-pooja-kit.html", "assets/pooja-kits/display/05-shiv-puja-kit-hindi.jpg", "Shiva worship", "Shiv pooja kit for Monday worship, Rudra sankalp and family peace prayers."],
+  ["Hanuman Pooja Kit", "hanuman-pooja-kit.html", "assets/pooja-kits/display/06-hanuman-puja-kit-hindi.jpg", "Strength", "Hanuman kit for courage, protection, discipline and Tuesday or Saturday worship."],
+  ["Satyanarayan Pooja Kit", "satyanarayan-pooja-kit.html", "assets/pooja-kits/display/07-satyanarayan-puja-kit-hindi.jpg", "Family blessing", "Satyanarayan kit for family katha, gratitude, birthdays, anniversaries and griha shanti."],
+  ["Navgrah Pooja Kit", "navgrah-pooja-kit.html", "assets/pooja-kits/display/08-navgrah-puja-kit-hindi.jpg", "Grah shanti", "Navgrah kit for nine-planet shanti, dasha concern and kundli-based remedy preparation."],
+  ["Kali Pooja Kit", "kali-pooja-kit.html", "assets/pooja-kits/display/09-kali-puja-kit-hindi.jpg", "Protection", "Kali kit for shakti worship, protection prayers and special spiritual sankalp."],
+  ["Griha Pravesh Pooja Kit", "griha-pravesh-pooja-kit.html", "assets/pooja-kits/display/10-griha-pravesh-puja-kit-hindi.jpg", "Home blessing", "Griha Pravesh kit for new home entry, vastu shanti and family blessing preparation."]
+];
+
+const samagriPages = [
+  ["Hawan Samagri Premium Mix", "hawan-samagri-premium-mix.html", "assets/hawan-samagri/items/10-hawan-samagri-single-item.png", "Premium mix", "Core herbal hawan mix for ahuti; quantity depends on mantra count and duration."],
+  ["Navgrah Hawan Samagri", "navgrah-hawan-samagri.html", "assets/hawan-samagri/items/11-nav-grah-hawan-samagri-single-item.png", "Grah shanti", "Prepared for Navgrah hawan enquiries with nine-planet shanti focus."],
+  ["Lakshmi Hawan Samagri", "lakshmi-hawan-samagri.html", "assets/hawan-samagri/items/12-lakshmi-hawan-samagri-single-item.png", "Prosperity", "For Lakshmi or Kuber hawan planning for home, shop or business sankalp."],
+  ["Durga Hawan Samagri", "durga-hawan-samagri.html", "assets/hawan-samagri/items/13-durga-hawan-samagri-single-item.png", "Shakti", "For Durga, Navratri, protection and strength-related hawan preparation."],
+  ["Ganesh Hawan Samagri", "ganesh-hawan-samagri.html", "assets/hawan-samagri/items/14-ganesh-hawan-samagri-single-item.png", "New beginning", "For Ganesh hawan, obstacle-removal prayers and shubh aarambh rituals."],
+  ["Mahamrityunjay Hawan Samagri", "mahamrityunjay-hawan-samagri.html", "assets/hawan-samagri/items/15-mahamrityunjay-hawan-samagri-single-item.png", "Health prayer", "For Mahamrityunjay hawan and protection sankalp after scope is confirmed."],
+  ["Vastu Shanti Hawan Samagri", "vastu-shanti-hawan-samagri.html", "assets/hawan-samagri/items/17-vastu-shanti-hawan-samagri-single-item.png", "Home shanti", "For vastu shanti, griha pravesh, home, shop or office hawan planning."]
+];
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#039;"
+  }[character]));
+}
+
+function bookingUrl(product, category) {
+  const service = category === "pooja-kit" ? `${product} Enquiry` : `Hawan Samagri - ${product}`;
+  const mode = category === "pooja-kit" ? "Pooja kit guidance" : "Hawan samagri guidance";
+  const categoryLabel = category === "pooja-kit" ? "Hindi Pooja Kit" : "Hawan Samagri";
+  const concern = [
+    `Product category: ${categoryLabel}`,
+    `Product name: ${product}`,
+    "Quote type: Product quote before payment",
+    "Delivery country: To be confirmed",
+    "Please share item list, availability, delivery options and final quote."
+  ].join("\\n");
+  return `book-online.html?service=${encodeURIComponent(service)}&mode=${encodeURIComponent(mode)}&product=${encodeURIComponent(product)}&category=${encodeURIComponent(categoryLabel)}&quoteType=${encodeURIComponent("Product quote before payment")}&concern=${encodeURIComponent(concern)}`;
+}
+
+function pageTemplate(product, category) {
+  const [name, slug, image, badge, body] = product;
+  const backLink = category === "pooja-kit" ? "online-pooja.html#pooja-kit-title" : "hawan.html#hawan-samagri";
+  const eyebrow = category === "pooja-kit" ? "Premium Hindi pooja kit" : "Premium hawan samagri";
+  const productType = category === "pooja-kit" ? "Pooja Kit" : "Hawan Samagri";
+  const summaryNeed = category === "pooja-kit" ? "Kit items, delivery and ritual guidance" : "Quantity, ritual type and delivery country";
+  const inclusions = category === "pooja-kit"
+    ? ["Real kit picture for reference", "Item list confirmed before payment", "NRI delivery and local alternatives discussed"]
+    : ["Real item picture for reference", "Quantity confirmed by hawan type", "Safe local alternatives discussed for NRI families"];
+
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${escapeHtml(name)} | Bandevi Astro ${escapeHtml(productType)}</title>
+    <meta name="description" content="${escapeHtml(name)} enquiry with real picture, quote before payment, delivery country check, policy clarity and Booking ID tracking." />
+    <link rel="canonical" href="https://bandeviastro.com/${escapeHtml(slug)}" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    ${header}
+    <main class="gemstone-product-detail-main product-detail-main">
+      <section class="gemstone-product-hero pooja-kit-product-hero" aria-labelledby="product-title">
+        <div class="gemstone-product-hero-inner">
+          <div class="gemstone-product-copy">
+            <a class="breadcrumb" href="${escapeHtml(backLink)}">Back to product catalogue</a>
+            <p class="eyebrow">${escapeHtml(eyebrow)}</p>
+            <h1 id="product-title">${escapeHtml(name)}</h1>
+            <p>${escapeHtml(body)} Create a trackable quote request before payment with delivery, item list and policy clarity.</p>
+            <div class="product-kicker-row" aria-label="Product highlights">
+              <span>${escapeHtml(badge)}</span>
+              <span>Real picture</span>
+              <span>Quote before payment</span>
+            </div>
+            <div class="gemstone-product-trust-row" aria-label="Trust checkpoints">
+              <span>Since 1981 guidance</span>
+              <span>Booking ID tracking</span>
+              <span>NRI support</span>
+            </div>
+            <div class="gemstone-product-actions">
+              <a class="btn btn-primary" href="${escapeHtml(bookingUrl(name, category))}">Create Product Quote ID</a>
+              <a class="btn btn-secondary" href="https://wa.me/918676846484?text=${encodeURIComponent(`Namaste, I want details for ${name}.`)}">WhatsApp Desk</a>
+            </div>
+          </div>
+          <div class="gemstone-product-gallery product-detail-gallery" aria-label="Product photo">
+            <figure>
+              <img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product image" />
+            </figure>
+          </div>
+        </div>
+        <div class="gemstone-product-summary-strip" aria-label="Product summary">
+          <div><span>Product</span><strong>${escapeHtml(productType)}</strong></div>
+          <div><span>Category</span><strong>${escapeHtml(badge)}</strong></div>
+          <div><span>Quote</span><strong>Before payment</strong></div>
+          <div><span>Need</span><strong>${escapeHtml(summaryNeed)}</strong></div>
+        </div>
+      </section>
+
+      <section class="gemstone-product-section" aria-labelledby="confirm-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Before payment</p>
+          <h2 id="confirm-title">A clear product quote path for serious buyers</h2>
+          <p>Every enquiry follows a trust-based process: product selection, item or quantity confirmation, delivery country check, final quote and Booking ID tracking.</p>
+        </div>
+        <div class="gemstone-product-grid">
+          <article class="gemstone-detail-card"><strong>Product confirmation</strong><p>Staff confirms the exact product, availability and item requirements before any payment is requested.</p></article>
+          <article class="gemstone-detail-card"><strong>Delivery clarity</strong><p>Country, city, dispatch option and local alternatives are checked for India and NRI families.</p></article>
+          <article class="gemstone-detail-card"><strong>Quote approval</strong><p>Final quote, payment step and policy links are shared only after details are clear.</p></article>
+          <article class="gemstone-detail-card"><strong>Trackable support</strong><p>The customer receives a Booking ID so staff follow-up and quote status stay organized.</p></article>
+        </div>
+      </section>
+
+      <section class="gemstone-two-column" aria-label="Product details and policies">
+        <article class="gemstone-ring-spec-panel">
+          <p class="eyebrow">${escapeHtml(productType)} details</p>
+          <h2>${escapeHtml(name)} details</h2>
+          <p>Product images are reference visuals. Availability, final item list, packaging, delivery and quote are confirmed by staff before payment.</p>
+          <dl class="product-spec-list product-detail-list">
+            <div><dt>Product</dt><dd>${escapeHtml(name)}</dd></div>
+            <div><dt>Use</dt><dd>${escapeHtml(body)}</dd></div>
+            <div><dt>Confirmation</dt><dd>${escapeHtml(summaryNeed)}</dd></div>
+            <div><dt>Policy</dt><dd>Terms, privacy, cancellation, refund and shipping policy apply before paid orders.</dd></div>
+          </dl>
+        </article>
+        <article class="gemstone-caution-panel">
+          <p class="eyebrow">Safe buying path</p>
+          <strong>Do not pay until product, quote and delivery are clear.</strong>
+          <p>Spiritual products and ritual guidance are faith-based. They do not replace medical, legal, financial or safety advice.</p>
+          <ol class="product-step-list">
+            <li><span>1</span><div>Create a quote ID with name, WhatsApp, country and product requirement.</div></li>
+            <li><span>2</span><div>Staff confirms item list, availability, delivery and final quotation.</div></li>
+            <li><span>3</span><div>Pay only after the final product, delivery and policy details are clear.</div></li>
+          </ol>
+        </article>
+      </section>
+
+      <section class="gemstone-two-column" aria-label="Included support">
+        <article class="gemstone-related-panel">
+          <p class="eyebrow">What staff confirms</p>
+          <h2>Product quote checklist</h2>
+          <ul class="product-step-list product-detail-checklist">
+            ${inclusions.map((item, index) => `<li><span>${index + 1}</span><div>${escapeHtml(item)}</div></li>`).join("\\n            ")}
+          </ul>
+        </article>
+        <article class="gemstone-related-panel">
+          <p class="eyebrow">Related links</p>
+          <h2>Compare before payment</h2>
+          <p>Browse the full catalogue or create a quote request directly.</p>
+          <div class="related-product-links">
+            <a href="${escapeHtml(backLink)}">All related products</a>
+            <a href="${escapeHtml(bookingUrl(name, category))}">Create quote ID</a>
+            <a href="shipping-policy.html">Shipping policy</a>
+          </div>
+        </article>
+      </section>
+    </main>
+    ${footer}
+    <script src="site-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
+`;
+}
+
+const generatedPages = [
+  ...poojaKits.map((product) => ({ product, category: "pooja-kit" })),
+  ...samagriPages.map((product) => ({ product, category: "hawan-samagri" }))
+];
+
+generatedPages.forEach(({ product, category }) => {
+  fs.writeFileSync(product[1], pageTemplate(product, category));
+});
+
+const sitemapPath = "sitemap.xml";
+let sitemap = fs.readFileSync(sitemapPath, "utf8");
+const additions = generatedPages.map(({ product }) => `  <url>\\n    <loc>https://bandeviastro.com/${product[1]}</loc>\\n  </url>`).join("\\n");
+generatedPages.forEach(({ product }) => {
+  const loc = `https://bandeviastro.com/${product[1]}`;
+  if (!sitemap.includes(loc)) {
+    sitemap = sitemap.replace("</urlset>", `${additions}\\n</urlset>`);
+  }
+});
+fs.writeFileSync(sitemapPath, sitemap);
+
+console.log(`Generated ${generatedPages.length} product detail pages.`);

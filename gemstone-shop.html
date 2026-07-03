@@ -161,16 +161,56 @@
             </div>
             <span data-gemstone-match-count>30 products</span>
           </div>
-          <input type="search" data-gemstone-search placeholder="Search Ruby, Pukhraj, Opal, Shani, ring, pendant..." aria-label="Search gemstone products" />
-          <div class="service-filter-row" aria-label="Gemstone product filters">
+          <input type="search" data-gemstone-search placeholder="Search Ruby, Pukhraj, Opal, Shani, marriage, business, ring, pendant..." aria-label="Search gemstone products" />
+          <div class="service-filter-row gemstone-filter-row" aria-label="Gemstone product filters">
             <button type="button" class="is-active" data-gemstone-filter="all" aria-pressed="true">All</button>
             <button type="button" data-gemstone-filter="rings" aria-pressed="false">Rings</button>
             <button type="button" data-gemstone-filter="pendants" aria-pressed="false">Pendants</button>
             <button type="button" data-gemstone-filter="loose" aria-pressed="false">Loose Stones</button>
             <button type="button" data-gemstone-filter="caution" aria-pressed="false">High Caution</button>
+            <button type="button" data-gemstone-filter="authority" aria-pressed="false">Career</button>
+            <button type="button" data-gemstone-filter="calm" aria-pressed="false">Calm</button>
+            <button type="button" data-gemstone-filter="marriage" aria-pressed="false">Marriage</button>
             <button type="button" data-gemstone-filter="shukra" aria-pressed="false">Shukra</button>
+            <button type="button" data-gemstone-filter="rahu-ketu" aria-pressed="false">Rahu Ketu</button>
+            <button type="button" data-gemstone-filter="international" aria-pressed="false">NRI Delivery</button>
           </div>
+          <div class="gemstone-filter-insight" data-gemstone-filter-insight aria-live="polite"></div>
           <p class="gemstone-empty-message" data-gemstone-empty-message hidden>No product matched. Try Ruby, Emerald, Pukhraj, Neelam, Opal, ring or pendant.</p>
+        </div>
+      </section>
+
+      <section class="section gemstone-curated-section" aria-labelledby="gemstone-curated-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Guided product collections</p>
+          <h2 id="gemstone-curated-title">Browse by customer need, not only by stone name</h2>
+          <p>Quickly narrow the catalogue for career, marriage, calmness, Shukra, Rahu-Ketu or NRI delivery enquiries.</p>
+        </div>
+        <div class="gemstone-curated-grid">
+          <article>
+            <span>01</span>
+            <h3>Career, authority and business</h3>
+            <p>Ruby, Pukhraj and Emerald style enquiries with kundli suitability before recommendation.</p>
+            <button type="button" class="text-button" data-gemstone-filter-target="authority">Show career stones</button>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Marriage and prosperity guidance</h3>
+            <p>Guru and Shukra-related products such as Pukhraj, Diamond and Opal with certificate review.</p>
+            <button type="button" class="text-button" data-gemstone-filter-target="marriage">Show marriage stones</button>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>High-caution stones</h3>
+            <p>Neelam and Lehsunia should be reviewed carefully with trial and wearing guidance.</p>
+            <button type="button" class="text-button" data-gemstone-filter-target="caution">Show caution stones</button>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>NRI and international buyers</h3>
+            <p>Collect delivery country, proof, certificate preference and quote approval before payment.</p>
+            <button type="button" class="text-button" data-gemstone-filter-target="international">Show NRI-ready products</button>
+          </article>
         </div>
       </section>
 
@@ -766,6 +806,18 @@
               <option value="Lehsunia Loose Stone / Cat's Eye Loose Stone">Lehsunia Loose Stone / Cat's Eye Loose Stone</option>
             </select>
           </label>
+          <div class="stone-quote-summary full-span" id="stoneQuoteSummary" aria-live="polite">
+            <div>
+              <span>Certificate quote</span>
+              <strong>Manik Ring / Ruby Ring</strong>
+              <p>Staff will confirm available stone photo/video, certificate detail, carat or ratti, metal, delivery and policy clarity before payment.</p>
+            </div>
+            <dl>
+              <div><dt>Form</dt><dd>Ring</dd></div>
+              <div><dt>Metal</dt><dd>Gold</dd></div>
+              <div><dt>Check</dt><dd>Kundli suitability, product proof and final quote before payment</dd></div>
+            </dl>
+          </div>
           <label>
             Preferred form
             <select id="stoneForm">
