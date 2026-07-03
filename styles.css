@@ -3256,6 +3256,314 @@ details p {
   white-space: pre-wrap;
 }
 
+.backoffice-main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 238, 0.9)),
+    var(--cream);
+}
+
+.backoffice-hero {
+  background:
+    linear-gradient(90deg, rgba(32, 15, 20, 0.98), rgba(91, 18, 32, 0.86), rgba(15, 118, 110, 0.68)),
+    url("assets/real-havan-ritual.jpg") center / cover;
+}
+
+.backoffice-command-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+  width: min(1220px, calc(100% - 36px));
+  margin: -34px auto 0;
+}
+
+.backoffice-command-strip article {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 42px rgba(91, 18, 32, 0.12);
+}
+
+.backoffice-command-strip span {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border: 1px solid rgba(245, 184, 75, 0.36);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.16);
+  font-size: 0.74rem;
+  font-weight: 950;
+}
+
+.backoffice-command-strip strong {
+  display: block;
+  color: var(--maroon);
+  font-size: 1rem;
+}
+
+.backoffice-command-strip p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.backoffice-layout {
+  grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1.62fr);
+  width: min(1280px, 100%);
+}
+
+.backoffice-layout .backoffice-panel {
+  grid-column: auto;
+}
+
+.backoffice-panel.is-visible {
+  display: grid;
+  gap: clamp(18px, 3vw, 28px);
+}
+
+.backoffice-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.backoffice-panel-head h2 {
+  margin: 0;
+}
+
+.backoffice-dashboard-tools {
+  margin: 0;
+}
+
+.backoffice-stat-grid {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+.backoffice-stat-grid div {
+  min-width: 0;
+}
+
+.backoffice-stat-grid span,
+.backoffice-stat-grid strong {
+  overflow-wrap: anywhere;
+}
+
+.backoffice-filter-row {
+  grid-template-columns: minmax(260px, 1fr) minmax(190px, 0.4fr) auto;
+}
+
+.backoffice-section {
+  display: grid;
+  gap: 14px;
+  border-top: 1px solid rgba(91, 18, 32, 0.1);
+  padding-top: 18px;
+}
+
+.compact-heading {
+  margin-bottom: 0;
+}
+
+.compact-heading h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+}
+
+.backoffice-card-list {
+  display: grid;
+  gap: 14px;
+}
+
+.backoffice-card-list article {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-left: 4px solid var(--teal);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 238, 0.82)),
+    #ffffff;
+}
+
+.backoffice-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.backoffice-card-head h3 {
+  margin: 0 0 5px;
+  color: var(--maroon);
+  font-size: 1.02rem;
+}
+
+.backoffice-card-head p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.backoffice-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.backoffice-mini-grid div {
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(15, 118, 110, 0.06);
+  min-width: 0;
+}
+
+.backoffice-mini-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.backoffice-mini-grid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.backoffice-action-row,
+.backoffice-side-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.backoffice-action-row a,
+.backoffice-side-actions a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--teal);
+  background: rgba(15, 118, 110, 0.08);
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.backoffice-action-row a:hover,
+.backoffice-side-actions a:hover {
+  border-color: rgba(15, 118, 110, 0.42);
+  color: #0a5f59;
+  background: rgba(15, 118, 110, 0.14);
+}
+
+.backoffice-two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.backoffice-report-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.backoffice-report-grid article {
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 16px;
+  background: #fffdf9;
+}
+
+.backoffice-report-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.backoffice-report-grid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--maroon);
+  font-size: 1.9rem;
+}
+
+.backoffice-report-grid p {
+  margin: 6px 0 0;
+}
+
+@media (max-width: 1180px) {
+  .backoffice-command-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .backoffice-stat-grid,
+  .backoffice-mini-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .backoffice-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .backoffice-layout .backoffice-panel {
+    grid-column: 1;
+  }
+
+  .backoffice-two-column,
+  .backoffice-report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .backoffice-filter-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .backoffice-filter-row .btn {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .backoffice-command-strip {
+    grid-template-columns: 1fr;
+    width: min(100% - 28px, 1220px);
+    margin-top: -22px;
+  }
+
+  .backoffice-panel-head,
+  .backoffice-card-head {
+    display: grid;
+  }
+
+  .backoffice-stat-grid,
+  .backoffice-mini-grid,
+  .backoffice-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .backoffice-action-row a,
+  .backoffice-side-actions a {
+    flex: 1 1 100%;
+  }
+}
+
 .detail-main {
   background: var(--cream);
 }

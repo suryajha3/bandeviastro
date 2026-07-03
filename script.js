@@ -20,6 +20,18 @@ const adminStatusFilter = document.querySelector("#adminStatusFilter");
 const adminPaymentFilter = document.querySelector("#adminPaymentFilter");
 const adminRefreshButton = document.querySelector("#adminRefresh");
 const adminSourceStrip = document.querySelector("#adminSourceStrip");
+const backofficeAccessForm = document.querySelector("#backofficeAccessForm");
+const backofficePanel = document.querySelector("#backofficePanel");
+const backofficeStats = document.querySelector("#backofficeStats");
+const backofficeSearchInput = document.querySelector("#backofficeSearch");
+const backofficeQueueFilter = document.querySelector("#backofficeQueueFilter");
+const backofficeRefreshButton = document.querySelector("#backofficeRefresh");
+const backofficeSourceStrip = document.querySelector("#backofficeSourceStrip");
+const backofficeOperations = document.querySelector("#backofficeOperations");
+const backofficeCustomerList = document.querySelector("#backofficeCustomerList");
+const backofficeKundaliQueue = document.querySelector("#backofficeKundaliQueue");
+const backofficeGemstoneQueue = document.querySelector("#backofficeGemstoneQueue");
+const backofficeReportList = document.querySelector("#backofficeReportList");
 const customerAuthForm = document.querySelector("#customerAuthForm");
 const authLogoutButton = document.querySelector("#authLogoutButton");
 const accountSummary = document.querySelector("#accountSummary");
@@ -32,9 +44,12 @@ const ticketDetails = document.querySelector("#ticketDetails");
 const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
+const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
 let adminBookingsCache = [];
 let adminBookingsSource = "local";
+let backofficeBookingsCache = [];
+let backofficeBookingsSource = "local";
 
 const bookingStatuses = [
   "Enquiry Received",
@@ -1060,6 +1075,331 @@ async function renderAdminBookings() {
   renderAdminDashboard();
 }
 
+function getBackofficeSearchText(booking) {
+  return [
+    booking.id,
+    booking.name,
+    booking.phone,
+    booking.email,
+    booking.country,
+    booking.service,
+    booking.mode,
+    booking.concern,
+    booking.status,
+    booking.paymentStatus,
+    booking.amount,
+    booking.staffNote
+  ].join(" ").toLowerCase();
+}
+
+function isKundaliBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /kundali|kundli|janam|birth chart|dosh|dasha|rahu|ketu|shani|mangal|pitra|kaal sarp|navgraha|grah|vivah|marriage matching|guna|muhurat|upay|remedy/.test(text);
+}
+
+function isGemstoneBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera/.test(text);
+}
+
+function isNriBooking(booking) {
+  const country = (booking.country || "").trim().toLowerCase();
+  const isIndia = !country || ["india", "in", "bharat"].includes(country);
+  return /^NRI /i.test(booking.service || "") || !isIndia;
+}
+
+function getBackofficeFilteredBookings() {
+  const query = normalizeContact(backofficeSearchInput?.value || "");
+  const queue = backofficeQueueFilter?.value || "all";
+
+  return backofficeBookingsCache.filter((booking) => {
+    const searchable = normalizeContact(getBackofficeSearchText(booking));
+    const matchesQuery = !query || searchable.includes(query);
+    let matchesQueue = true;
+
+    if (queue === "new") matchesQueue = booking.status === "Enquiry Received";
+    if (queue === "payment") matchesQueue = booking.paymentStatus === "Payment Pending";
+    if (queue === "kundali") matchesQueue = isKundaliBooking(booking);
+    if (queue === "gemstone") matchesQueue = isGemstoneBooking(booking);
+    if (queue === "nri") matchesQueue = isNriBooking(booking);
+    if (queue === "scheduled") matchesQueue = booking.status === "Pooja Scheduled";
+    if (queue === "completed") matchesQueue = booking.status === "Completed";
+
+    return matchesQuery && matchesQueue;
+  });
+}
+
+function renderBackofficeStats(visibleBookings) {
+  if (!backofficeStats) return;
+  const total = backofficeBookingsCache.length;
+  const newEnquiries = backofficeBookingsCache.filter((booking) => booking.status === "Enquiry Received").length;
+  const quotesSent = backofficeBookingsCache.filter((booking) => booking.status === "Quote Sent").length;
+  const pendingPayment = backofficeBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const kundaliQueue = backofficeBookingsCache.filter(isKundaliBooking).length;
+  const gemstoneQueue = backofficeBookingsCache.filter(isGemstoneBooking).length;
+  const nriQueue = backofficeBookingsCache.filter(isNriBooking).length;
+  const completed = backofficeBookingsCache.filter((booking) => booking.status === "Completed").length;
+  const stats = [
+    ["Total", total],
+    ["Visible", visibleBookings.length],
+    ["New", newEnquiries],
+    ["Quote sent", quotesSent],
+    ["Payment pending", pendingPayment],
+    ["Kundali", kundaliQueue],
+    ["Gemstones", gemstoneQueue],
+    ["Global/NRI", nriQueue],
+    ["Completed", completed]
+  ];
+
+  backofficeStats.innerHTML = stats.map(([label, value]) => `
+    <div>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
+  `).join("");
+
+  if (backofficeSourceStrip) {
+    const sourceLabel = backofficeBookingsSource === "cloud"
+      ? "Secure shared backoffice connected"
+      : "Local preview mode - shared cloud will sync staff devices";
+    const visibleLabel = visibleBookings.length === total
+      ? "Showing all records"
+      : `Showing ${visibleBookings.length} of ${total}`;
+    backofficeSourceStrip.innerHTML = `
+      <span>${escapeHtml(sourceLabel)}</span>
+      <strong>${escapeHtml(visibleLabel)}</strong>
+    `;
+  }
+}
+
+function getBackofficeCustomers(bookings) {
+  const groups = new Map();
+
+  bookings.forEach((booking) => {
+    const key = normalizeContact(booking.phone)
+      || normalizeContact(booking.email)
+      || normalizeContact(booking.name)
+      || booking.id;
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        name: booking.name || "Client",
+        phone: booking.phone || "Not shared",
+        email: booking.email || "Not shared",
+        country: booking.country || "Not shared",
+        bookings: [],
+        active: 0,
+        paymentPending: 0,
+        updatedAt: booking.updatedAt || booking.createdAt
+      });
+    }
+
+    const group = groups.get(key);
+    group.bookings.push(booking);
+    if (booking.status !== "Completed") group.active += 1;
+    if (booking.paymentStatus === "Payment Pending") group.paymentPending += 1;
+    if (new Date(booking.updatedAt || booking.createdAt) > new Date(group.updatedAt || 0)) {
+      group.updatedAt = booking.updatedAt || booking.createdAt;
+      group.name = booking.name || group.name;
+      group.phone = booking.phone || group.phone;
+      group.email = booking.email || group.email;
+      group.country = booking.country || group.country;
+    }
+  });
+
+  return [...groups.values()].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+}
+
+function renderBackofficeCustomers(bookings) {
+  if (!backofficeCustomerList) return;
+  const customers = getBackofficeCustomers(bookings);
+
+  if (!customers.length) {
+    backofficeCustomerList.innerHTML = `<article><h3>No customer records</h3><p>Customer records appear here after bookings are created.</p></article>`;
+    return;
+  }
+
+  backofficeCustomerList.innerHTML = customers.slice(0, 12).map((customer) => {
+    const latestBooking = customer.bookings.reduce((latest, booking) => (
+      new Date(booking.updatedAt || booking.createdAt) > new Date(latest.updatedAt || latest.createdAt) ? booking : latest
+    ), customer.bookings[0]);
+
+    return `
+      <article>
+        <div class="backoffice-card-head">
+          <div>
+            <h3>${escapeHtml(customer.name)}</h3>
+            <p>${escapeHtml(customer.country)} | ${escapeHtml(customer.phone)}</p>
+          </div>
+          <span class="status-pill">${escapeHtml(customer.bookings.length)} booking${customer.bookings.length === 1 ? "" : "s"}</span>
+        </div>
+        <div class="backoffice-mini-grid">
+          <div><span>Email</span><strong>${escapeHtml(customer.email)}</strong></div>
+          <div><span>Active</span><strong>${escapeHtml(customer.active)}</strong></div>
+          <div><span>Payment</span><strong>${escapeHtml(customer.paymentPending)} pending</strong></div>
+          <div><span>Latest</span><strong>${escapeHtml(latestBooking.service)}</strong></div>
+        </div>
+        <div class="backoffice-action-row">
+          <a href="track-booking.html?id=${encodeURIComponent(latestBooking.id)}">Track latest</a>
+          <a href="${escapeHtml(staffWhatsAppUrl(latestBooking, "status"))}" target="_blank" rel="noopener">WhatsApp update</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderBackofficeQueue(container, bookings, emptyTitle, emptyText) {
+  if (!container) return;
+
+  if (!bookings.length) {
+    container.innerHTML = `<article><h3>${escapeHtml(emptyTitle)}</h3><p>${escapeHtml(emptyText)}</p></article>`;
+    return;
+  }
+
+  container.innerHTML = bookings.slice(0, 10).map((booking) => {
+    const profile = getServiceProfile(booking.service);
+    const priority = getBookingPriority(booking);
+
+    return `
+      <article>
+        <div class="backoffice-card-head">
+          <div>
+            <h3>${escapeHtml(booking.service)}</h3>
+            <p>${escapeHtml(booking.name)} | ${escapeHtml(booking.id)}</p>
+          </div>
+          <span class="status-pill">${escapeHtml(priority.label)}</span>
+        </div>
+        <p>${escapeHtml(booking.concern || profile.body)}</p>
+        <div class="backoffice-mini-grid">
+          <div><span>Quote</span><strong>${escapeHtml(booking.amount || profile.quote)}</strong></div>
+          <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
+          <div><span>Needed</span><strong>${escapeHtml(profile.details)}</strong></div>
+          <div><span>Proof</span><strong>${escapeHtml(profile.proof)}</strong></div>
+        </div>
+        <div class="backoffice-action-row">
+          <a href="admin-bookings.html">Update status</a>
+          <a href="${escapeHtml(staffWhatsAppUrl(booking, "quote"))}" target="_blank" rel="noopener">Send quote</a>
+          <a href="track-booking.html?id=${encodeURIComponent(booking.id)}">Client view</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderBackofficeReports(bookings) {
+  if (!backofficeReportList) return;
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  const newThisWeek = backofficeBookingsCache.filter((booking) => new Date(booking.createdAt || booking.updatedAt) >= sevenDaysAgo).length;
+  const dueSoon = backofficeBookingsCache.filter((booking) => {
+    const days = getDaysUntilBooking(booking);
+    return booking.status !== "Completed" && days !== null && days >= 0 && days <= 2;
+  }).length;
+  const datePassed = backofficeBookingsCache.filter((booking) => {
+    const days = getDaysUntilBooking(booking);
+    return booking.status !== "Completed" && days !== null && days < 0;
+  }).length;
+  const proofReady = backofficeBookingsCache.filter((booking) => booking.proofUrl).length;
+  const reports = [
+    ["7-day intake", newThisWeek, "New requests created this week."],
+    ["Due soon", dueSoon, "Preferred date is within two days and still needs staff attention."],
+    ["Date passed", datePassed, "Check completion, reschedule or customer update."],
+    ["Filtered queue", bookings.length, "Current search and queue view."],
+    ["Proof links", proofReady, "Bookings that already have proof or delivery links."],
+    ["NRI/global", backofficeBookingsCache.filter(isNriBooking).length, "Families outside India or NRI service requests."]
+  ];
+
+  backofficeReportList.innerHTML = reports.map(([label, value, detail]) => `
+    <article>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <p>${escapeHtml(detail)}</p>
+    </article>
+  `).join("");
+}
+
+function renderBackofficeOperations(bookings) {
+  if (!backofficeOperations) return;
+
+  if (!backofficeBookingsCache.length) {
+    backofficeOperations.innerHTML = `<article><h3>No bookings yet</h3><p>Operations will appear here after clients create Booking IDs.</p></article>`;
+    return;
+  }
+
+  if (!bookings.length) {
+    backofficeOperations.innerHTML = `<article><h3>No matching records</h3><p>Try a different search or queue filter.</p></article>`;
+    return;
+  }
+
+  backofficeOperations.innerHTML = bookings.slice(0, 18).map((booking) => {
+    const priority = getBookingPriority(booking);
+
+    return `
+      <article>
+        <div class="backoffice-card-head">
+          <div>
+            <h3>${escapeHtml(booking.name)}</h3>
+            <p>${escapeHtml(booking.id)} | ${escapeHtml(booking.service)}</p>
+          </div>
+          <span class="status-pill">${escapeHtml(booking.status)}</span>
+        </div>
+        <div class="admin-priority-card is-${escapeHtml(priority.tone)}">
+          <strong>${escapeHtml(priority.label)}</strong>
+          <p>${escapeHtml(priority.detail)}</p>
+        </div>
+        ${renderCompactStatusRail(booking, "admin-status-rail")}
+        <div class="backoffice-mini-grid">
+          <div><span>Phone</span><strong>${escapeHtml(booking.phone)}</strong></div>
+          <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
+          <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
+          <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
+        </div>
+        <p>${escapeHtml(booking.concern || "No concern added yet.")}</p>
+        <div class="backoffice-action-row">
+          <a href="admin-bookings.html">Open staff desk</a>
+          <a href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track</a>
+          <a href="${escapeHtml(staffWhatsAppUrl(booking, "quote"))}" target="_blank" rel="noopener">Quote WA</a>
+          <a href="${escapeHtml(staffWhatsAppUrl(booking, "payment"))}" target="_blank" rel="noopener">Payment WA</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderBackofficeDashboard() {
+  if (!backofficePanel) return;
+  const bookings = getBackofficeFilteredBookings();
+  renderBackofficeStats(bookings);
+  renderBackofficeOperations(bookings);
+  renderBackofficeCustomers(bookings);
+  renderBackofficeQueue(
+    backofficeKundaliQueue,
+    bookings.filter(isKundaliBooking),
+    "No Kundali or Dosh queue",
+    "Kundali, dasha, dosh and remedy requests will be highlighted here."
+  );
+  renderBackofficeQueue(
+    backofficeGemstoneQueue,
+    bookings.filter(isGemstoneBooking),
+    "No gemstone queue",
+    "Gemstone, ring, pendant and certified quote requests will be highlighted here."
+  );
+  renderBackofficeReports(bookings);
+}
+
+async function renderBackofficeBookings() {
+  if (!backofficePanel) return;
+  if (backofficeOperations) {
+    backofficeOperations.innerHTML = `<article><h3>Loading backoffice</h3><p>Checking bookings, customer records and queues.</p></article>`;
+  }
+
+  const result = await readBookingsOnline();
+  backofficeBookingsCache = result.bookings;
+  backofficeBookingsSource = result.source;
+  renderBackofficeDashboard();
+}
+
 function setService(serviceName) {
   if (!serviceSelect) return;
   serviceSelect.value = serviceName;
@@ -1405,6 +1745,25 @@ function updateAdminAccessMode() {
   }
 }
 
+function setBackofficeStatus(message) {
+  const status = document.querySelector("#backofficeAccessStatus");
+  if (status) status.textContent = message;
+}
+
+function updateBackofficeAccessMode() {
+  const codeField = document.querySelector("#backofficeCodeField");
+  const cloudFields = document.querySelector("#backofficeCloudFields");
+
+  if (isCloudEnabled()) {
+    codeField?.classList.add("is-hidden");
+    cloudFields?.classList.remove("is-hidden");
+    setBackofficeStatus("Secure backoffice login is active. Use the admin staff email and password.");
+  } else {
+    cloudFields?.classList.add("is-hidden");
+    codeField?.classList.remove("is-hidden");
+  }
+}
+
 async function currentUserIsAdmin() {
   if (!isCloudEnabled()) return false;
   const user = await getCurrentUser();
@@ -1425,6 +1784,13 @@ async function openAdminPanel(message = "Staff dashboard opened.") {
   adminPanel?.classList.add("is-visible");
   setAdminStatus(message);
   await renderAdminBookings();
+}
+
+async function openBackofficePanel(message = "Backoffice opened.") {
+  sessionStorage.setItem(backofficeAccessKey, "true");
+  backofficePanel?.classList.add("is-visible");
+  setBackofficeStatus(message);
+  await renderBackofficeBookings();
 }
 
 adminAccessForm?.addEventListener("submit", async (event) => {
@@ -1464,6 +1830,7 @@ adminAccessForm?.addEventListener("submit", async (event) => {
 });
 
 updateAdminAccessMode();
+updateBackofficeAccessMode();
 
 if (adminPanel) {
   if (isCloudEnabled()) {
@@ -1472,6 +1839,52 @@ if (adminPanel) {
     });
   } else if (sessionStorage.getItem(adminAccessKey) === "true") {
     openAdminPanel("Staff dashboard opened in local mode.");
+  }
+}
+
+backofficeAccessForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (isCloudEnabled()) {
+    const email = document.querySelector("#backofficeEmail")?.value.trim();
+    const password = document.querySelector("#backofficePassword")?.value;
+
+    if (!email || !password) {
+      setBackofficeStatus("Enter staff email and password.");
+      return;
+    }
+
+    setBackofficeStatus("Checking secure backoffice login...");
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      setBackofficeStatus(error.message || "Backoffice login was not accepted.");
+      return;
+    }
+
+    if (!(await currentUserIsAdmin())) {
+      setBackofficeStatus("This account is not marked as admin staff yet.");
+      return;
+    }
+
+    await openBackofficePanel("Secure backoffice opened.");
+    return;
+  }
+
+  const code = document.querySelector("#backofficeCode").value.trim();
+  if (code === adminAccessCode) {
+    await openBackofficePanel("Backoffice opened in local mode.");
+  } else {
+    setBackofficeStatus("Access code not accepted.");
+  }
+});
+
+if (backofficePanel) {
+  if (isCloudEnabled()) {
+    currentUserIsAdmin().then((isAdmin) => {
+      if (isAdmin) openBackofficePanel("Secure backoffice opened.");
+    });
+  } else if (sessionStorage.getItem(backofficeAccessKey) === "true") {
+    openBackofficePanel("Backoffice opened in local mode.");
   }
 }
 
@@ -1524,6 +1937,9 @@ adminSearchInput?.addEventListener("input", renderAdminDashboard);
 adminStatusFilter?.addEventListener("change", renderAdminDashboard);
 adminPaymentFilter?.addEventListener("change", renderAdminDashboard);
 adminRefreshButton?.addEventListener("click", renderAdminBookings);
+backofficeSearchInput?.addEventListener("input", renderBackofficeDashboard);
+backofficeQueueFilter?.addEventListener("change", renderBackofficeDashboard);
+backofficeRefreshButton?.addEventListener("click", renderBackofficeBookings);
 
 async function prefillPortalFromSession() {
   if (!portalBookingForm || !isCloudEnabled()) return;
