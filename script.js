@@ -43,6 +43,10 @@ const primaryNav = document.querySelector("#primaryNav");
 const portalServiceField = document.querySelector("#portalService");
 const portalModeField = document.querySelector("#portalMode");
 const servicePreview = document.querySelector("#servicePreview");
+const portalServiceIntake = document.querySelector("#portalServiceIntake");
+const portalIntakeTitle = document.querySelector("#portalIntakeTitle");
+const portalIntakeBody = document.querySelector("#portalIntakeBody");
+const portalIntakeBadge = document.querySelector("#portalIntakeBadge");
 const ticketDetails = document.querySelector("#ticketDetails");
 const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
@@ -1536,6 +1540,47 @@ function setSelectValue(select, value) {
   select.value = value;
 }
 
+function getPortalServiceType(serviceName) {
+  const service = (serviceName || "").toLowerCase();
+  if (/kundali|kundli|janam|birth chart|dosh|dasha|rahu|ketu|shani|mangal|pitra|kaal sarp|grahan|sade sati|marriage match|guna/.test(service)) {
+    return "kundali";
+  }
+  if (/gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|diamond|heera/.test(service)) {
+    return "gemstone";
+  }
+  return "pooja";
+}
+
+function updatePortalServiceIntake() {
+  if (!portalServiceIntake || !portalServiceField) return;
+  const serviceType = getPortalServiceType(portalServiceField.value);
+  const copy = {
+    kundali: {
+      title: "Kundali, Dosh and birth-detail intake",
+      body: "Birth date, time, place and focus area help the Acharya review Kundali, dosh, dasha, marriage, career and gemstone suitability.",
+      badge: "Kundali desk"
+    },
+    pooja: {
+      title: "Pooja, Hawan and sankalp intake",
+      body: "Sankalp name, gotra, proof option, purpose and samagri notes help staff confirm the correct ritual scope and quote.",
+      badge: "Pooja desk"
+    },
+    gemstone: {
+      title: "Gemstone ring and product intake",
+      body: "Stone name, ring or pendant form, metal, size, budget and certificate preference help staff prepare the right quote.",
+      badge: "Gemstone desk"
+    }
+  };
+
+  portalServiceIntake.dataset.activeType = serviceType;
+  document.querySelectorAll("[data-intake-panel]").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.intakePanel === serviceType);
+  });
+  if (portalIntakeTitle) portalIntakeTitle.textContent = copy[serviceType].title;
+  if (portalIntakeBody) portalIntakeBody.textContent = copy[serviceType].body;
+  if (portalIntakeBadge) portalIntakeBadge.textContent = copy[serviceType].badge;
+}
+
 function updateServicePreview() {
   if (!servicePreview || !portalServiceField) return;
   const service = portalServiceField.value;
@@ -1561,6 +1606,8 @@ function updateServicePreview() {
       portalModeField.value = "Temple pooja with proof";
     }
   }
+
+  updatePortalServiceIntake();
 }
 
 function prefillPortalBookingFromUrl() {
@@ -1647,15 +1694,52 @@ function initializeServiceFinders() {
   });
 }
 
+function getPortalFieldValue(selector) {
+  return document.querySelector(selector)?.value.trim() || "";
+}
+
+function addPortalDetail(details, label, value) {
+  if (value) details.push(`${label}: ${value}`);
+}
+
 function buildPortalConcern() {
   const requirement = document.querySelector("#portalConcern")?.value.trim();
   const sankalp = document.querySelector("#portalSankalp")?.value.trim();
   const timezone = document.querySelector("#portalTimezone")?.value.trim();
+  const selectedService = document.querySelector("#portalService")?.value || "";
+  const serviceType = getPortalServiceType(selectedService);
   const details = [];
 
   if (requirement) details.push(`Requirement: ${requirement}`);
-  if (sankalp) details.push(`Birth / sankalp details: ${sankalp}`);
+  if (sankalp) details.push(`Additional details: ${sankalp}`);
   if (timezone) details.push(`Country time zone: ${timezone}`);
+
+  if (serviceType === "kundali") {
+    addPortalDetail(details, "Birth date", getPortalFieldValue("#portalBirthDate"));
+    addPortalDetail(details, "Birth time", getPortalFieldValue("#portalBirthTime"));
+    addPortalDetail(details, "Birth place", getPortalFieldValue("#portalBirthPlace"));
+    addPortalDetail(details, "Gotra", getPortalFieldValue("#portalGotra"));
+    addPortalDetail(details, "Kundali focus", getPortalFieldValue("#portalDoshType"));
+    addPortalDetail(details, "Second person details", getPortalFieldValue("#portalPartnerDetails"));
+  }
+
+  if (serviceType === "pooja") {
+    addPortalDetail(details, "Sankalp name", getPortalFieldValue("#portalSankalpName"));
+    addPortalDetail(details, "Gotra", getPortalFieldValue("#portalPoojaGotra"));
+    addPortalDetail(details, "Proof option", getPortalFieldValue("#portalProofOption"));
+    addPortalDetail(details, "Participants", getPortalFieldValue("#portalParticipantCount"));
+    addPortalDetail(details, "Ritual purpose", getPortalFieldValue("#portalRitualPurpose"));
+    addPortalDetail(details, "Samagri / location note", getPortalFieldValue("#portalSamagri"));
+  }
+
+  if (serviceType === "gemstone") {
+    addPortalDetail(details, "Stone name", getPortalFieldValue("#portalGemstoneName"));
+    addPortalDetail(details, "Product form", getPortalFieldValue("#portalGemstoneForm"));
+    addPortalDetail(details, "Metal preference", getPortalFieldValue("#portalGemstoneMetal"));
+    addPortalDetail(details, "Ring size", getPortalFieldValue("#portalRingSize"));
+    addPortalDetail(details, "Budget / carat", getPortalFieldValue("#portalGemstoneBudget"));
+    addPortalDetail(details, "Certificate", getPortalFieldValue("#portalCertificate"));
+  }
 
   return details.join("\n") || "Please call me to discuss details.";
 }
@@ -1798,6 +1882,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
   renderTicket(booking, syncResult);
   portalBookingForm.reset();
   updateServicePreview();
+  updatePortalServiceIntake();
   await prefillPortalFromSession();
   if (submitButton) submitButton.textContent = "Create booking ID";
 });
@@ -2112,17 +2197,21 @@ function renderAccountSummary(bookings, sourceLabel = "Booking desk") {
   const activeBookings = bookings.filter((booking) => booking.status !== "Completed").length;
   const paymentPending = bookings.filter((booking) => booking.paymentStatus === "Payment Pending").length;
   const completed = bookings.filter((booking) => booking.status === "Completed").length;
+  const quotePending = bookings.filter((booking) => booking.status === "Enquiry Received").length;
+  const proofReady = bookings.filter((booking) => booking.proofUrl).length;
   const summaryItems = [
     ["Total requests", bookings.length],
     ["Active", activeBookings],
+    ["Quote review", quotePending],
     ["Payment pending", paymentPending],
+    ["Proof ready", proofReady],
     ["Completed", completed]
   ];
 
   accountSummary.innerHTML = `
     <article class="account-summary-lead">
       <span>${escapeHtml(sourceLabel)}</span>
-      <strong>Track quote, payment, schedule and proof from one place.</strong>
+      <strong>Client command desk for quote, payment, schedule and proof updates.</strong>
     </article>
     ${summaryItems.map(([label, value]) => `
       <article>
@@ -2177,6 +2266,25 @@ async function renderAccountBookings() {
   }
 }
 
+function getCustomerChecklistItems(booking) {
+  const type = getPortalServiceType(booking.service);
+  if (type === "kundali") {
+    return ["Birth date", "Birth time", "Birth place", "Gotra", "Problem focus"];
+  }
+  if (type === "gemstone") {
+    return ["Stone", "Ring/pendant", "Metal", "Size", "Certificate"];
+  }
+  return ["Sankalp", "Gotra", "Proof option", "Samagri", "Schedule"];
+}
+
+function renderCustomerChecklist(booking) {
+  return `
+    <div class="customer-checklist" aria-label="Client service checklist">
+      ${getCustomerChecklistItems(booking).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
+    </div>
+  `;
+}
+
 function renderAccountBookingCard(booking) {
   const priority = getBookingPriority(booking);
   const serviceProfile = getServiceProfile(booking.service);
@@ -2193,6 +2301,7 @@ function renderAccountBookingCard(booking) {
         <p>${escapeHtml(booking.id)} | ${escapeHtml(formatBookingDate(booking))} | ${escapeHtml(booking.mode || "Mode pending")}</p>
         ${renderProgressBar(booking, "Status progress")}
         ${renderCompactStatusRail(booking, "account-status-rail")}
+        ${renderCustomerChecklist(booking)}
         <div class="mini-booking-meta">
           <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
           <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>

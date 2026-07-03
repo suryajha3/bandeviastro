@@ -217,6 +217,82 @@
               <div><span>Details needed</span><strong id="servicePreviewDetails">Name, contact and concern</strong></div>
             </div>
           </div>
+          <div class="service-intake-panel full-span" id="portalServiceIntake" aria-live="polite">
+            <div class="service-intake-head">
+              <div>
+                <p class="eyebrow">Smart details</p>
+                <h3 id="portalIntakeTitle">Service details for faster quote</h3>
+                <p id="portalIntakeBody">Share the correct details now so staff can confirm quote, schedule and proof without repeated calls.</p>
+              </div>
+              <span id="portalIntakeBadge">Client intake</span>
+            </div>
+
+            <div class="portal-intake-fields" data-intake-panel="kundali">
+              <label>Birth date<input id="portalBirthDate" type="date" /></label>
+              <label>Birth time<input id="portalBirthTime" type="time" /></label>
+              <label>Birth place<input id="portalBirthPlace" type="text" placeholder="City, state, country" /></label>
+              <label>Gotra<input id="portalGotra" type="text" placeholder="If known" /></label>
+              <label>
+                Kundali focus
+                <select id="portalDoshType">
+                  <option value="">Select focus</option>
+                  <option value="Full Kundali reading">Full Kundali reading</option>
+                  <option value="Marriage matching">Marriage matching</option>
+                  <option value="Career / business">Career / business</option>
+                  <option value="Mangal Dosh">Mangal Dosh</option>
+                  <option value="Pitra Dosh">Pitra Dosh</option>
+                  <option value="Kaal Sarp Dosh">Kaal Sarp Dosh</option>
+                  <option value="Shani / Sade Sati">Shani / Sade Sati</option>
+                  <option value="Gemstone suitability">Gemstone suitability</option>
+                </select>
+              </label>
+              <label>Second person details<input id="portalPartnerDetails" type="text" placeholder="For marriage matching, if applicable" /></label>
+            </div>
+
+            <div class="portal-intake-fields" data-intake-panel="pooja">
+              <label>Sankalp name<input id="portalSankalpName" type="text" placeholder="Name for sankalp" /></label>
+              <label>Gotra<input id="portalPoojaGotra" type="text" placeholder="Family gotra if known" /></label>
+              <label>
+                Proof option
+                <select id="portalProofOption">
+                  <option value="">Select option</option>
+                  <option value="Temple pooja with photos">Temple pooja with photos</option>
+                  <option value="Live video joining">Live video joining</option>
+                  <option value="Photos and short video proof">Photos and short video proof</option>
+                  <option value="Completion note only">Completion note only</option>
+                </select>
+              </label>
+              <label>Participants<input id="portalParticipantCount" type="text" placeholder="Single, couple, family, business team" /></label>
+              <label class="full-span">Ritual purpose<input id="portalRitualPurpose" type="text" placeholder="Health, marriage, business, grah shanti, griha pravesh..." /></label>
+              <label class="full-span">Samagri / location note<textarea id="portalSamagri" rows="3" placeholder="Temple pooja, home pooja, hawan samagri needed, city/country, or special items"></textarea></label>
+            </div>
+
+            <div class="portal-intake-fields" data-intake-panel="gemstone">
+              <label>Stone name<input id="portalGemstoneName" type="text" placeholder="Ruby, Emerald, Yellow Sapphire..." /></label>
+              <label>
+                Product form
+                <select id="portalGemstoneForm">
+                  <option value="">Select form</option>
+                  <option value="Ring">Ring</option>
+                  <option value="Pendant">Pendant</option>
+                  <option value="Loose stone">Loose stone</option>
+                  <option value="Need recommendation">Need recommendation</option>
+                </select>
+              </label>
+              <label>Metal preference<input id="portalGemstoneMetal" type="text" placeholder="Gold, silver, panchdhatu..." /></label>
+              <label>Ring size<input id="portalRingSize" type="text" placeholder="If ring required" /></label>
+              <label>Budget / carat<input id="portalGemstoneBudget" type="text" placeholder="Budget or carat preference" /></label>
+              <label>
+                Certificate
+                <select id="portalCertificate">
+                  <option value="">Select preference</option>
+                  <option value="Certified stone required">Certified stone required</option>
+                  <option value="Standard quote first">Standard quote first</option>
+                  <option value="Need kundali suitability check">Need kundali suitability check</option>
+                </select>
+              </label>
+            </div>
+          </div>
           <label>Preferred date<input id="portalDate" type="date" /></label>
           <label>Preferred time<input id="portalTime" type="time" /></label>
           <label>Country time zone<input id="portalTimezone" type="text" placeholder="India IST, USA EST, UAE GST..." /></label>
@@ -229,7 +305,7 @@
               <option value="Gemstone delivery">Gemstone delivery</option>
             </select>
           </label>
-          <label class="full-span">Birth / sankalp details<input id="portalSankalp" type="text" placeholder="Name, gotra, DOB/time/place if needed, or family sankalp name" /></label>
+          <label class="full-span">Additional details<input id="portalSankalp" type="text" placeholder="Any extra birth, sankalp, family, samagri or gemstone note" /></label>
           <label class="full-span">Concern / requirement<textarea id="portalConcern" rows="4" placeholder="Marriage, business, grah shanti, gemstone, muhurat..."></textarea></label>
           <label class="checkbox-line full-span">
             <input type="checkbox" required />
