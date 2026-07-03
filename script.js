@@ -335,6 +335,74 @@ function safeExternalUrl(value) {
   }
 }
 
+function parseStaffNotePaymentLink(value) {
+  const rawNote = String(value || "");
+  const match = rawNote.match(/\[\[payment_link:([^\]]*)\]\]/i);
+  let paymentLink = "";
+  if (match) {
+    try {
+      paymentLink = decodeURIComponent(match[1] || "");
+    } catch {
+      paymentLink = "";
+    }
+  }
+  const note = rawNote.replace(/\s*\[\[payment_link:[^\]]*\]\]\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
+  return { note, paymentLink };
+}
+
+function serializeStaffNotePaymentLink(note, paymentLink) {
+  const parsed = parseStaffNotePaymentLink(note);
+  const cleanNote = parsed.note;
+  const cleanPaymentLink = String(paymentLink || "").trim();
+  if (!cleanPaymentLink) return cleanNote;
+  return `${cleanNote}${cleanNote ? "\n\n" : ""}[[payment_link:${encodeURIComponent(cleanPaymentLink)}]]`;
+}
+
+function getBookingPaymentLink(booking) {
+  if (!booking) return "";
+  if (booking.paymentLink) return String(booking.paymentLink).trim();
+  return parseStaffNotePaymentLink(booking.staffNote).paymentLink;
+}
+
+function isPaymentPendingStage(booking) {
+  return booking?.paymentStatus === "Payment Pending" || booking?.status === "Payment Pending";
+}
+
+function getVisiblePaymentLink(booking) {
+  if (!isPaymentPendingStage(booking)) return "";
+  const paymentLink = getBookingPaymentLink(booking);
+  const safeLink = safeExternalUrl(paymentLink);
+  return safeLink === "#" ? "" : safeLink;
+}
+
+function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
+  if (!booking) return "";
+  const amount = booking.amount || getServiceProfile(booking.service).quote || "Quote pending";
+  const paymentLink = getVisiblePaymentLink(booking);
+  const isPending = isPaymentPendingStage(booking);
+  const stateLabel = isPending
+    ? paymentLink ? "Payment link ready" : "Payment link pending"
+    : "Locked until quote approval";
+  const pendingActionLabel = isPending ? "Awaiting payment link" : "Payment locked";
+  const action = paymentLink
+    ? `<a class="btn btn-primary" href="${escapeHtml(paymentLink)}" target="_blank" rel="noopener">Pay Now</a>`
+    : `<span class="payment-pending-chip">${escapeHtml(pendingActionLabel)}</span>`;
+
+  return `
+    <div class="${escapeHtml(className)} ${isPending ? "is-payment-open" : "is-payment-locked"}" aria-label="Payment readiness">
+      <div>
+        <span>${escapeHtml(stateLabel)}</span>
+        <strong>${escapeHtml(amount)}</strong>
+        <p>Payment opens only after staff confirms the quote. UPI, bank transfer or gateway link can be shared here before full payment gateway integration.</p>
+      </div>
+      <div class="payment-ready-actions">
+        ${action}
+        <small>Pay only after confirming the quote and Booking ID with staff.</small>
+      </div>
+    </div>
+  `;
+}
+
 function csvCell(value) {
   return `"${String(value ?? "").replace(/"/g, "\"\"")}"`;
 }
@@ -351,6 +419,7 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       "Status",
       "Payment",
       "Quote",
+      "Payment Link",
       "Date / Time",
       "Mode",
       "Concern",
@@ -369,6 +438,7 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       booking.status,
       booking.paymentStatus,
       booking.amount || "",
+      getBookingPaymentLink(booking),
       formatBookingDate(booking),
       booking.mode || "",
       booking.concern || "",
@@ -410,10 +480,13 @@ function getStatusGuidance(booking) {
   const proofLabel = booking?.proofUrl
     ? "Proof/update link is ready in your booking panel."
     : "Proof, photos, video or completion note will be shared where applicable.";
+  const paymentLabel = getVisiblePaymentLink(booking)
+    ? "Payment link is ready in your booking panel. Please pay only after confirming the quote and Booking ID."
+    : "Payment is pending after quote approval. Staff will confirm the payment method or link before collection.";
   const guidance = {
     "Enquiry Received": "Your request is received. The team will review details and share the right quote, schedule and payment process.",
     "Quote Sent": `Quote is ready: ${amount}. Please confirm on WhatsApp before making payment.`,
-    "Payment Pending": "Payment is pending after quote approval. Staff will confirm the payment method before collection.",
+    "Payment Pending": paymentLabel,
     "Confirmed": "Your booking is confirmed. The team is preparing the schedule, pandit assignment or consultation slot.",
     "Pooja Scheduled": `Your service is scheduled for ${scheduleLabel}. Please keep your phone available for final coordination and proof updates.`,
     "Completed": `Your service is marked completed. ${proofLabel}`
@@ -638,7 +711,8 @@ function toCloudTimeValue(value) {
 }
 
 function toCloudBooking(booking, user) {
-  return {
+  const staffNote = serializeStaffNotePaymentLink(booking.staffNote, booking.paymentLink);
+  const payload = {
     booking_code: booking.id,
     customer_name: booking.name,
     phone: booking.phone,
@@ -653,15 +727,22 @@ function toCloudBooking(booking, user) {
     payment_status: booking.paymentStatus,
     amount: booking.amount || null,
     proof_url: booking.proofUrl || null,
-    staff_note: booking.staffNote || null,
+    staff_note: staffNote || null,
     customer_user_id: user?.id || booking.customerUserId || null,
     created_at: booking.createdAt,
     updated_at: booking.updatedAt
   };
+
+  if (siteConfig.paymentLinkColumnEnabled) {
+    payload.payment_link = booking.paymentLink || null;
+  }
+
+  return payload;
 }
 
 function fromCloudBooking(row) {
   const preferredTime = row.preferred_time ? String(row.preferred_time).slice(0, 5) : "";
+  const parsedStaffNote = parseStaffNotePaymentLink(row.staff_note || row.staffNote || "");
 
   return {
     id: row.booking_code || row.id,
@@ -677,8 +758,9 @@ function fromCloudBooking(row) {
     status: row.status || "Enquiry Received",
     paymentStatus: row.payment_status || row.paymentStatus || "Not Requested",
     amount: row.amount || "",
+    paymentLink: row.payment_link || row.paymentLink || parsedStaffNote.paymentLink || "",
     proofUrl: row.proof_url || row.proofUrl || "",
-    staffNote: row.staff_note || row.staffNote || "",
+    staffNote: parsedStaffNote.note,
     customerUserId: row.customer_user_id || row.customerUserId || null,
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
     updatedAt: row.updated_at || row.updatedAt || row.created_at || new Date().toISOString(),
@@ -752,6 +834,7 @@ async function readBookingsOnline() {
 async function updateBookingOnline(booking) {
   booking.updatedAt = new Date().toISOString();
   saveBooking(booking);
+  const staffNote = serializeStaffNotePaymentLink(booking.staffNote, booking.paymentLink);
 
   if (!isCloudEnabled()) {
     return { savedCloud: false, mode: "local" };
@@ -765,9 +848,13 @@ async function updateBookingOnline(booking) {
     payment_status: booking.paymentStatus,
     amount: booking.amount || null,
     proof_url: booking.proofUrl || null,
-    staff_note: booking.staffNote || null,
+    staff_note: staffNote || null,
     updated_at: booking.updatedAt
   };
+
+  if (siteConfig.paymentLinkColumnEnabled) {
+    updatePayload.payment_link = booking.paymentLink || null;
+  }
 
   const { error } = await supabaseClient
     .from("bookings")
@@ -818,6 +905,9 @@ function getStaffTemplateMessage(booking, templateKey = "status") {
     payment: [
       "Your booking has reached the payment stage.",
       `Amount / quote: ${amount}`,
+      getBookingPaymentLink(booking)
+        ? `Payment link: ${getBookingPaymentLink(booking)}`
+        : "Payment link/method will be shared after staff confirms the quote.",
       "Please share payment confirmation after transfer so the team can update your booking."
     ],
     received: [
@@ -922,6 +1012,7 @@ function renderStatusPanel(booking) {
   const statusWhatsApp = document.querySelector("#statusWhatsApp");
   const statusNextAction = document.querySelector("#statusNextAction");
   const statusStageBoard = document.querySelector("#statusStageBoard");
+  const statusPaymentAction = document.querySelector("#statusPaymentAction");
   if (!statusPanel || !statusMessage || !statusTimeline || !statusMeta || !statusWhatsApp) return;
 
   if (!booking) {
@@ -933,6 +1024,7 @@ function renderStatusPanel(booking) {
     statusTimeline.innerHTML = "";
     statusMeta.innerHTML = "";
     if (statusStageBoard) statusStageBoard.innerHTML = "";
+    if (statusPaymentAction) statusPaymentAction.innerHTML = "";
     statusWhatsApp.href = `https://wa.me/${businessWhatsApp}`;
     return;
   }
@@ -956,6 +1048,9 @@ function renderStatusPanel(booking) {
   if (statusStageBoard) {
     statusStageBoard.innerHTML = renderCustomerStageBoard(booking);
   }
+  if (statusPaymentAction) {
+    statusPaymentAction.innerHTML = renderPaymentReadyPanel(booking);
+  }
   statusTimeline.innerHTML = bookingStatuses.map((status, index) => {
     const stateClass = index < currentIndex ? "is-complete" : index === currentIndex ? "is-current" : "";
     const timelineText = index < currentIndex
@@ -978,6 +1073,11 @@ function renderStatusPanel(booking) {
 
   if (booking.staffNote) {
     metaItems.push(["Team update", booking.staffNote]);
+  }
+
+  const paymentLink = getVisiblePaymentLink(booking);
+  if (paymentLink) {
+    metaItems.push(["Payment link", `<a href="${escapeHtml(paymentLink)}" target="_blank" rel="noopener">Pay Now</a>`]);
   }
 
   if (booking.proofUrl) {
@@ -1165,6 +1265,7 @@ function renderAdminDashboard() {
           <label>Status<select data-field="status">${statusOptions}</select></label>
           <label>Payment<select data-field="paymentStatus">${paymentOptions}</select></label>
           <label>Amount<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
+          <label>Payment link<input data-field="paymentLink" type="url" value="${escapeHtml(getBookingPaymentLink(booking))}" placeholder="Razorpay, Stripe, UPI or bank payment link" /></label>
           <label>Schedule date<input data-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
           <label>Schedule time<input data-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
           <label>Service mode<input data-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Online, temple proof, delivery..." /></label>
@@ -1175,6 +1276,7 @@ function renderAdminDashboard() {
           <div><span>Proof plan</span><strong>${escapeHtml(serviceProfile.proof)}</strong></div>
           <div><span>Details needed</span><strong>${escapeHtml(serviceProfile.details)}</strong></div>
         </div>
+        ${renderPaymentReadyPanel(booking, "payment-ready-panel admin-payment-ready-panel")}
         ${renderCustomerStageBoard(booking, "admin-stage-board")}
         <div class="admin-note-box">
           <strong>Client concern</strong>
@@ -1214,6 +1316,7 @@ function getBackofficeSearchText(booking) {
     booking.status,
     booking.paymentStatus,
     booking.amount,
+    getBookingPaymentLink(booking),
     booking.staffNote
   ].join(" ").toLowerCase();
 }
@@ -1576,6 +1679,7 @@ function renderBackofficeOperations(bookings) {
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
           <div><span>Quote</span><strong>${escapeHtml(booking.amount || serviceProfile.quote)}</strong></div>
+          <div><span>Payment link</span><strong>${escapeHtml(getBookingPaymentLink(booking) ? "Ready" : "Pending")}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
           <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
           <div><span>Proof</span><strong>${escapeHtml(booking.proofUrl ? "Ready" : "Pending")}</strong></div>
@@ -1586,11 +1690,13 @@ function renderBackofficeOperations(bookings) {
           <label>Status<select data-backoffice-field="status">${statusOptions}</select></label>
           <label>Payment<select data-backoffice-field="paymentStatus">${paymentOptions}</select></label>
           <label>Quote amount<input data-backoffice-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="${escapeHtml(serviceProfile.quote)}" /></label>
+          <label>Payment link<input data-backoffice-field="paymentLink" type="url" value="${escapeHtml(getBookingPaymentLink(booking))}" placeholder="Razorpay, Stripe, UPI or bank payment link" /></label>
           <label>Schedule date<input data-backoffice-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
           <label>Schedule time<input data-backoffice-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
           <label>Service mode<input data-backoffice-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Temple proof, live video, delivery..." /></label>
           <label>Proof link<input data-backoffice-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         </div>
+        ${renderPaymentReadyPanel(booking, "payment-ready-panel backoffice-payment-ready-panel")}
         <label class="backoffice-note-field">Staff work note<textarea data-backoffice-field="staffNote" rows="4" placeholder="Record Kundali birth details, sankalp, samagri, gemstone quote or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
         <p>${escapeHtml(booking.concern || "No concern added yet.")}</p>
         ${renderBackofficeTemplateLinks(booking)}
@@ -2850,6 +2956,7 @@ function renderAccountBookingCard(booking) {
         ${renderCompactStatusRail(booking, "account-status-rail")}
         ${renderCustomerChecklist(booking)}
         ${renderCustomerStageBoard(booking, "account-stage-board")}
+        ${renderPaymentReadyPanel(booking, "payment-ready-panel account-payment-ready-panel")}
         <div class="mini-booking-meta">
           <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
           <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>

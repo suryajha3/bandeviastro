@@ -28,6 +28,7 @@ create table if not exists public.bookings (
   status text not null default 'Enquiry Received',
   payment_status text not null default 'Not Requested',
   amount text,
+  payment_link text,
   proof_url text,
   staff_note text,
   customer_user_id uuid references auth.users(id) on delete set null,
@@ -39,6 +40,8 @@ create index if not exists bookings_booking_code_idx on public.bookings (booking
 create index if not exists bookings_customer_user_idx on public.bookings (customer_user_id);
 create index if not exists bookings_email_idx on public.bookings (lower(email));
 create index if not exists bookings_created_at_idx on public.bookings (created_at desc);
+
+alter table public.bookings add column if not exists payment_link text;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -117,6 +120,7 @@ returns table (
   status text,
   payment_status text,
   amount text,
+  payment_link text,
   proof_url text,
   staff_note text,
   created_at timestamptz,
@@ -145,6 +149,7 @@ as $$
     b.status,
     b.payment_status,
     b.amount,
+    b.payment_link,
     b.proof_url,
     b.staff_note,
     b.created_at,
