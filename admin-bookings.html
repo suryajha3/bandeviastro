@@ -41,6 +41,25 @@
         </div>
       </section>
 
+      <section class="staff-queue-command" aria-labelledby="staff-queue-title">
+        <div class="staff-queue-copy">
+          <p class="eyebrow">Staff quick queues</p>
+          <h2 id="staff-queue-title">Jump directly to the work that needs attention</h2>
+          <p>Use these quick queues for quote, payment, schedule, proof, Kundali, gemstone and NRI follow-up before marking any booking complete.</p>
+        </div>
+        <div class="staff-queue-buttons" aria-label="Staff quick queue filters">
+          <button type="button" data-admin-quick-filter="all" class="is-active">All</button>
+          <button type="button" data-admin-quick-filter="new">New</button>
+          <button type="button" data-admin-quick-filter="quote">Quote</button>
+          <button type="button" data-admin-quick-filter="payment">Payment</button>
+          <button type="button" data-admin-quick-filter="due">Due soon</button>
+          <button type="button" data-admin-quick-filter="proof">Proof pending</button>
+          <button type="button" data-admin-quick-filter="kundali">Kundali</button>
+          <button type="button" data-admin-quick-filter="gemstone">Gemstone</button>
+          <button type="button" data-admin-quick-filter="nri">NRI</button>
+        </div>
+      </section>
+
       <section class="portal-shell admin-layout">
         <aside class="admin-toolbar">
           <form id="adminAccessForm">
@@ -71,6 +90,7 @@
           <div class="admin-dashboard-tools" id="adminDashboardTools">
             <div class="admin-source-strip" id="adminSourceStrip" aria-live="polite"></div>
             <div class="admin-stat-grid" id="adminStats" aria-label="Booking summary"></div>
+            <div class="staff-queue-board" id="adminQueueBoard" aria-label="Staff queue summary"></div>
             <div class="admin-filter-row">
               <label>Search booking<input id="adminSearch" type="search" placeholder="Name, ID, phone or service" /></label>
               <label>Status filter<select id="adminStatusFilter"><option value="">All statuses</option></select></label>

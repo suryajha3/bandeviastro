@@ -105,13 +105,18 @@
           <div class="admin-dashboard-tools backoffice-dashboard-tools">
             <div class="admin-source-strip" id="backofficeSourceStrip" aria-live="polite"></div>
             <div class="admin-stat-grid backoffice-stat-grid" id="backofficeStats" aria-label="Backoffice summary"></div>
+            <div class="backoffice-queue-overview" id="backofficeQueueOverview" aria-label="Backoffice queue overview"></div>
             <div class="admin-filter-row backoffice-filter-row">
               <label>Search records<input id="backofficeSearch" type="search" placeholder="Name, ID, phone, service, country" /></label>
               <label>Queue filter
                 <select id="backofficeQueueFilter">
                   <option value="all">All records</option>
                   <option value="new">New enquiries</option>
+                  <option value="quote">Quote sent</option>
                   <option value="payment">Payment pending</option>
+                  <option value="due">Due soon</option>
+                  <option value="proof">Proof pending</option>
+                  <option value="pooja">Pooja and Hawan</option>
                   <option value="kundali">Kundali and Dosh</option>
                   <option value="gemstone">Gemstone and Rings</option>
                   <option value="products">Kits and Samagri</option>

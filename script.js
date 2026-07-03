@@ -22,6 +22,7 @@ const adminPaymentFilter = document.querySelector("#adminPaymentFilter");
 const adminRefreshButton = document.querySelector("#adminRefresh");
 const adminExportButton = document.querySelector("#adminExport");
 const adminSourceStrip = document.querySelector("#adminSourceStrip");
+const adminQueueBoard = document.querySelector("#adminQueueBoard");
 const backofficeAccessForm = document.querySelector("#backofficeAccessForm");
 const backofficePanel = document.querySelector("#backofficePanel");
 const backofficeStats = document.querySelector("#backofficeStats");
@@ -30,6 +31,7 @@ const backofficeQueueFilter = document.querySelector("#backofficeQueueFilter");
 const backofficeRefreshButton = document.querySelector("#backofficeRefresh");
 const backofficeExportButton = document.querySelector("#backofficeExport");
 const backofficeSourceStrip = document.querySelector("#backofficeSourceStrip");
+const backofficeQueueOverview = document.querySelector("#backofficeQueueOverview");
 const backofficeOperations = document.querySelector("#backofficeOperations");
 const backofficeCustomerList = document.querySelector("#backofficeCustomerList");
 const backofficeKundaliQueue = document.querySelector("#backofficeKundaliQueue");
@@ -59,6 +61,7 @@ const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
 const adminAccessCode = "BA-ADMIN-2026";
 let adminBookingsCache = [];
 let adminBookingsSource = "local";
+let adminQuickFilter = "all";
 let backofficeBookingsCache = [];
 let backofficeBookingsSource = "local";
 
@@ -1109,6 +1112,72 @@ function initAdminStatusFilter() {
   }
 }
 
+function isDueSoonBooking(booking) {
+  const days = getDaysUntilBooking(booking);
+  return booking?.status !== "Completed" && days !== null && days >= 0 && days <= 2;
+}
+
+function isProofPendingBooking(booking) {
+  const proofNeeded = booking?.status === "Pooja Scheduled"
+    || booking?.status === "Completed"
+    || booking?.paymentStatus === "Payment Received";
+  return proofNeeded && !booking?.proofUrl;
+}
+
+function isPoojaHawanBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /pooja|puja|hawan|havan|jaap|path|shanti|sankalp|rudrabhishek|satyanarayan|navgraha|durga|lakshmi|ganesh|pitra|mangal|mahamrityunjay|griha|vastu/.test(text)
+    && !isGemstoneBooking(booking)
+    && !isProductQuoteBooking(booking);
+}
+
+function matchesStaffQueueFilter(booking, filter) {
+  if (!filter || filter === "all") return true;
+  if (filter === "new") return booking.status === "Enquiry Received";
+  if (filter === "quote") return booking.status === "Quote Sent";
+  if (filter === "payment") return booking.paymentStatus === "Payment Pending";
+  if (filter === "due") return isDueSoonBooking(booking);
+  if (filter === "proof") return isProofPendingBooking(booking);
+  if (filter === "pooja") return isPoojaHawanBooking(booking);
+  if (filter === "kundali") return isKundaliBooking(booking);
+  if (filter === "gemstone") return isGemstoneBooking(booking);
+  if (filter === "products") return isProductQuoteBooking(booking);
+  if (filter === "nri") return isNriBooking(booking);
+  if (filter === "scheduled") return booking.status === "Pooja Scheduled";
+  if (filter === "completed") return booking.status === "Completed";
+  return true;
+}
+
+function getStaffQueueItems(bookings) {
+  return [
+    ["all", "All", bookings.length, "Every booking in the desk"],
+    ["new", "New", bookings.filter((booking) => matchesStaffQueueFilter(booking, "new")).length, "Needs first review"],
+    ["quote", "Quote", bookings.filter((booking) => matchesStaffQueueFilter(booking, "quote")).length, "Quote sent follow-up"],
+    ["payment", "Payment", bookings.filter((booking) => matchesStaffQueueFilter(booking, "payment")).length, "Payment link or receipt"],
+    ["due", "Due soon", bookings.filter((booking) => matchesStaffQueueFilter(booking, "due")).length, "Date is close"],
+    ["proof", "Proof", bookings.filter((booking) => matchesStaffQueueFilter(booking, "proof")).length, "Proof/update pending"],
+    ["pooja", "Pooja", bookings.filter((booking) => matchesStaffQueueFilter(booking, "pooja")).length, "Pooja and hawan work"],
+    ["kundali", "Kundali", bookings.filter((booking) => matchesStaffQueueFilter(booking, "kundali")).length, "Birth chart and dosh"],
+    ["gemstone", "Gems", bookings.filter((booking) => matchesStaffQueueFilter(booking, "gemstone")).length, "Stone and ring quote"],
+    ["nri", "NRI", bookings.filter((booking) => matchesStaffQueueFilter(booking, "nri")).length, "Global family handling"]
+  ];
+}
+
+function syncAdminQuickFilterButtons() {
+  document.querySelectorAll("[data-admin-quick-filter]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.adminQuickFilter === adminQuickFilter);
+    button.setAttribute("aria-pressed", button.dataset.adminQuickFilter === adminQuickFilter ? "true" : "false");
+  });
+}
+
+function applyAdminQuickFilter(filter) {
+  adminQuickFilter = filter || "all";
+  if (adminStatusFilter) adminStatusFilter.value = "";
+  if (adminPaymentFilter) adminPaymentFilter.value = "";
+  syncAdminQuickFilterButtons();
+  renderAdminDashboard();
+}
+
 function getFilteredAdminBookings() {
   const query = normalizeContact(adminSearchInput?.value || "");
   const status = adminStatusFilter?.value || "";
@@ -1128,7 +1197,8 @@ function getFilteredAdminBookings() {
     const matchesQuery = !query || searchable.includes(query);
     const matchesStatus = !status || booking.status === status;
     const matchesPayment = !paymentStatus || booking.paymentStatus === paymentStatus;
-    return matchesQuery && matchesStatus && matchesPayment;
+    const matchesQuickFilter = matchesStaffQueueFilter(booking, adminQuickFilter);
+    return matchesQuery && matchesStatus && matchesPayment && matchesQuickFilter;
   });
 }
 
@@ -1139,6 +1209,10 @@ function renderAdminStats(visibleBookings) {
   const pendingPayment = adminBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
   const quotesSent = adminBookingsCache.filter((booking) => booking.status === "Quote Sent").length;
   const scheduled = adminBookingsCache.filter((booking) => booking.status === "Pooja Scheduled").length;
+  const dueSoon = adminBookingsCache.filter(isDueSoonBooking).length;
+  const proofPending = adminBookingsCache.filter(isProofPendingBooking).length;
+  const kundaliQueue = adminBookingsCache.filter(isKundaliBooking).length;
+  const gemstoneQueue = adminBookingsCache.filter(isGemstoneBooking).length;
   const completed = adminBookingsCache.filter((booking) => booking.status === "Completed").length;
   const stats = [
     ["Total", total],
@@ -1146,6 +1220,10 @@ function renderAdminStats(visibleBookings) {
     ["New", newEnquiries],
     ["Quote sent", quotesSent],
     ["Payment pending", pendingPayment],
+    ["Due soon", dueSoon],
+    ["Proof pending", proofPending],
+    ["Kundali", kundaliQueue],
+    ["Gemstones", gemstoneQueue],
     ["Scheduled", scheduled],
     ["Completed", completed]
   ];
@@ -1169,6 +1247,18 @@ function renderAdminStats(visibleBookings) {
       <strong>${escapeHtml(visibleLabel)}</strong>
     `;
   }
+}
+
+function renderStaffQueueBoard() {
+  if (!adminQueueBoard) return;
+  adminQueueBoard.innerHTML = getStaffQueueItems(adminBookingsCache).map(([key, label, value, detail]) => `
+    <button type="button" data-admin-quick-filter="${escapeHtml(key)}" class="${adminQuickFilter === key ? "is-active" : ""}" aria-pressed="${adminQuickFilter === key ? "true" : "false"}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(detail)}</small>
+    </button>
+  `).join("");
+  syncAdminQuickFilterButtons();
 }
 
 function renderAdminWorkflowButtons(booking) {
@@ -1219,6 +1309,7 @@ function renderAdminDashboard() {
   initAdminStatusFilter();
   const bookings = getFilteredAdminBookings();
   renderAdminStats(bookings);
+  renderStaffQueueBoard();
 
   if (!adminBookingsCache.length) {
     const emptyMessage = adminBookingsSource === "cloud"
@@ -1349,16 +1440,7 @@ function getBackofficeFilteredBookings() {
   return backofficeBookingsCache.filter((booking) => {
     const searchable = normalizeContact(getBackofficeSearchText(booking));
     const matchesQuery = !query || searchable.includes(query);
-    let matchesQueue = true;
-
-    if (queue === "new") matchesQueue = booking.status === "Enquiry Received";
-    if (queue === "payment") matchesQueue = booking.paymentStatus === "Payment Pending";
-    if (queue === "kundali") matchesQueue = isKundaliBooking(booking);
-    if (queue === "gemstone") matchesQueue = isGemstoneBooking(booking);
-    if (queue === "products") matchesQueue = isProductQuoteBooking(booking);
-    if (queue === "nri") matchesQueue = isNriBooking(booking);
-    if (queue === "scheduled") matchesQueue = booking.status === "Pooja Scheduled";
-    if (queue === "completed") matchesQueue = booking.status === "Completed";
+    const matchesQueue = matchesStaffQueueFilter(booking, queue);
 
     return matchesQuery && matchesQueue;
   });
@@ -1374,6 +1456,9 @@ function renderBackofficeStats(visibleBookings) {
   const gemstoneQueue = backofficeBookingsCache.filter(isGemstoneBooking).length;
   const productQueue = backofficeBookingsCache.filter(isProductQuoteBooking).length;
   const nriQueue = backofficeBookingsCache.filter(isNriBooking).length;
+  const poojaQueue = backofficeBookingsCache.filter(isPoojaHawanBooking).length;
+  const dueSoon = backofficeBookingsCache.filter(isDueSoonBooking).length;
+  const proofPending = backofficeBookingsCache.filter(isProofPendingBooking).length;
   const completed = backofficeBookingsCache.filter((booking) => booking.status === "Completed").length;
   const stats = [
     ["Total", total],
@@ -1381,6 +1466,9 @@ function renderBackofficeStats(visibleBookings) {
     ["New", newEnquiries],
     ["Quote sent", quotesSent],
     ["Payment pending", pendingPayment],
+    ["Due soon", dueSoon],
+    ["Proof pending", proofPending],
+    ["Pooja/Hawan", poojaQueue],
     ["Kundali", kundaliQueue],
     ["Gemstones", gemstoneQueue],
     ["Kits/Samagri", productQueue],
@@ -1407,6 +1495,25 @@ function renderBackofficeStats(visibleBookings) {
       <strong>${escapeHtml(visibleLabel)}</strong>
     `;
   }
+}
+
+function renderBackofficeQueueOverview() {
+  if (!backofficeQueueOverview) return;
+  const activeQueue = backofficeQueueFilter?.value || "all";
+  const queueItems = [
+    ...getStaffQueueItems(backofficeBookingsCache),
+    ["products", "Kits", backofficeBookingsCache.filter(isProductQuoteBooking).length, "Samagri and kit quotes"],
+    ["scheduled", "Scheduled", backofficeBookingsCache.filter((booking) => booking.status === "Pooja Scheduled").length, "Upcoming service proof"],
+    ["completed", "Done", backofficeBookingsCache.filter((booking) => booking.status === "Completed").length, "Completed records"]
+  ];
+
+  backofficeQueueOverview.innerHTML = queueItems.map(([key, label, value, detail]) => `
+    <button type="button" data-backoffice-queue-target="${escapeHtml(key)}" class="${activeQueue === key ? "is-active" : ""}" aria-pressed="${activeQueue === key ? "true" : "false"}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(detail)}</small>
+    </button>
+  `).join("");
 }
 
 function getBackofficeCustomers(bookings) {
@@ -1716,6 +1823,7 @@ function renderBackofficeDashboard() {
   if (!backofficePanel) return;
   const bookings = getBackofficeFilteredBookings();
   renderBackofficeStats(bookings);
+  renderBackofficeQueueOverview();
   renderBackofficeOperations(bookings);
   renderBackofficeCustomers(bookings);
   renderBackofficeQueue(
@@ -2796,8 +2904,16 @@ adminBookingList?.addEventListener("click", async (event) => {
 });
 
 adminSearchInput?.addEventListener("input", renderAdminDashboard);
-adminStatusFilter?.addEventListener("change", renderAdminDashboard);
-adminPaymentFilter?.addEventListener("change", renderAdminDashboard);
+adminStatusFilter?.addEventListener("change", () => {
+  adminQuickFilter = "all";
+  syncAdminQuickFilterButtons();
+  renderAdminDashboard();
+});
+adminPaymentFilter?.addEventListener("change", () => {
+  adminQuickFilter = "all";
+  syncAdminQuickFilterButtons();
+  renderAdminDashboard();
+});
 adminRefreshButton?.addEventListener("click", renderAdminBookings);
 adminExportButton?.addEventListener("click", () => {
   const bookings = getFilteredAdminBookings();
@@ -2810,6 +2926,19 @@ adminExportButton?.addEventListener("click", () => {
 });
 backofficeSearchInput?.addEventListener("input", renderBackofficeDashboard);
 backofficeQueueFilter?.addEventListener("change", renderBackofficeDashboard);
+document.addEventListener("click", (event) => {
+  const adminQuickButton = event.target.closest("[data-admin-quick-filter]");
+  if (adminQuickButton) {
+    applyAdminQuickFilter(adminQuickButton.dataset.adminQuickFilter);
+    return;
+  }
+
+  const backofficeQueueButton = event.target.closest("[data-backoffice-queue-target]");
+  if (backofficeQueueButton && backofficeQueueFilter) {
+    backofficeQueueFilter.value = backofficeQueueButton.dataset.backofficeQueueTarget || "all";
+    renderBackofficeDashboard();
+  }
+});
 backofficeRefreshButton?.addEventListener("click", renderBackofficeBookings);
 backofficeExportButton?.addEventListener("click", () => {
   const bookings = getBackofficeFilteredBookings();
