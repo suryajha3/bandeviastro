@@ -54,6 +54,9 @@ const authPhoneField = document.querySelector("#authPhoneField");
 const authOtpField = document.querySelector("#authOtpField");
 const accountSection = document.querySelector("#accountSection");
 const accountSummary = document.querySelector("#accountSummary");
+const passwordUpdateForm = document.querySelector("#passwordUpdateForm");
+const passwordUpdateStatus = document.querySelector("#passwordUpdateStatus");
+const passwordUpdateCancel = document.querySelector("#passwordUpdateCancel");
 const menuToggle = document.querySelector("#menuToggle");
 const primaryNav = document.querySelector("#primaryNav");
 const portalServiceField = document.querySelector("#portalService");
@@ -103,7 +106,7 @@ const supportedLanguages = {
 };
 const headerLanguageCopy = {
   en: {
-    topStart: "<strong>Global desk</strong> India, USA, UK, Canada, UAE and NRI families",
+    topStart: "<strong>Since 1981</strong> Global desk for India, USA, UK, Canada, UAE and NRI families",
     topEnd: "Hindi and English | Quote before payment | Proof where applicable",
     track: "Track Booking ID",
     brandSmall: "Pdt. Jyotishacharya Kumodanand Jha (Shastri)",
@@ -130,7 +133,7 @@ const headerLanguageCopy = {
     }
   },
   hi: {
-    topStart: "<strong>Global desk</strong> Bharat, USA, UK, Canada, UAE aur NRI parivar",
+    topStart: "<strong>1981 se</strong> Bharat, USA, UK, Canada, UAE aur NRI parivar ke liye global desk",
     topEnd: "Hindi aur English | Payment se pehle quote | Jahan lagu ho proof",
     track: "Booking ID Track karein",
     brandSmall: "Pdt. Jyotishacharya Kumodanand Jha (Shastri)",
@@ -463,10 +466,11 @@ function getPageFromHref(href) {
 }
 
 function initHeaderGlobalTools() {
-  document.querySelectorAll(".international-header .header-main").forEach((headerMain) => {
-    if (headerMain.querySelector("[data-global-tools]")) return;
-    const actions = headerMain.querySelector(".header-actions");
-    if (!actions) return;
+  document.querySelectorAll(".international-header").forEach((header) => {
+    if (header.querySelector("[data-global-tools]")) return;
+    const topline = header.querySelector(".international-topline");
+    const trustCopy = topline?.querySelector("span:last-child");
+    if (!topline || !trustCopy) return;
 
     const tools = document.createElement("div");
     tools.className = "header-global-tools notranslate";
@@ -474,7 +478,7 @@ function initHeaderGlobalTools() {
     tools.setAttribute("aria-label", "Language and currency converter");
     tools.innerHTML = `
       <label>
-        <span>Language</span>
+        <span>Lang</span>
         <select data-language-control aria-label="Select website language">
           ${Object.entries(supportedLanguages).map(([code, label]) => `<option value="${escapeHtml(code)}">${escapeHtml(label)}</option>`).join("")}
         </select>
@@ -487,7 +491,7 @@ function initHeaderGlobalTools() {
       </label>
       <small data-currency-note>Display only. Final quote before payment.</small>
     `;
-    headerMain.insertBefore(tools, actions);
+    topline.insertBefore(tools, trustCopy);
   });
 
   document.querySelectorAll("[data-language-control]").forEach((select) => {
@@ -529,7 +533,7 @@ function applyHeaderLanguage() {
   document.documentElement.lang = selectedLanguage === "en" ? "en" : selectedLanguage;
 
   document.querySelectorAll(".international-topline").forEach((topline) => {
-    const spans = topline.querySelectorAll("span");
+    const spans = topline.querySelectorAll(":scope > span");
     if (spans[0]) spans[0].innerHTML = copy.topStart;
     if (spans[1]) spans[1].textContent = copy.topEnd;
     const trackLink = topline.querySelector("a[href*='track-booking']");
@@ -970,6 +974,10 @@ function generateBookingId() {
 
 function normalizeContact(value) {
   return (value || "").toLowerCase().replace(/[^a-z0-9@.]/g, "");
+}
+
+function normalizePhoneDigits(value) {
+  return String(value || "").replace(/\D/g, "");
 }
 
 function saveBooking(booking) {
@@ -3401,10 +3409,15 @@ async function prefillPortalFromSession() {
 
   const emailField = document.querySelector("#portalEmail");
   const nameField = document.querySelector("#portalName");
+  const phoneField = document.querySelector("#portalPhone");
   const fullName = user.user_metadata?.full_name || "";
 
   if (emailField && !emailField.value && user.email) {
     emailField.value = user.email;
+  }
+
+  if (phoneField && !phoneField.value && user.phone) {
+    phoneField.value = user.phone;
   }
 
   if (nameField && !nameField.value && fullName) {
@@ -3421,6 +3434,11 @@ function getAuthRedirectUrl() {
   return `${window.location.origin}${window.location.pathname}`;
 }
 
+function clearAuthUrlTokens() {
+  if (!window.location.hash && !window.location.search.includes("type=recovery")) return;
+  window.history.replaceState({}, document.title, `${window.location.origin}${window.location.pathname}`);
+}
+
 function getAuthSubmitLabel() {
   if (authContactMode === "phone") {
     return authPhoneOtpSent ? "Verify mobile OTP" : "Send mobile OTP";
@@ -3432,9 +3450,22 @@ function normalizeAuthPhone(phone) {
   const raw = String(phone || "").trim();
   if (!raw) return "";
   if (raw.startsWith("+")) return `+${raw.slice(1).replace(/\D/g, "")}`;
-  const digits = raw.replace(/\D/g, "");
+  const digits = normalizePhoneDigits(raw);
   if (digits.length === 10) return `+91${digits}`;
   return digits ? `+${digits}` : "";
+}
+
+function setPasswordUpdateStatus(message) {
+  if (passwordUpdateStatus) passwordUpdateStatus.textContent = message;
+}
+
+function setPasswordRecoveryMode(isRecovery) {
+  passwordUpdateForm?.classList.toggle("is-hidden", !isRecovery);
+  customerAuthForm?.classList.toggle("is-hidden", isRecovery);
+  if (isRecovery) {
+    setPasswordUpdateStatus("Enter a new password to finish account recovery.");
+    document.querySelector("#newPassword")?.focus();
+  }
 }
 
 function setAuthSubmitLabel() {
@@ -3475,7 +3506,7 @@ function setAuthContactMode(mode) {
     ? "Enter mobile number to receive OTP. Use country code, for example +91."
     : authMode === "sign-up"
       ? "Create an account with the same email used for your Booking ID."
-      : "Sign in to open private booking history for your email.");
+      : "Sign in to open private booking history for your email or mobile.");
 }
 
 function setAuthMode(mode) {
@@ -3496,7 +3527,7 @@ function setAuthMode(mode) {
     ? "Enter mobile number to receive OTP. Use country code, for example +91."
     : authMode === "sign-up"
       ? "Create an account with the same email used for your Booking ID."
-      : "Sign in to open private booking history for your email.");
+      : "Sign in to open private booking history for your email or mobile.");
 }
 
 function setAccountPrivacyState(isPrivate) {
@@ -3582,7 +3613,7 @@ async function renderAccountBookings() {
       } else {
         renderAccountLockedState(
           "Booking history is private.",
-          "Sign in or create an account with the same email used in your Booking ID. No booking details are shown before login.",
+          "Sign in or create an account with the same email or mobile used in your Booking ID. No booking details are shown before login.",
           "Sign in"
         );
       }
@@ -3610,7 +3641,7 @@ async function renderAccountBookings() {
     accountPortalUnlocked = false;
     renderAccountLockedState(
       "Sign in to view bookings.",
-      "After login, matching bookings for your email will appear here for quote, payment, schedule and proof updates.",
+      "After login, matching bookings for your email or mobile will appear here for quote, payment, schedule and proof updates.",
       "Sign in"
     );
     return;
@@ -3618,15 +3649,18 @@ async function renderAccountBookings() {
 
   try {
     setAccountPrivacyState(false);
-    let bookingQuery = supabaseClient
-      .from("bookings")
-      .select("*");
-
+    const filters = [];
     if (user.email) {
-      bookingQuery = bookingQuery.eq("email", user.email);
-    } else if (user.phone) {
-      bookingQuery = bookingQuery.eq("phone", user.phone);
-    } else {
+      filters.push(`email.eq.${user.email.replaceAll(",", "%2C")}`);
+    }
+
+    const phoneDigits = normalizePhoneDigits(user.phone);
+    if (phoneDigits) {
+      filters.push(`phone.ilike.%${phoneDigits}%`);
+      if (phoneDigits.length > 10) filters.push(`phone.ilike.%${phoneDigits.slice(-10)}%`);
+    }
+
+    if (!filters.length) {
       renderAccountLockedState(
         "Account contact is not available.",
         "Please track with Booking ID or contact WhatsApp support so staff can verify the booking.",
@@ -3635,7 +3669,11 @@ async function renderAccountBookings() {
       return;
     }
 
-    const { data, error } = await bookingQuery.order("created_at", { ascending: false });
+    const { data, error } = await supabaseClient
+      .from("bookings")
+      .select("*")
+      .or(filters.join(","))
+      .order("created_at", { ascending: false });
     if (error) throw error;
 
     const bookings = (data || []).map(fromCloudBooking);
@@ -3745,7 +3783,7 @@ async function refreshAuthState() {
     authOpenAccountButton?.classList.toggle("is-hidden", accountPortalUnlocked);
   } else {
     accountPortalUnlocked = false;
-    setAuthStatus("Sign in or create an account to view bookings saved with your email.");
+    setAuthStatus("Sign in or create an account to view bookings saved with your email or mobile.");
     authLogoutButton?.classList.add("is-hidden");
     authOpenAccountButton?.classList.add("is-hidden");
   }
@@ -3852,6 +3890,80 @@ async function handleCustomerPhoneAuth() {
   }
 }
 
+function initializeCustomerAuthSessionWatcher() {
+  if (!isCloudEnabled() || !customerAuthForm) return;
+
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
+  if (hashParams.get("type") === "recovery" || queryParams.get("type") === "recovery") {
+    setPasswordRecoveryMode(true);
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (event) => {
+    if (event === "PASSWORD_RECOVERY") {
+      setPasswordRecoveryMode(true);
+      return;
+    }
+
+    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+      await prefillPortalFromSession();
+      await refreshAuthState();
+    }
+
+    if (event === "SIGNED_OUT") {
+      accountPortalUnlocked = false;
+      authPhoneOtpSent = false;
+      setAuthSubmitLabel();
+      await refreshAuthState();
+    }
+  });
+}
+
+passwordUpdateForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!isCloudEnabled()) {
+    setPasswordUpdateStatus("Password update is available after secure login is connected.");
+    return;
+  }
+
+  const newPassword = document.querySelector("#newPassword")?.value || "";
+  const confirmPassword = document.querySelector("#confirmPassword")?.value || "";
+
+  if (newPassword.length < 8) {
+    setPasswordUpdateStatus("Use at least 8 characters for the new password.");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    setPasswordUpdateStatus("Both password fields must match.");
+    return;
+  }
+
+  setPasswordUpdateStatus("Updating password...");
+  const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+  if (error) {
+    setPasswordUpdateStatus(error.message || "Password could not be updated.");
+    return;
+  }
+
+  const newPasswordField = document.querySelector("#newPassword");
+  const confirmPasswordField = document.querySelector("#confirmPassword");
+  if (newPasswordField) newPasswordField.value = "";
+  if (confirmPasswordField) confirmPasswordField.value = "";
+  setPasswordRecoveryMode(false);
+  clearAuthUrlTokens();
+  accountPortalUnlocked = true;
+  setAuthStatus("Password updated. Private bookings are open for this session.");
+  await refreshAuthState();
+  accountSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+passwordUpdateCancel?.addEventListener("click", () => {
+  setPasswordRecoveryMode(false);
+  clearAuthUrlTokens();
+  setAuthStatus("Sign in with your updated password, Google account or mobile OTP.");
+});
+
 customerAuthForm?.addEventListener("submit", (event) => {
   event.preventDefault();
   handleCustomerAuth(authMode);
@@ -3947,6 +4059,7 @@ if (customerAuthForm) {
   }
   setAuthMode("sign-in");
   setAuthContactMode("email");
+  initializeCustomerAuthSessionWatcher();
   window.addEventListener("load", () => {
     document.querySelector("#client-login")?.scrollIntoView({ behavior: "auto", block: "start" });
   }, { once: true });

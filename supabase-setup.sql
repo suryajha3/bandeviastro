@@ -7,6 +7,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
+  phone text,
   full_name text,
   role text not null default 'customer' check (role in ('customer', 'admin')),
   created_at timestamptz not null default now(),
@@ -39,9 +40,11 @@ create table if not exists public.bookings (
 create index if not exists bookings_booking_code_idx on public.bookings (booking_code);
 create index if not exists bookings_customer_user_idx on public.bookings (customer_user_id);
 create index if not exists bookings_email_idx on public.bookings (lower(email));
+create index if not exists bookings_phone_idx on public.bookings (phone);
 create index if not exists bookings_created_at_idx on public.bookings (created_at desc);
 
 alter table public.bookings add column if not exists payment_link text;
+alter table public.profiles add column if not exists phone text;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -70,15 +73,17 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, role)
+  insert into public.profiles (id, email, phone, full_name, role)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', new.email),
+    new.phone,
+    coalesce(new.raw_user_meta_data->>'full_name', new.email, new.phone, 'Customer'),
     'customer'
   )
   on conflict (id) do update
   set email = excluded.email,
+      phone = coalesce(public.profiles.phone, excluded.phone),
       full_name = coalesce(public.profiles.full_name, excluded.full_name);
   return new;
 end;
@@ -213,6 +218,10 @@ to authenticated
 using (
   customer_user_id = auth.uid()
   or lower(coalesce(email, '')) = lower(coalesce(auth.jwt()->>'email', ''))
+  or (
+    length(regexp_replace(coalesce(auth.jwt()->>'phone', ''), '[^0-9]', '', 'g')) >= 10
+    and regexp_replace(coalesce(phone, ''), '[^0-9]', '', 'g') like '%' || right(regexp_replace(coalesce(auth.jwt()->>'phone', ''), '[^0-9]', '', 'g'), 10) || '%'
+  )
   or public.is_admin()
 );
 
@@ -233,3 +242,11 @@ grant execute on function public.is_admin() to authenticated;
 
 -- After the staff account is created from login.html, run this once:
 -- update public.profiles set role = 'admin' where email = 'staff@example.com';
+
+-- Auth dashboard checklist:
+-- 1. Authentication > URL Configuration:
+--    Site URL: https://bandeviastro.com
+--    Redirect URLs: https://bandeviastro.com/login.html and http://127.0.0.1:4173/login.html
+-- 2. Enable Email provider for sign in, sign up and forgot password.
+-- 3. Enable Google provider for "Continue with Google".
+-- 4. Enable Phone provider with an SMS provider for mobile OTP.

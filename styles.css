@@ -7865,21 +7865,22 @@ details p {
 .international-header {
   border-bottom: 1px solid rgba(91, 18, 32, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(255, 248, 238, 0.94)),
+    linear-gradient(180deg, rgba(255, 253, 249, 0.99), rgba(255, 248, 238, 0.96)),
     #fff8ee;
+  box-shadow: 0 18px 42px rgba(32, 24, 29, 0.1);
 }
 
 .international-topline {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto minmax(280px, 1fr);
+  grid-template-columns: minmax(250px, 1fr) auto auto;
   align-items: center;
-  gap: 14px;
-  min-height: 36px;
-  padding: 7px clamp(16px, 4vw, 54px);
+  gap: 12px;
+  min-height: 38px;
+  padding: 6px clamp(16px, 4vw, 54px);
   color: rgba(255, 255, 255, 0.9);
   background:
-    linear-gradient(90deg, #41111a, var(--maroon) 38%, #0f766e);
-  font-size: 0.78rem;
+    linear-gradient(90deg, #261219, #5b1220 44%, #164e63 74%, #0f766e);
+  font-size: 0.74rem;
   font-weight: 850;
 }
 
@@ -7889,24 +7890,26 @@ details p {
 
 .international-topline a {
   display: inline-flex;
+  align-items: center;
   justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  padding: 6px 12px;
+  min-height: 28px;
+  padding: 5px 13px;
   color: #ffffff;
   background: rgba(255, 255, 255, 0.12);
   font-weight: 950;
   white-space: nowrap;
 }
 
-.international-topline span:last-child {
-  text-align: right;
+.international-topline > span:last-child {
+  display: none;
 }
 
 .international-header .header-main {
-  grid-template-columns: minmax(230px, 0.74fr) minmax(500px, 1.16fr) minmax(210px, 0.42fr) auto;
-  gap: 14px;
-  padding: 12px clamp(16px, 4vw, 54px);
+  grid-template-columns: minmax(230px, 0.78fr) minmax(510px, 1.2fr) auto;
+  gap: 16px;
+  padding: 11px clamp(16px, 4vw, 54px);
 }
 
 .international-brand {
@@ -7914,8 +7917,8 @@ details p {
 }
 
 .international-brand .brand-mark {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   letter-spacing: 0;
 }
 
@@ -7940,33 +7943,32 @@ details p {
 
 .international-brand small {
   color: var(--maroon);
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   font-weight: 900;
+  line-height: 1.16;
 }
 
 .international-brand em {
-  margin-top: 2px;
-  color: var(--teal);
-  font-size: 0.7rem;
-  font-style: normal;
-  font-weight: 900;
+  display: none;
 }
 
 .international-nav {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 5px;
+  gap: 4px;
   border-color: rgba(91, 18, 32, 0.12);
   padding: 5px;
-  background: rgba(255, 255, 255, 0.74);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 250, 242, 0.78));
+  box-shadow: 0 12px 28px rgba(32, 24, 29, 0.06);
 }
 
 .international-nav a {
   display: grid;
-  min-height: 48px;
+  min-height: 46px;
   align-content: center;
   gap: 2px;
-  padding: 8px 9px;
+  padding: 8px 8px;
   color: #2f2026;
   text-align: center;
 }
@@ -8004,13 +8006,13 @@ details p {
 }
 
 .international-header .header-actions {
-  gap: 7px;
+  gap: 8px;
 }
 
 .international-header .header-action {
   display: grid;
-  min-width: 88px;
-  min-height: 50px;
+  min-width: 92px;
+  min-height: 48px;
   align-content: center;
   gap: 2px;
   padding: 8px 11px;
@@ -8051,28 +8053,30 @@ details p {
 }
 
 .header-global-tools {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: end;
+  gap: 7px;
   min-width: 0;
-  width: min(250px, 24vw);
-  border: 1px solid rgba(91, 18, 32, 0.13);
-  border-radius: 8px;
-  padding: 7px;
+  width: auto;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 4px 5px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 248, 238, 0.76));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.44);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .header-global-tools label {
-  display: grid;
-  gap: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   min-width: 0;
 }
 
 .header-global-tools span {
-  color: var(--maroon);
-  font-size: 0.58rem;
+  color: #ffd58c;
+  font-size: 0.57rem;
   font-weight: 950;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -8080,30 +8084,30 @@ details p {
 }
 
 .header-global-tools select {
-  width: 100%;
-  min-height: 30px;
-  border: 1px solid rgba(91, 18, 32, 0.14);
-  border-radius: 7px;
-  padding: 5px 24px 5px 8px;
-  color: #2f2026;
+  width: 98px;
+  min-height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 4px 22px 4px 8px;
+  color: #2a161c;
   background:
-    linear-gradient(180deg, #ffffff, #fff9f0);
-  font-size: 0.72rem;
+    linear-gradient(180deg, #ffffff, #fff8ee);
+  font-size: 0.68rem;
   font-weight: 900;
   outline: none;
 }
 
+.header-global-tools label:last-of-type select {
+  width: 126px;
+}
+
 .header-global-tools select:focus {
-  border-color: rgba(15, 118, 110, 0.54);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: rgba(245, 184, 75, 0.72);
+  box-shadow: 0 0 0 3px rgba(245, 184, 75, 0.16);
 }
 
 .header-global-tools small {
-  grid-column: 1 / -1;
-  color: var(--teal);
-  font-size: 0.58rem;
-  font-weight: 900;
-  line-height: 1.2;
+  display: none;
 }
 
 .google-translate-shell,
@@ -8174,43 +8178,9 @@ body {
   color: #ffffff;
 }
 
-@media (max-width: 1380px) and (min-width: 981px) {
-  .international-header .header-main {
-    grid-template-columns: minmax(220px, 0.72fr) minmax(430px, 1fr) auto;
-  }
-
-  .international-brand {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .international-nav {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .header-global-tools {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    width: 100%;
-    grid-template-columns: minmax(150px, 220px) minmax(150px, 220px) minmax(260px, 1fr);
-    align-items: end;
-  }
-
-  .header-global-tools small {
-    grid-column: auto;
-    padding-bottom: 6px;
-  }
-
-  .international-header .header-actions {
-    grid-column: 3;
-    grid-row: 1;
-  }
-}
-
 @media (max-width: 1180px) {
   .international-header .header-main {
-    grid-template-columns: minmax(220px, 0.72fr) minmax(420px, 1fr) auto;
+    grid-template-columns: minmax(220px, 0.7fr) minmax(420px, 1fr) auto;
     gap: 10px;
   }
 
@@ -8227,8 +8197,12 @@ body {
     min-width: 74px;
   }
 
-  .header-global-tools {
-    width: 100%;
+  .header-global-tools select {
+    width: 88px;
+  }
+
+  .header-global-tools label:last-of-type select {
+    width: 112px;
   }
 }
 
@@ -8237,7 +8211,7 @@ body {
     grid-template-columns: 1fr auto;
   }
 
-  .international-topline span:last-child {
+  .international-topline > span:last-child {
     grid-column: 1 / -1;
     text-align: left;
     display: none;
@@ -8247,17 +8221,13 @@ body {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .header-global-tools {
+  .international-topline .header-global-tools {
     grid-column: 1 / -1;
-    order: 3;
+    justify-self: stretch;
     width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(150px, 0.9fr);
-    align-items: end;
-  }
-
-  .header-global-tools small {
-    grid-column: auto;
-    padding-bottom: 6px;
+    justify-content: space-between;
+    border-radius: 8px;
+    padding: 5px;
   }
 
   .international-header .header-actions {
@@ -8301,7 +8271,7 @@ body {
   }
 
   .international-topline a,
-  .international-topline span:last-child {
+  .international-topline > span:last-child {
     justify-self: start;
   }
 
@@ -8334,20 +8304,25 @@ body {
   }
 
   .header-global-tools {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     padding: 6px;
   }
 
-  .header-global-tools small {
-    grid-column: 1 / -1;
-    padding-bottom: 0;
-    font-size: 0.56rem;
+  .header-global-tools label {
+    display: grid;
+    gap: 4px;
   }
 
   .header-global-tools select {
+    width: 100%;
     min-height: 34px;
     font-size: 0.7rem;
+  }
+
+  .header-global-tools label:last-of-type select {
+    width: 100%;
   }
 
   .international-header .header-action {

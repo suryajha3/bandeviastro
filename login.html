@@ -58,7 +58,7 @@
           <a class="breadcrumb" href="book-online.html">Create booking</a>
           <p class="eyebrow">Customer Login</p>
           <h1>Client portal for bookings, quote, payment and proof</h1>
-          <p>Sign in to view all bookings connected to your email, follow the status timeline and keep pooja, Kundali, hawan and gemstone updates in one account.</p>
+          <p>Sign in to view bookings connected to your email or mobile, follow the status timeline and keep pooja, Kundali, hawan and gemstone updates in one account.</p>
         </div>
       </section>
 
@@ -91,7 +91,25 @@
             <button class="btn btn-secondary is-hidden" type="button" id="authOpenAccountButton">Open my bookings</button>
             <button class="btn btn-secondary is-hidden" type="button" id="authLogoutButton">Logout</button>
           </div>
-          <p class="form-note" id="authStatus" aria-live="polite">Sign in or create an account to view bookings saved with your email. Private booking history stays locked until login.</p>
+          <p class="form-note" id="authStatus" aria-live="polite">Sign in or create an account to view bookings saved with your email or mobile. Private booking history stays locked until login.</p>
+        </form>
+
+        <form class="portal-form auth-form password-reset-form is-hidden" id="passwordUpdateForm">
+          <div class="auth-form-head full-span">
+            <div>
+              <p class="eyebrow">Password recovery</p>
+              <h2>Create new password</h2>
+            </div>
+            <span>Secure</span>
+          </div>
+          <p class="form-note full-span">Enter a new password after opening the reset link from your email. Your private bookings stay locked until the password is updated.</p>
+          <label>New password<input id="newPassword" type="password" autocomplete="new-password" minlength="8" /></label>
+          <label>Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" /></label>
+          <div class="auth-button-row full-span">
+            <button class="btn btn-primary" type="submit" id="passwordUpdateButton">Update password</button>
+            <button class="btn btn-secondary" type="button" id="passwordUpdateCancel">Back to login</button>
+          </div>
+          <p class="form-note full-span" id="passwordUpdateStatus" aria-live="polite">Use at least 8 characters.</p>
         </form>
 
         <aside class="portal-card auth-side-card">
@@ -111,7 +129,7 @@
       </section>
 
       <section class="client-portal-command-strip" aria-label="Client portal features">
-        <article><span>01</span><strong>All bookings</strong><p>View active and completed requests connected to your customer email.</p></article>
+        <article><span>01</span><strong>All bookings</strong><p>View active and completed requests connected to your customer email or mobile.</p></article>
         <article><span>02</span><strong>Quote first</strong><p>See quote and payment stage before making any payment.</p></article>
         <article><span>03</span><strong>Proof updates</strong><p>Staff proof link, completion note or service update appears in tracking.</p></article>
         <article><span>04</span><strong>WhatsApp help</strong><p>Open support with Booking ID already connected to the conversation.</p></article>
@@ -121,7 +139,7 @@
         <div>
           <p class="eyebrow">International client desk</p>
           <h2>One account for quote, payment, schedule and proof</h2>
-          <p>When bookings are created with the same email, the client account shows the latest status, staff note, payment stage, proof link and WhatsApp support action.</p>
+          <p>When bookings are created with the same email or mobile, the client account shows the latest status, staff note, payment stage, proof link and WhatsApp support action.</p>
         </div>
         <div class="client-account-grid">
           <article><span>Quote</span><strong>Clear quote before payment</strong></article>
