@@ -786,32 +786,104 @@ function safeExternalUrl(value) {
 }
 
 function parseStaffNotePaymentLink(value) {
+  const parsed = parseStaffNoteBookingMeta(value);
+  return { note: parsed.note, paymentLink: parsed.paymentLink };
+}
+
+function parseStaffNoteBookingMeta(value) {
   const rawNote = String(value || "");
-  const match = rawNote.match(/\[\[payment_link:([^\]]*)\]\]/i);
-  let paymentLink = "";
-  if (match) {
+  const meta = {
+    paymentLink: "",
+    mrpPrice: "",
+    offerPrice: "",
+    discountPrice: ""
+  };
+  const fieldMap = {
+    payment_link: "paymentLink",
+    mrp_price: "mrpPrice",
+    offer_price: "offerPrice",
+    discount_price: "discountPrice"
+  };
+  rawNote.replace(/\[\[(payment_link|mrp_price|offer_price|discount_price):([^\]]*)\]\]/gi, (_match, key, encodedValue) => {
+    const target = fieldMap[String(key || "").toLowerCase()];
+    if (!target) return "";
     try {
-      paymentLink = decodeURIComponent(match[1] || "");
+      meta[target] = decodeURIComponent(encodedValue || "");
     } catch {
-      paymentLink = "";
+      meta[target] = "";
     }
-  }
-  const note = rawNote.replace(/\s*\[\[payment_link:[^\]]*\]\]\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
-  return { note, paymentLink };
+    return "";
+  });
+  const note = rawNote.replace(/\s*\[\[(payment_link|mrp_price|offer_price|discount_price):[^\]]*\]\]\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
+  return { note, ...meta };
 }
 
 function serializeStaffNotePaymentLink(note, paymentLink) {
-  const parsed = parseStaffNotePaymentLink(note);
+  return serializeStaffNoteBookingMeta(note, { paymentLink });
+}
+
+function serializeStaffNoteBookingMeta(note, booking = {}) {
+  const parsed = parseStaffNoteBookingMeta(note);
   const cleanNote = parsed.note;
-  const cleanPaymentLink = String(paymentLink || "").trim();
-  if (!cleanPaymentLink) return cleanNote;
-  return `${cleanNote}${cleanNote ? "\n\n" : ""}[[payment_link:${encodeURIComponent(cleanPaymentLink)}]]`;
+  const metaItems = [
+    ["payment_link", booking.paymentLink],
+    ["mrp_price", booking.mrpPrice],
+    ["offer_price", booking.offerPrice],
+    ["discount_price", booking.discountPrice]
+  ]
+    .map(([key, value]) => [key, String(value || "").trim()])
+    .filter(([, value]) => value);
+  if (!metaItems.length) return cleanNote;
+  const metaText = metaItems.map(([key, value]) => `[[${key}:${encodeURIComponent(value)}]]`).join("\n");
+  return `${cleanNote}${cleanNote ? "\n\n" : ""}${metaText}`;
 }
 
 function getBookingPaymentLink(booking) {
   if (!booking) return "";
   if (booking.paymentLink) return String(booking.paymentLink).trim();
-  return parseStaffNotePaymentLink(booking.staffNote).paymentLink;
+  return parseStaffNoteBookingMeta(booking.staffNote).paymentLink;
+}
+
+function getBookingPriceBreakdown(booking = {}, fallbackQuote = "") {
+  const parsed = parseStaffNoteBookingMeta(booking.staffNote);
+  return {
+    mrpPrice: booking.mrpPrice || parsed.mrpPrice || "",
+    offerPrice: booking.offerPrice || parsed.offerPrice || "",
+    discountPrice: booking.discountPrice || parsed.discountPrice || "",
+    amount: booking.amount || fallbackQuote || ""
+  };
+}
+
+function hasPriceBreakdown(booking = {}) {
+  const pricing = getBookingPriceBreakdown(booking);
+  return Boolean(pricing.mrpPrice || pricing.offerPrice || pricing.discountPrice);
+}
+
+function renderBookingPriceBreakdown(booking = {}, className = "booking-price-breakdown") {
+  const profile = getServiceProfile(booking.service);
+  const pricing = getBookingPriceBreakdown(booking, profile.quote || "Quote pending");
+  const rows = [
+    ["MRP", pricing.mrpPrice || "To be confirmed"],
+    ["Offer Price", pricing.offerPrice || pricing.amount || "Quote pending"],
+    ["Discount", pricing.discountPrice || "Staff offer pending"],
+    ["Final Quote", pricing.amount || "Quote pending"]
+  ];
+  return `
+    <div class="${escapeHtml(className)}" aria-label="MRP offer discount and final quote">
+      ${rows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}
+    </div>
+  `;
+}
+
+function pricingLinesForMessage(booking = {}) {
+  const profile = getServiceProfile(booking.service);
+  const pricing = getBookingPriceBreakdown(booking, profile.quote || "Quote pending");
+  return [
+    `MRP: ${pricing.mrpPrice || "To be confirmed"}`,
+    `Offer Price: ${pricing.offerPrice || pricing.amount || "Quote pending"}`,
+    `Discount: ${pricing.discountPrice || "Staff offer pending"}`,
+    `Final Quote: ${pricing.amount || "Quote pending"}`
+  ];
 }
 
 function isPaymentPendingStage(booking) {
@@ -827,7 +899,7 @@ function getVisiblePaymentLink(booking) {
 
 function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
   if (!booking) return "";
-  const amount = booking.amount || getServiceProfile(booking.service).quote || "Quote pending";
+  const amount = booking.amount || booking.offerPrice || getServiceProfile(booking.service).quote || "Quote pending";
   const paymentLink = getVisiblePaymentLink(booking);
   const isPending = isPaymentPendingStage(booking);
   const stateLabel = isPending
@@ -843,6 +915,7 @@ function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
       <div>
         <span>${escapeHtml(stateLabel)}</span>
         <strong>${escapeHtml(amount)}</strong>
+        ${hasPriceBreakdown(booking) ? renderBookingPriceBreakdown(booking, "payment-price-breakdown") : ""}
         <p>Payment opens only after staff confirms the quote. UPI, bank transfer or gateway link can be shared here before full payment gateway integration.</p>
       </div>
       <div class="payment-ready-actions">
@@ -868,7 +941,10 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       "Service",
       "Status",
       "Payment",
-      "Quote",
+      "MRP",
+      "Offer Price",
+      "Discount",
+      "Final Quote",
       "Payment Link",
       "Date / Time",
       "Mode",
@@ -887,6 +963,9 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       booking.service,
       booking.status,
       booking.paymentStatus,
+      booking.mrpPrice || "",
+      booking.offerPrice || "",
+      booking.discountPrice || "",
       booking.amount || "",
       getBookingPaymentLink(booking),
       formatBookingDate(booking),
@@ -925,7 +1004,7 @@ function getServiceProfile(serviceName) {
 }
 
 function getStatusGuidance(booking) {
-  const amount = booking?.amount || getServiceProfile(booking?.service).quote;
+  const amount = booking?.amount || booking?.offerPrice || getServiceProfile(booking?.service).quote;
   const scheduleLabel = formatBookingDate(booking);
   const proofLabel = booking?.proofUrl
     ? "Proof/update link is ready in your booking panel."
@@ -1116,7 +1195,7 @@ function renderCompactStatusRail(booking, className = "compact-status-rail") {
 
 function renderCustomerStageBoard(booking, className = "customer-stage-board") {
   const profile = getServiceProfile(booking?.service);
-  const amount = booking?.amount || profile.quote || "Quote under review";
+  const amount = booking?.amount || booking?.offerPrice || profile.quote || "Quote under review";
   const scheduleValue = formatBookingDate(booking);
   const modeValue = booking?.mode || "Mode to be confirmed";
   const proofValue = booking?.proofUrl
@@ -1165,7 +1244,7 @@ function toCloudTimeValue(value) {
 }
 
 function toCloudBooking(booking, user) {
-  const staffNote = serializeStaffNotePaymentLink(booking.staffNote, booking.paymentLink);
+  const staffNote = serializeStaffNoteBookingMeta(booking.staffNote, booking);
   const payload = {
     booking_code: booking.id,
     customer_name: booking.name,
@@ -1191,12 +1270,18 @@ function toCloudBooking(booking, user) {
     payload.payment_link = booking.paymentLink || null;
   }
 
+  if (siteConfig.priceBreakdownColumnEnabled) {
+    payload.mrp_price = booking.mrpPrice || null;
+    payload.offer_price = booking.offerPrice || null;
+    payload.discount_price = booking.discountPrice || null;
+  }
+
   return payload;
 }
 
 function fromCloudBooking(row) {
   const preferredTime = row.preferred_time ? String(row.preferred_time).slice(0, 5) : "";
-  const parsedStaffNote = parseStaffNotePaymentLink(row.staff_note || row.staffNote || "");
+  const parsedStaffNote = parseStaffNoteBookingMeta(row.staff_note || row.staffNote || "");
 
   return {
     id: row.booking_code || row.id,
@@ -1212,6 +1297,9 @@ function fromCloudBooking(row) {
     status: row.status || "Enquiry Received",
     paymentStatus: row.payment_status || row.paymentStatus || "Not Requested",
     amount: row.amount || "",
+    mrpPrice: row.mrp_price || row.mrpPrice || parsedStaffNote.mrpPrice || "",
+    offerPrice: row.offer_price || row.offerPrice || parsedStaffNote.offerPrice || "",
+    discountPrice: row.discount_price || row.discountPrice || parsedStaffNote.discountPrice || "",
     paymentLink: row.payment_link || row.paymentLink || parsedStaffNote.paymentLink || "",
     proofUrl: row.proof_url || row.proofUrl || "",
     staffNote: parsedStaffNote.note,
@@ -1288,7 +1376,7 @@ async function readBookingsOnline() {
 async function updateBookingOnline(booking) {
   booking.updatedAt = new Date().toISOString();
   saveBooking(booking);
-  const staffNote = serializeStaffNotePaymentLink(booking.staffNote, booking.paymentLink);
+  const staffNote = serializeStaffNoteBookingMeta(booking.staffNote, booking);
 
   if (!isCloudEnabled()) {
     return { savedCloud: false, mode: "local" };
@@ -1308,6 +1396,12 @@ async function updateBookingOnline(booking) {
 
   if (siteConfig.paymentLinkColumnEnabled) {
     updatePayload.payment_link = booking.paymentLink || null;
+  }
+
+  if (siteConfig.priceBreakdownColumnEnabled) {
+    updatePayload.mrp_price = booking.mrpPrice || null;
+    updatePayload.offer_price = booking.offerPrice || null;
+    updatePayload.discount_price = booking.discountPrice || null;
   }
 
   const { error } = await supabaseClient
@@ -1341,7 +1435,7 @@ function bookingWhatsAppUrl(booking) {
 }
 
 function getStaffTemplateMessage(booking, templateKey = "status") {
-  const amount = booking.amount || getServiceProfile(booking.service).quote;
+  const pricingLines = pricingLinesForMessage(booking);
   const baseLines = [
     `Namaste ${booking.name},`,
     "",
@@ -1353,12 +1447,12 @@ function getStaffTemplateMessage(booking, templateKey = "status") {
   const templateLines = {
     quote: [
       "Your details have been reviewed and the quote is ready.",
-      `Amount / quote: ${amount}`,
+      ...pricingLines,
       "Please confirm the service, date and payment process on WhatsApp before making payment."
     ],
     payment: [
       "Your booking has reached the payment stage.",
-      `Amount / quote: ${amount}`,
+      ...pricingLines,
       getBookingPaymentLink(booking)
         ? `Payment link: ${getBookingPaymentLink(booking)}`
         : "Payment link/method will be shared after staff confirms the quote.",
@@ -1384,7 +1478,7 @@ function getStaffTemplateMessage(booking, templateKey = "status") {
     status: [
       `Current status: ${booking.status}`,
       `Payment status: ${booking.paymentStatus}`,
-      `Amount / quote: ${amount}`,
+      ...pricingLines,
       "",
       getStatusGuidance(booking)
     ]
@@ -1422,7 +1516,7 @@ function renderTicket(booking, syncResult = {}) {
   if (ticketDetails) {
     const detailItems = [
       ["Service", booking.service],
-      ["Quote", booking.amount || "Quote pending"],
+      ["Final Quote", booking.amount || booking.offerPrice || "Quote pending"],
       ["Date / time", formatBookingDate(booking)],
       ["Mode", booking.mode],
       ["Payment", booking.paymentStatus],
@@ -1515,10 +1609,14 @@ function renderStatusPanel(booking) {
     return `<li class="${stateClass}"><span class="status-dot">${index + 1}</span><div><strong>${escapeHtml(status)}</strong><p>${escapeHtml(timelineText)}</p></div></li>`;
   }).join("");
 
+  const pricing = getBookingPriceBreakdown(booking, serviceProfile.quote || "Quote pending");
   const metaItems = [
     ["Service", booking.service],
     ["Payment", booking.paymentStatus],
-    ["Amount", booking.amount || "Quote pending"],
+    ["MRP", pricing.mrpPrice || "To be confirmed"],
+    ["Offer Price", pricing.offerPrice || "Quote pending"],
+    ["Discount", pricing.discountPrice || "Staff offer pending"],
+    ["Final Quote", pricing.amount || "Quote pending"],
     ["Date / time", formatBookingDate(booking)],
     ["Mode", booking.mode],
     ["Staff priority", `${priority.label}: ${priority.detail}`],
@@ -1750,7 +1848,7 @@ function applyAdminWorkflow(booking, actionKey) {
   if (!action) return false;
   booking.status = action.status;
   booking.paymentStatus = action.paymentStatus;
-  booking.amount = booking.amount || getServiceProfile(booking.service).quote;
+  booking.amount = booking.amount || booking.offerPrice || getServiceProfile(booking.service).quote;
   booking.staffNote = action.note;
   return true;
 }
@@ -1806,7 +1904,10 @@ function renderAdminDashboard() {
         <div class="admin-edit-grid">
           <label>Status<select data-field="status">${statusOptions}</select></label>
           <label>Payment<select data-field="paymentStatus">${paymentOptions}</select></label>
-          <label>Amount<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
+          <label>MRP<input data-field="mrpPrice" type="text" value="${escapeHtml(booking.mrpPrice || "")}" placeholder="Rs 7,100" /></label>
+          <label>Offer Price<input data-field="offerPrice" type="text" value="${escapeHtml(booking.offerPrice || "")}" placeholder="Rs 5,100" /></label>
+          <label>Discount Price<input data-field="discountPrice" type="text" value="${escapeHtml(booking.discountPrice || "")}" placeholder="Rs 2,000 off" /></label>
+          <label>Final Quote<input data-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="Final quote" /></label>
           <label>Payment link<input data-field="paymentLink" type="url" value="${escapeHtml(getBookingPaymentLink(booking))}" placeholder="Razorpay, Stripe, UPI or bank payment link" /></label>
           <label>Schedule date<input data-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
           <label>Schedule time<input data-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
@@ -1857,6 +1958,9 @@ function getBackofficeSearchText(booking) {
     booking.concern,
     booking.status,
     booking.paymentStatus,
+    booking.mrpPrice,
+    booking.offerPrice,
+    booking.discountPrice,
     booking.amount,
     getBookingPaymentLink(booking),
     booking.staffNote
@@ -2066,7 +2170,10 @@ function renderBackofficeQueue(container, bookings, emptyTitle, emptyText) {
         </div>
         <p>${escapeHtml(booking.concern || profile.body)}</p>
         <div class="backoffice-mini-grid">
-          <div><span>Quote</span><strong>${escapeHtml(booking.amount || profile.quote)}</strong></div>
+          <div><span>MRP</span><strong>${escapeHtml(booking.mrpPrice || "To be confirmed")}</strong></div>
+          <div><span>Offer</span><strong>${escapeHtml(booking.offerPrice || "Quote pending")}</strong></div>
+          <div><span>Discount</span><strong>${escapeHtml(booking.discountPrice || "Staff offer pending")}</strong></div>
+          <div><span>Final quote</span><strong>${escapeHtml(booking.amount || profile.quote)}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
           <div><span>Needed</span><strong>${escapeHtml(profile.details)}</strong></div>
           <div><span>Proof</span><strong>${escapeHtml(profile.proof)}</strong></div>
@@ -2236,7 +2343,10 @@ function renderBackofficeOperations(bookings) {
           <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
-          <div><span>Quote</span><strong>${escapeHtml(booking.amount || serviceProfile.quote)}</strong></div>
+          <div><span>MRP</span><strong>${escapeHtml(booking.mrpPrice || "To be confirmed")}</strong></div>
+          <div><span>Offer</span><strong>${escapeHtml(booking.offerPrice || "Quote pending")}</strong></div>
+          <div><span>Discount</span><strong>${escapeHtml(booking.discountPrice || "Staff offer pending")}</strong></div>
+          <div><span>Final quote</span><strong>${escapeHtml(booking.amount || serviceProfile.quote)}</strong></div>
           <div><span>Payment link</span><strong>${escapeHtml(getBookingPaymentLink(booking) ? "Ready" : "Pending")}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
           <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
@@ -2247,7 +2357,10 @@ function renderBackofficeOperations(bookings) {
         <div class="backoffice-edit-grid">
           <label>Status<select data-backoffice-field="status">${statusOptions}</select></label>
           <label>Payment<select data-backoffice-field="paymentStatus">${paymentOptions}</select></label>
-          <label>Quote amount<input data-backoffice-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="${escapeHtml(serviceProfile.quote)}" /></label>
+          <label>MRP<input data-backoffice-field="mrpPrice" type="text" value="${escapeHtml(booking.mrpPrice || "")}" placeholder="Rs 7,100" /></label>
+          <label>Offer Price<input data-backoffice-field="offerPrice" type="text" value="${escapeHtml(booking.offerPrice || "")}" placeholder="Rs 5,100" /></label>
+          <label>Discount Price<input data-backoffice-field="discountPrice" type="text" value="${escapeHtml(booking.discountPrice || "")}" placeholder="Rs 2,000 off" /></label>
+          <label>Final quote<input data-backoffice-field="amount" type="text" value="${escapeHtml(booking.amount || "")}" placeholder="${escapeHtml(serviceProfile.quote)}" /></label>
           <label>Payment link<input data-backoffice-field="paymentLink" type="url" value="${escapeHtml(getBookingPaymentLink(booking))}" placeholder="Razorpay, Stripe, UPI or bank payment link" /></label>
           <label>Schedule date<input data-backoffice-field="date" type="date" value="${escapeHtml(booking.date || "")}" /></label>
           <label>Schedule time<input data-backoffice-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
@@ -3731,7 +3844,10 @@ function renderAccountBookingCard(booking) {
         ${renderPaymentReadyPanel(booking, "payment-ready-panel account-payment-ready-panel")}
         <div class="mini-booking-meta">
           <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
-          <span><strong>Amount</strong>${escapeHtml(booking.amount || "Quote pending")}</span>
+          <span><strong>MRP</strong>${escapeHtml(booking.mrpPrice || "To be confirmed")}</span>
+          <span><strong>Offer</strong>${escapeHtml(booking.offerPrice || "Quote pending")}</span>
+          <span><strong>Discount</strong>${escapeHtml(booking.discountPrice || "Staff offer pending")}</span>
+          <span><strong>Final Quote</strong>${escapeHtml(booking.amount || booking.offerPrice || "Quote pending")}</span>
           <span><strong>Proof plan</strong>${escapeHtml(serviceProfile.proof)}</span>
         </div>
         <div class="account-action-rail" aria-label="Client next action summary">

@@ -29,6 +29,9 @@ create table if not exists public.bookings (
   status text not null default 'Enquiry Received',
   payment_status text not null default 'Not Requested',
   amount text,
+  mrp_price text,
+  offer_price text,
+  discount_price text,
   payment_link text,
   proof_url text,
   staff_note text,
@@ -44,6 +47,9 @@ create index if not exists bookings_phone_idx on public.bookings (phone);
 create index if not exists bookings_created_at_idx on public.bookings (created_at desc);
 
 alter table public.bookings add column if not exists payment_link text;
+alter table public.bookings add column if not exists mrp_price text;
+alter table public.bookings add column if not exists offer_price text;
+alter table public.bookings add column if not exists discount_price text;
 alter table public.profiles add column if not exists phone text;
 
 create or replace function public.set_updated_at()
@@ -125,6 +131,9 @@ returns table (
   status text,
   payment_status text,
   amount text,
+  mrp_price text,
+  offer_price text,
+  discount_price text,
   payment_link text,
   proof_url text,
   staff_note text,
@@ -154,6 +163,9 @@ as $$
     b.status,
     b.payment_status,
     b.amount,
+    b.mrp_price,
+    b.offer_price,
+    b.discount_price,
     b.payment_link,
     b.proof_url,
     b.staff_note,
