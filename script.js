@@ -1,5 +1,9 @@
 const siteConfig = window.BANDEVI_CONFIG || {};
 const businessWhatsApp = siteConfig.whatsappNumber || "918676846484";
+const businessCallNumbers = Array.isArray(siteConfig.phoneNumbers) && siteConfig.phoneNumbers.length
+  ? siteConfig.phoneNumbers
+  : [businessWhatsApp, "916204641845"];
+const primaryCallNumber = businessCallNumbers[0] || businessWhatsApp;
 const supabaseClient = createSupabaseClient();
 
 const serviceSelect = document.querySelector("#clientService");
@@ -180,6 +184,7 @@ let authContactMode = "email";
 let authPhoneOtpSent = false;
 let accountPortalUnlocked = false;
 let activePricingPackages = [];
+let activeStonePricingPackage = null;
 const pricingManagerCategoryState = { admin: "", backoffice: "" };
 
 const bookingStatuses = [
@@ -308,19 +313,26 @@ const defaultPricingPackages = [
   ["certificate-stone-proof", "Certificate and Stone Proof", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "Stock price", "Staff quote", "Approved offer", "Staff quote"],
   ["ring-pendant-finish", "Ring or Pendant Finish", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "By metal", "Custom quote", "Before payment", "Custom quote"],
   ["tracked-order-delivery", "Tracked Order and Delivery", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "Item total", "Final quote", "Shown in ID", "Final quote"]
-].map(([id, title, service, mode, category, mrpPrice, offerPrice, discountPrice, amount], index) => ({
-  id,
-  title,
-  service,
-  mode,
-  category,
-  mrpPrice,
-  offerPrice,
-  discountPrice,
-  amount,
-  sortOrder: index + 1,
-  isActive: true
-}));
+].map(([id, title, service, mode, category, mrpPrice, offerPrice, discountPrice, amount], index) => {
+  const isProductQuote = /stock price|by metal|item total|custom quote/i.test(`${mrpPrice} ${offerPrice} ${amount}`);
+  return {
+    id,
+    title,
+    service,
+    mode,
+    category,
+    mrpPrice,
+    offerPrice,
+    discountPrice,
+    amount,
+    productStatus: isProductQuote ? "Quote after staff review" : "Bookable",
+    quoteNote: isProductQuote
+      ? "Staff confirms availability, product proof, delivery and final quote before payment."
+      : "Bookable package. Final timing, proof and payment step are confirmed by staff.",
+    sortOrder: index + 1,
+    isActive: true
+  };
+});
 
 const pricingManagerTabs = [
   ["pooja-hawan", "Hawan/Pooja", "Online pooja, hawan, jaap and muhurat packages"],
@@ -340,6 +352,15 @@ const pricingCategoryFieldOptions = [
   "Kundali",
   "Gemstone",
   "Muhurat"
+];
+
+const productStatusOptions = [
+  "Bookable",
+  "Quote after staff review",
+  "Limited availability",
+  "Certificate required",
+  "Delivery confirmation needed",
+  "Hidden from public quote"
 ];
 
 const serviceProfileRules = [
@@ -447,6 +468,7 @@ function markActiveHeaderLinks() {
 
 markActiveHeaderLinks();
 initHeaderGlobalTools();
+initCallNowActions();
 initCurrencyConversion();
 
 function initPremiumSliders() {
@@ -540,6 +562,79 @@ function writePreference(key, value) {
 
 function getPageFromHref(href) {
   return (href || "").split("#")[0].split("?")[0] || "index.html";
+}
+
+function normalizePhoneForCall(number) {
+  const digits = String(number || "").replace(/[^0-9]/g, "");
+  if (digits.length === 10) return `91${digits}`;
+  return digits;
+}
+
+function phoneTelUrl(number) {
+  const digits = normalizePhoneForCall(number);
+  return digits ? `tel:+${digits}` : "#";
+}
+
+function formatDisplayPhone(number) {
+  const digits = normalizePhoneForCall(number);
+  if (digits.length === 12 && digits.startsWith("91")) {
+    return `+91 ${digits.slice(2, 7)} ${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  }
+  return number ? `+${digits}` : "";
+}
+
+function initCallNowActions() {
+  const primaryPhone = formatDisplayPhone(primaryCallNumber);
+  const allPhones = businessCallNumbers.map(formatDisplayPhone).filter(Boolean);
+
+  document.querySelectorAll(".international-header .header-actions").forEach((actions) => {
+    if (actions.querySelector("[data-call-now-action]")) return;
+    const callLink = document.createElement("a");
+    callLink.className = "header-action call-now";
+    callLink.href = phoneTelUrl(primaryCallNumber);
+    callLink.dataset.callNowAction = "header";
+    callLink.setAttribute("aria-label", `Call Bandevi Astro now at ${primaryPhone}`);
+    callLink.innerHTML = `<span>${escapeHtml(primaryPhone)}</span><strong>Call Now</strong>`;
+    const whatsappLink = actions.querySelector(".header-action.whatsapp");
+    actions.insertBefore(callLink, whatsappLink || actions.firstChild);
+  });
+
+  document.querySelectorAll(".floating-whatsapp").forEach((whatsappLink) => {
+    const href = whatsappLink.getAttribute("href") || "";
+    if (!href.includes(businessWhatsApp)) {
+      whatsappLink.href = `https://wa.me/${businessWhatsApp}`;
+    }
+    if (whatsappLink.parentElement?.querySelector("[data-call-now-action='floating']")) return;
+    const callLink = document.createElement("a");
+    callLink.className = "floating-call-now";
+    callLink.href = phoneTelUrl(primaryCallNumber);
+    callLink.dataset.callNowAction = "floating";
+    callLink.setAttribute("aria-label", `Call now ${primaryPhone}`);
+    callLink.innerHTML = `<span>Call Now</span><strong>${escapeHtml(primaryPhone)}</strong>`;
+    whatsappLink.insertAdjacentElement("beforebegin", callLink);
+  });
+
+  if (!document.querySelector(".floating-whatsapp") && !document.querySelector("[data-call-now-action='floating']")) {
+    const callLink = document.createElement("a");
+    callLink.className = "floating-call-now";
+    callLink.href = phoneTelUrl(primaryCallNumber);
+    callLink.dataset.callNowAction = "floating";
+    callLink.setAttribute("aria-label", `Call now ${primaryPhone}`);
+    callLink.innerHTML = `<span>Call Now</span><strong>${escapeHtml(primaryPhone)}</strong>`;
+    document.body.appendChild(callLink);
+  }
+
+  document.querySelectorAll(".footer-contact-card, .footer-contact").forEach((card) => {
+    if (card.querySelector("[data-call-now-action='footer']") || !allPhones.length) return;
+    const line = document.createElement("p");
+    line.className = "footer-call-line";
+    line.dataset.callNowAction = "footer";
+    line.innerHTML = `Call Now: ${allPhones.map((phone, index) => `<a href="${escapeHtml(phoneTelUrl(businessCallNumbers[index]))}">${escapeHtml(phone)}</a>`).join(" / ")}`;
+    card.appendChild(line);
+  });
 }
 
 function initHeaderGlobalTools() {
@@ -882,6 +977,8 @@ function normalizePricingPackage(item = {}, fallback = {}) {
     offerPrice: String(item.offerPrice || item.offer_price || fallback.offerPrice || "").trim(),
     discountPrice: String(item.discountPrice || item.discount_price || fallback.discountPrice || "").trim(),
     amount: String(item.amount || item.final_quote || fallback.amount || item.offerPrice || item.offer_price || "").trim(),
+    productStatus: String(item.productStatus || item.product_status || fallback.productStatus || "Quote after staff review").trim(),
+    quoteNote: String(item.quoteNote || item.quote_note || fallback.quoteNote || "Staff confirms final quote, proof and delivery/payment step before payment.").trim(),
     sortOrder: Number(item.sortOrder || item.sort_order || fallback.sortOrder || 0),
     isActive: item.isActive ?? item.is_active ?? fallback.isActive ?? true
   };
@@ -927,6 +1024,117 @@ function findPricingPackage({ id = "", title = "", service = "" } = {}) {
     || packages.find((item) => normalizedTitle && normalizePackageId(item.title) === normalizedTitle)
     || packages.find((item) => normalizedService && normalizePackageId(item.service) === normalizedService)
     || null;
+}
+
+function getCategoryPricingDefaults(category = "", productName = "") {
+  const text = normalizeCatalogText(`${category} ${productName}`);
+  if (/mala/.test(text)) {
+    return {
+      mrpPrice: "Stock price",
+      offerPrice: "Staff quote",
+      discountPrice: "Before payment",
+      amount: "Staff quote",
+      productStatus: "Quote after staff review",
+      quoteNote: "Staff confirms bead type, bead count, purpose, product proof and delivery before payment."
+    };
+  }
+  if (/hawan samagri|havan samagri/.test(text)) {
+    return {
+      mrpPrice: "Stock price",
+      offerPrice: "Staff quote",
+      discountPrice: "Before payment",
+      amount: "Staff quote",
+      productStatus: "Delivery confirmation needed",
+      quoteNote: "Staff confirms item list, quantity, delivery country and final quote before payment."
+    };
+  }
+  if (/pooja samagri|puja samagri|pooja kit|puja kit/.test(text)) {
+    return {
+      mrpPrice: "Stock price",
+      offerPrice: "Staff quote",
+      discountPrice: "Before payment",
+      amount: "Staff quote",
+      productStatus: "Quote after staff review",
+      quoteNote: "Staff confirms kit items, deity/ritual fit, packaging, delivery and final quote before payment."
+    };
+  }
+  if (/ring|pendant/.test(text)) {
+    return {
+      mrpPrice: "By stone + metal",
+      offerPrice: "Custom quote",
+      discountPrice: "Before payment",
+      amount: "Custom quote",
+      productStatus: "Certificate required",
+      quoteNote: "Staff confirms stone proof, certificate, metal, size and final quote before payment."
+    };
+  }
+  if (/gemstone|stone|ratna|loose/.test(text)) {
+    return {
+      mrpPrice: "By carat/certificate",
+      offerPrice: "Staff quote",
+      discountPrice: "Approved offer",
+      amount: "Staff quote",
+      productStatus: "Certificate required",
+      quoteNote: "Staff confirms carat/ratti, origin, treatment note, certificate and proof before payment."
+    };
+  }
+  return {
+    mrpPrice: "To be confirmed",
+    offerPrice: "Staff quote",
+    discountPrice: "Before payment",
+    amount: "Staff quote",
+    productStatus: "Quote after staff review",
+    quoteNote: "Staff confirms final quote, schedule, proof and payment step before payment."
+  };
+}
+
+function getProductPricingPackage(name, category, fallback = {}) {
+  const matched = findPricingPackage({ id: fallback.id || "", title: name, service: fallback.service || name });
+  return normalizePricingPackage({
+    id: fallback.id || normalizePackageId(`${category}-${name}`),
+    title: name,
+    service: fallback.service || `${category} Product`,
+    mode: fallback.mode || "Product quote before payment",
+    category,
+    ...getCategoryPricingDefaults(category, name),
+    ...(matched || {}),
+    ...fallback
+  });
+}
+
+function productPricingBlock(pricingPackage, className = "") {
+  const pricing = normalizePricingPackage(pricingPackage);
+  return `
+    <div class="price-stack compact-price-stack product-price-stack ${escapeHtml(className)}" aria-label="${escapeHtml(pricing.title)} pricing">
+      <div class="price-row mrp-price"><span>MRP</span><strong>${escapeHtml(pricing.mrpPrice || "To be confirmed")}</strong></div>
+      <div class="price-row offer-price"><span>Offer Price</span><strong>${escapeHtml(pricing.offerPrice || pricing.amount || "Staff quote")}</strong></div>
+      <div class="price-row discount-price"><span>Discount</span><strong>${escapeHtml(pricing.discountPrice || "Before payment")}</strong></div>
+    </div>
+  `;
+}
+
+function productTrustDetailBlock(pricingPackage, details = []) {
+  const pricing = normalizePricingPackage(pricingPackage);
+  const lines = [
+    pricing.productStatus || "Quote after staff review",
+    pricing.quoteNote || "Staff confirms details before payment.",
+    ...details
+  ].filter(Boolean);
+  return `
+    <details class="product-quick-detail">
+      <summary>Product detail and trust</summary>
+      <div>
+        <strong>${escapeHtml(pricing.title)}</strong>
+        <ul>
+          ${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}
+        </ul>
+      </div>
+    </details>
+  `;
+}
+
+function addPricingToBookingUrl(href, pricingPackage) {
+  return addPackageParamsToUrl(href, normalizePricingPackage(pricingPackage));
 }
 
 function packageFromCard(card, link) {
@@ -2138,7 +2346,7 @@ function pricingPackageToCloudRow(item) {
 }
 
 function pricingPackageFromCloudRow(row) {
-  return normalizePricingPackage({
+  return {
     id: row.id,
     title: row.title,
     service: row.service,
@@ -2148,9 +2356,11 @@ function pricingPackageFromCloudRow(row) {
     offerPrice: row.offer_price,
     discountPrice: row.discount_price,
     amount: row.final_quote,
+    productStatus: row.product_status || "",
+    quoteNote: row.quote_note || "",
     sortOrder: row.sort_order,
     isActive: row.is_active
-  });
+  };
 }
 
 async function readPricingPackagesOnline() {
@@ -2252,6 +2462,15 @@ function renderPricingCategoryOptions(selectedCategory = "") {
   `).join("");
 }
 
+function renderProductStatusOptions(selectedStatus = "") {
+  const options = productStatusOptions.includes(selectedStatus) || !selectedStatus
+    ? productStatusOptions
+    : [selectedStatus, ...productStatusOptions];
+  return options.map((status) => `
+    <option value="${escapeHtml(status)}" ${status === selectedStatus ? "selected" : ""}>${escapeHtml(status)}</option>
+  `).join("");
+}
+
 function renderPricingManager(scope = "admin", message = "") {
   const manager = ensurePricingManager(scope);
   if (!manager) return;
@@ -2293,6 +2512,10 @@ function renderPricingManager(scope = "admin", message = "") {
       <div class="package-pricing-grid">
       ${visiblePackages.map((item) => `
         <article class="package-pricing-card" data-pricing-package-id="${escapeHtml(item.id)}">
+          <div class="package-pricing-card-head">
+            <strong>${escapeHtml(item.title)}</strong>
+            <span>${escapeHtml(item.productStatus || "Quote after staff review")}</span>
+          </div>
           <label>Package<input data-pricing-field="title" type="text" value="${escapeHtml(item.title)}" /></label>
           <label>Service<input data-pricing-field="service" type="text" value="${escapeHtml(item.service)}" /></label>
           <label>Mode<input data-pricing-field="mode" type="text" value="${escapeHtml(item.mode)}" /></label>
@@ -2301,6 +2524,8 @@ function renderPricingManager(scope = "admin", message = "") {
           <label>Offer Price<input data-pricing-field="offerPrice" type="text" value="${escapeHtml(item.offerPrice)}" /></label>
           <label>Discount<input data-pricing-field="discountPrice" type="text" value="${escapeHtml(item.discountPrice)}" /></label>
           <label>Final Quote<input data-pricing-field="amount" type="text" value="${escapeHtml(item.amount)}" /></label>
+          <label>Product Status<select data-pricing-field="productStatus">${renderProductStatusOptions(item.productStatus)}</select></label>
+          <label class="package-pricing-note-field">Quote Note<textarea data-pricing-field="quoteNote" rows="3" placeholder="What staff must confirm before payment">${escapeHtml(item.quoteNote || "")}</textarea></label>
           <a class="text-button" href="${escapeHtml(addPackageParamsToUrl("book-online.html", item))}">Create Booking ID</a>
         </article>
       `).join("")}
@@ -2333,9 +2558,11 @@ async function initializePricingPackages() {
   const cloudPackages = await readPricingPackagesOnline();
   if (cloudPackages.length) {
     const byId = new Map(getDefaultPricingPackages().map((item) => [item.id, item]));
-    cloudPackages.forEach((item) => byId.set(item.id, normalizePricingPackage(item, byId.get(item.id) || {})));
+    const localById = new Map(activePricingPackages.map((item) => [item.id, item]));
+    cloudPackages.forEach((item) => byId.set(item.id, normalizePricingPackage(item, localById.get(item.id) || byId.get(item.id) || {})));
     writePricingPackages([...byId.values()]);
     enhanceBookablePackageLinks();
+    refreshProductPriceSurfaces();
   }
   renderPricingManager("admin");
   renderPricingManager("backoffice");
@@ -3001,16 +3228,32 @@ function getStoneQuoteProfile(stoneName) {
   return profile;
 }
 
-function updateStoneQuoteSummary(stoneName) {
+function getStonePricingCategory(profile) {
+  if (profile.form === "Mala") return "Mala";
+  if (profile.form === "Loose stone") return "Loose Gemstone";
+  if (profile.form === "Pendant") return "Gemstone Pendant";
+  return "Gemstone Ring";
+}
+
+function getStoneProductPricing(stoneName, profile, pricingPackage = null) {
+  return normalizePricingPackage(pricingPackage || getProductPricingPackage(stoneName, getStonePricingCategory(profile), {
+    service: `Gemstone Quote - ${stoneName}`,
+    mode: `${profile.form} / ${profile.metal} / gemstone delivery`
+  }));
+}
+
+function updateStoneQuoteSummary(stoneName, pricingPackage = null) {
   if (!stoneQuoteSummary) return;
   const selectedStone = stoneName || stoneSelect?.value || "Select a gemstone product";
   const profile = getStoneQuoteProfile(selectedStone);
+  const pricing = getStoneProductPricing(selectedStone, profile, pricingPackage || activeStonePricingPackage);
   stoneQuoteSummary.innerHTML = `
     <div>
       <span>${escapeHtml(profile.badge)}</span>
       <strong>${escapeHtml(selectedStone)}</strong>
       <p>${escapeHtml(profile.note)}</p>
     </div>
+    ${productPricingBlock(pricing, "stone-summary-price")}
     <dl>
       <div><dt>Form</dt><dd>${escapeHtml(profile.form)}</dd></div>
       <div><dt>Metal</dt><dd>${escapeHtml(profile.metal)}</dd></div>
@@ -3035,6 +3278,9 @@ function setStone(stoneName, options = {}) {
   const stonePurposeField = document.querySelector("#stonePurpose");
   const stoneDeliveryField = document.querySelector("#stoneDelivery");
   const profile = getStoneQuoteProfile(stoneName);
+  activeStonePricingPackage = getStoneProductPricing(stoneName, profile, options.pricingPackageId
+    ? findPricingPackage({ id: options.pricingPackageId })
+    : null);
 
   setSelectValue(stoneFormField, profile.form);
   setSelectValue(stoneMetalField, profile.metal);
@@ -3046,9 +3292,9 @@ function setStone(stoneName, options = {}) {
   if (stoneDeliveryField) {
     stoneDeliveryField.placeholder = "India, USA, UK, Canada, UAE, Australia, etc.";
   }
-  updateStoneQuoteSummary(stoneName);
+  updateStoneQuoteSummary(stoneName, activeStonePricingPackage);
   if (stoneStatusEl) {
-    stoneStatusEl.textContent = `${stoneName} selected. Add name, WhatsApp, budget and delivery country to create the quote ID.`;
+    stoneStatusEl.textContent = `${stoneName} selected. ${activeStonePricingPackage.offerPrice || "Staff quote"} will be confirmed before payment.`;
   }
   if (options.scroll !== false) {
     document.querySelector("#stoneOrder")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -3056,7 +3302,7 @@ function setStone(stoneName, options = {}) {
 }
 
 document.querySelectorAll("[data-stone]").forEach((button) => {
-  button.addEventListener("click", () => setStone(button.dataset.stone));
+  button.addEventListener("click", () => setStone(button.dataset.stone, { pricingPackageId: button.dataset.packageBook || "" }));
 });
 
 function setSelectValue(select, value) {
@@ -3507,6 +3753,62 @@ function initializeGemstoneProductFinder() {
   });
 }
 
+function createHtmlFragment(html) {
+  const template = document.createElement("template");
+  template.innerHTML = html.trim();
+  return template.content.firstElementChild;
+}
+
+function getStaticProductCardCategory(card) {
+  const section = card.closest("section");
+  if (section?.id === "ring-products") return "Gemstone Ring";
+  if (section?.id === "pendant-products") return "Gemstone Pendant";
+  if (section?.id === "loose-stones") return "Loose Gemstone";
+  return "Gemstone";
+}
+
+function enhanceStaticProductCards() {
+  const cards = [...document.querySelectorAll("#ring-products .ring-product-card, #pendant-products .ring-product-card, #loose-stones .premium-product-card")];
+  cards.forEach((card) => {
+    const title = card.querySelector("h3")?.textContent.trim();
+    if (!title) return;
+    const category = getStaticProductCardCategory(card);
+    const pricing = getProductPricingPackage(title, category, {
+      service: `Gemstone Quote - ${title}`,
+      mode: category.includes("Loose") ? "Loose stone quote" : "Gemstone jewellery quote"
+    });
+    const actionRow = card.querySelector(".product-card-actions");
+    const specList = card.querySelector(".ring-spec-list, .product-spec-list, .product-ring-list, .product-card-actions");
+
+    if (!card.querySelector(".product-price-stack") && specList) {
+      specList.before(createHtmlFragment(productPricingBlock(pricing, "static-card-price")));
+    }
+
+    if (!card.querySelector(".product-quick-detail") && actionRow) {
+      actionRow.before(createHtmlFragment(productTrustDetailBlock(pricing, [
+        "Kundli suitability or existing recommendation is reviewed before wearing.",
+        "Stone photo/video, certificate note and final quote are shared before payment."
+      ])));
+    }
+
+    const quoteButton = card.querySelector("[data-stone]");
+    if (quoteButton) {
+      quoteButton.dataset.packageBook = pricing.id;
+      quoteButton.dataset.productCategory = category;
+      quoteButton.textContent = "Create Quote ID";
+    }
+  });
+}
+
+function refreshProductPriceSurfaces() {
+  renderPoojaKitCatalog();
+  renderHawanSamagriCatalog();
+  renderMalaProductCatalog();
+  enhanceStaticProductCards();
+  document.querySelectorAll("[data-gemstone-finder]").forEach((finder) => updateGemstoneProductFinder(finder));
+  applyCurrencyToPage();
+}
+
 const poojaKitProducts = [
   ["Durga Pooja Kit", "assets/pooja-kits/display/01-durga-puja-kit-hindi.jpg", "Shakti worship", "Durga upasana kit with core pooja items, useful for Navratri, strength and protection sankalp."],
   ["Lakshmi Pooja Kit", "assets/pooja-kits/display/02-lakshmi-puja-kit-hindi.jpg", "Prosperity", "Lakshmi worship kit for home, shop, business blessing and Diwali-style pooja preparation."],
@@ -3612,61 +3914,107 @@ function productConcern(product, category) {
 function renderPoojaKitCatalog() {
   const catalog = document.querySelector("[data-pooja-kit-catalog]");
   if (!catalog) return;
-  catalog.innerHTML = poojaKitProducts.map(([name, image, badge, body]) => `
-    <article class="pooja-product-card pooja-kit-card">
-      <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product kit image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
-      <div class="pooja-product-body">
-        <span class="quote-chip">Hindi pooja kit</span>
-        <h3>${escapeHtml(name)}</h3>
-        <p>${escapeHtml(body)}</p>
-        <div class="pooja-product-meta"><div><span>Quote</span><strong>Before payment</strong></div><div><span>Support</span><strong>Kit + guidance</strong></div></div>
-        <ul class="pooja-product-list"><li>Real kit image shown</li><li>Item list confirmed by ritual</li><li>Booking ID for follow-up</li></ul>
-        <div class="product-card-actions">
-          <a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>
-          <a class="text-button" href="${escapeHtml(bookingUrl(`${name} Enquiry`, "Pooja kit guidance", { product: name, category: "Hindi Pooja Kit", quoteType: "Product quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Hindi Pooja Kit") }))}">Create Quote</a>
+  catalog.innerHTML = poojaKitProducts.map(([name, image, badge, body]) => {
+    const pricing = getProductPricingPackage(name, "Pooja Samagri", {
+      service: `${name} Enquiry`,
+      mode: "Pooja kit guidance"
+    });
+    const quoteHref = addPricingToBookingUrl(bookingUrl(`${name} Enquiry`, "Pooja kit guidance", {
+      product: name,
+      category: "Pooja Samagri",
+      quoteType: "Product quote before payment",
+      delivery: "To be confirmed",
+      concern: productConcern(name, "Pooja Samagri")
+    }), pricing);
+    return `
+      <article class="pooja-product-card pooja-kit-card" data-product-name="${escapeHtml(name)}" data-product-category="Pooja Samagri">
+        <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product kit image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
+        <div class="pooja-product-body">
+          <span class="quote-chip">Hindi pooja kit</span>
+          <h3>${escapeHtml(name)}</h3>
+          <p>${escapeHtml(body)}</p>
+          ${productPricingBlock(pricing)}
+          <div class="pooja-product-meta"><div><span>Status</span><strong>${escapeHtml(pricing.productStatus)}</strong></div><div><span>Support</span><strong>Kit + guidance</strong></div></div>
+          <ul class="pooja-product-list"><li>Real kit image shown</li><li>Item list confirmed by ritual</li><li>Booking ID for follow-up</li></ul>
+          ${productTrustDetailBlock(pricing, ["Delivery and packaging confirmed by staff.", "Final quote appears in the Booking ID before payment."])}
+          <div class="product-card-actions">
+            <a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>
+            <a class="text-button" href="${escapeHtml(quoteHref)}">Create Quote</a>
+          </div>
         </div>
-      </div>
-    </article>
-  `).join("");
+      </article>
+    `;
+  }).join("");
 }
 
 function renderHawanSamagriCatalog() {
   const catalog = document.querySelector("[data-hawan-samagri-catalog]");
   if (!catalog) return;
-  catalog.innerHTML = hawanSamagriProducts.map(([name, image, badge, body]) => `
-    <article class="samagri-card is-product-item">
-      <img src="${escapeHtml(image)}" alt="${escapeHtml(name)} hawan samagri product image" loading="lazy" />
-      <div>
-        <span>${escapeHtml(badge)}</span>
-        <h3>${escapeHtml(name)}</h3>
-        <p>${escapeHtml(body)}</p>
-        <div class="product-card-actions ${mainSamagriDetailNames.has(name) ? "" : "single-action"}">
-          ${mainSamagriDetailNames.has(name) ? `<a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>` : ""}
-          <a class="text-button" href="${escapeHtml(bookingUrl(`Hawan Samagri - ${name}`, "Hawan samagri guidance", { product: name, category: "Hawan Samagri", quoteType: "Product quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Hawan Samagri") }))}">Ask for this item</a>
+  catalog.innerHTML = hawanSamagriProducts.map(([name, image, badge, body]) => {
+    const pricing = getProductPricingPackage(name, "Hawan Samagri", {
+      service: `Hawan Samagri - ${name}`,
+      mode: "Hawan samagri guidance"
+    });
+    const quoteHref = addPricingToBookingUrl(bookingUrl(`Hawan Samagri - ${name}`, "Hawan samagri guidance", {
+      product: name,
+      category: "Hawan Samagri",
+      quoteType: "Product quote before payment",
+      delivery: "To be confirmed",
+      concern: productConcern(name, "Hawan Samagri")
+    }), pricing);
+    return `
+      <article class="samagri-card is-product-item" data-product-name="${escapeHtml(name)}" data-product-category="Hawan Samagri">
+        <img src="${escapeHtml(image)}" alt="${escapeHtml(name)} hawan samagri product image" loading="lazy" />
+        <div>
+          <span>${escapeHtml(badge)}</span>
+          <h3>${escapeHtml(name)}</h3>
+          <p>${escapeHtml(body)}</p>
+          ${productPricingBlock(pricing)}
+          <div class="pooja-product-meta product-status-meta"><div><span>Status</span><strong>${escapeHtml(pricing.productStatus)}</strong></div><div><span>Quote</span><strong>${escapeHtml(pricing.amount || "Staff quote")}</strong></div></div>
+          ${productTrustDetailBlock(pricing, ["Quantity is confirmed by ritual and place.", "Delivery country and safety note are checked before payment."])}
+          <div class="product-card-actions ${mainSamagriDetailNames.has(name) ? "" : "single-action"}">
+            ${mainSamagriDetailNames.has(name) ? `<a class="text-button product-detail-link" href="${escapeHtml(productDetailUrl(name))}">View details</a>` : ""}
+            <a class="text-button" href="${escapeHtml(quoteHref)}">Ask for this item</a>
+          </div>
         </div>
-      </div>
-    </article>
-  `).join("");
+      </article>
+    `;
+  }).join("");
 }
 
 function renderMalaProductCatalog() {
   const catalog = document.querySelector("[data-mala-products-catalog]");
   if (!catalog) return;
-  catalog.innerHTML = malaProducts.map(([name, image, badge, body]) => `
-    <article class="pooja-product-card mala-product-card">
-      <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
-      <div class="pooja-product-body">
-        <span class="quote-chip">Astro mala</span>
-        <h3>${escapeHtml(name)}</h3>
-        <p>${escapeHtml(body)}</p>
-        <div class="pooja-product-meta"><div><span>Quote</span><strong>Before payment</strong></div><div><span>Confirm</span><strong>Bead type + count</strong></div></div>
-        <ul class="pooja-product-list"><li>Product picture shown before quote</li><li>Use guidance confirmed by purpose</li><li>Booking ID for delivery updates</li></ul>
-        <div class="product-card-actions single-action">
-          <a class="text-button" href="${escapeHtml(bookingUrl(`Astro Mala - ${name}`, "Mala product quote", { product: name, category: "Astro Mala", quoteType: "Mala quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Astro Mala") }))}">Create Quote ID</a>
+  catalog.innerHTML = malaProducts.map(([name, image, badge, body]) => {
+    const pricing = getProductPricingPackage(name, "Mala", {
+      service: `Astro Mala - ${name}`,
+      mode: "Mala product quote"
+    });
+    const quoteHref = addPricingToBookingUrl(bookingUrl(`Astro Mala - ${name}`, "Mala product quote", {
+      product: name,
+      category: "Astro Mala",
+      quoteType: "Mala quote before payment",
+      delivery: "To be confirmed",
+      concern: productConcern(name, "Astro Mala")
+    }), pricing);
+    return `
+      <article class="pooja-product-card mala-product-card" data-product-name="${escapeHtml(name)}" data-product-category="Mala">
+        <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
+        <div class="pooja-product-body">
+          <span class="quote-chip">Astro mala</span>
+          <h3>${escapeHtml(name)}</h3>
+          <p>${escapeHtml(body)}</p>
+          ${productPricingBlock(pricing)}
+          <div class="pooja-product-meta"><div><span>Status</span><strong>${escapeHtml(pricing.productStatus)}</strong></div><div><span>Confirm</span><strong>Bead type + count</strong></div></div>
+          <ul class="pooja-product-list"><li>Product picture shown before quote</li><li>Use guidance confirmed by purpose</li><li>Booking ID for delivery updates</li></ul>
+          ${productTrustDetailBlock(pricing, ["Bead count, purpose and packaging are confirmed.", "Delivery and payment step are shared only after quote approval."])}
+          <div class="product-card-actions single-action">
+            <a class="text-button" href="${escapeHtml(quoteHref)}">Create Quote ID</a>
+          </div>
         </div>
-      </div>
-    </article>
-  `).join("");
+      </article>
+    `;
+  }).join("");
 }
 
 function getPortalFieldValue(selector) {
@@ -3778,6 +4126,8 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     delivery: document.querySelector("#stoneDelivery").value.trim() || "Need delivery guidance",
     purpose: document.querySelector("#stonePurpose").value.trim() || "Please call me for kundli/gemstone guidance."
   };
+  const orderProfile = getStoneQuoteProfile(order.stone);
+  const orderPricing = getStoneProductPricing(order.stone, orderProfile, activeStonePricingPackage);
 
   const booking = {
     id: generateBookingId(),
@@ -3801,9 +4151,16 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     ].join("\n"),
     status: "Enquiry Received",
     paymentStatus: "Not Requested",
-    amount: "Certificate-based quote pending",
+    amount: orderPricing.amount || orderPricing.offerPrice || "Certificate-based quote pending",
+    mrpPrice: orderPricing.mrpPrice || "",
+    offerPrice: orderPricing.offerPrice || "",
+    discountPrice: orderPricing.discountPrice || "",
     proofUrl: "",
-    staffNote: "",
+    staffNote: [
+      orderPricing.title ? `Selected product: ${orderPricing.title}` : "",
+      orderPricing.productStatus ? `Product status: ${orderPricing.productStatus}` : "",
+      orderPricing.quoteNote || ""
+    ].filter(Boolean).join("\n"),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -3818,6 +4175,7 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
   const syncResult = await saveBookingOnline(booking);
   renderTicket(booking, syncResult);
   stoneOrderForm.reset();
+  activeStonePricingPackage = null;
   updateStoneQuoteSummary(stoneSelect?.value || "");
 
   if (stoneStatusEl) {
@@ -4186,6 +4544,7 @@ document.addEventListener("click", async (event) => {
     const packages = writePricingPackages(collectPricingManagerPackages(manager));
     const result = await savePricingPackagesOnline(packages);
     enhanceBookablePackageLinks();
+    refreshProductPriceSurfaces();
     renderPricingManager(scope, result.savedCloud
       ? "Package prices saved to secure cloud and local browser."
       : "Package prices saved locally. Run the pricing package SQL once to share changes across devices.");
@@ -4203,6 +4562,7 @@ document.addEventListener("click", async (event) => {
     localStorage.removeItem(packagePricingStorageKey);
     activePricingPackages = readPricingPackages();
     enhanceBookablePackageLinks();
+    refreshProductPriceSurfaces();
     renderPricingManager(scope, "Local package prices reset to default website prices.");
     if (scope === "backoffice") {
       setBackofficeStatus("Local package prices reset.");
@@ -4905,9 +5265,7 @@ if (customerAuthForm) {
 prefillPortalBookingFromUrl();
 updateServicePreview();
 initializePricingPackages();
-renderPoojaKitCatalog();
-renderHawanSamagriCatalog();
-renderMalaProductCatalog();
+refreshProductPriceSurfaces();
 initializePublicProductTabs();
 initializeServiceFinders();
 initializeGemstoneProductFinder();

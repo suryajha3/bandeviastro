@@ -13,3 +13,5 @@ services:
         sync: false
       - key: WHATSAPP_NUMBER
         value: "918676846484"
+      - key: PHONE_NUMBERS
+        value: "918676846484,916204641845"

@@ -4,6 +4,11 @@ const defaultSupabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
 const configuredSupabaseAnonKey = process.env.SUPABASE_ANON_KEY || defaultSupabaseAnonKey;
 const defaultWhatsappNumber = "918676846484";
 const configuredWhatsappNumber = process.env.WHATSAPP_NUMBER || defaultWhatsappNumber;
+const defaultPhoneNumbers = ["918676846484", "916204641845"];
+const configuredPhoneNumbers = (process.env.PHONE_NUMBERS || defaultPhoneNumbers.join(","))
+  .split(",")
+  .map((number) => number.replace(/[^0-9]/g, ""))
+  .filter(Boolean);
 
 const config = {
   supabaseUrl: process.env.SUPABASE_URL || "https://ftikypoxakhfethkxvpr.supabase.co",
@@ -12,7 +17,8 @@ const config = {
     : configuredSupabaseAnonKey,
   whatsappNumber: configuredWhatsappNumber === "919876543210"
     ? defaultWhatsappNumber
-    : configuredWhatsappNumber
+    : configuredWhatsappNumber,
+  phoneNumbers: configuredPhoneNumbers.length ? configuredPhoneNumbers : defaultPhoneNumbers
 };
 
 fs.writeFileSync(
