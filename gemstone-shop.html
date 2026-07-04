@@ -180,28 +180,38 @@
 
       <section class="section gemstone-shop-nav-section" aria-label="Gemstone shop quick paths">
         <div class="gemstone-shop-nav">
-          <a href="#ring-products"><strong>Rings</strong><span>10 separate ring products</span></a>
-          <a href="#pendant-products"><strong>Pendants</strong><span>10 separate pendant products</span></a>
-          <a href="#loose-stones"><strong>Loose stones</strong><span>Certificate-based stone quote</span></a>
+          <a href="#gemstone-product-tabs" data-gemstone-filter-target="rings"><strong>Rings</strong><span>10 separate ring products</span></a>
+          <a href="#gemstone-product-tabs" data-gemstone-filter-target="pendants"><strong>Pendants</strong><span>10 separate pendant products</span></a>
+          <a href="#gemstone-product-tabs" data-gemstone-filter-target="loose"><strong>Loose stones</strong><span>Certificate-based stone quote</span></a>
+          <a href="#gemstone-product-tabs" data-gemstone-filter-target="malas"><strong>Malas</strong><span>Rudraksha, Tulsi and Jap Mala</span></a>
           <a href="#stoneOrder"><strong>Quote ID</strong><span>Trackable gemstone enquiry</span></a>
         </div>
       </section>
 
-      <section class="section gemstone-catalog-tools-section" aria-label="Gemstone product finder">
+      <section class="section mala-product-section" id="mala-products" aria-labelledby="mala-products-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Astro mala collection</p>
+          <h2 id="mala-products-title">Premium spiritual malas with quote tracking</h2>
+          <p>Choose Rudraksha, Sphatik, Tulsi, Chandan, Kamal Gatta, Hakik or premium Jap Mala. Staff confirms bead type, count, purpose, packaging and delivery before payment.</p>
+        </div>
+        <div class="pooja-product-grid mala-product-grid" data-mala-products-catalog></div>
+      </section>
+
+      <section class="section gemstone-catalog-tools-section" id="gemstone-product-tabs" aria-label="Gemstone product finder">
         <div class="gemstone-catalog-tools service-finder" data-gemstone-finder>
           <div class="service-finder-head">
             <div>
-              <p class="eyebrow">Product finder</p>
-              <h3>Find the right ring, pendant or loose stone</h3>
+              <p class="eyebrow">Product tabs</p>
+              <h3>Select one gemstone product family</h3>
             </div>
             <span data-gemstone-match-count>30 products</span>
           </div>
-          <input type="search" data-gemstone-search placeholder="Search Ruby, Pukhraj, Opal, Shani, marriage, business, ring, pendant..." aria-label="Search gemstone products" />
+          <input type="search" data-gemstone-search placeholder="Search within selected product family..." aria-label="Search gemstone products" />
           <div class="service-filter-row gemstone-filter-row" aria-label="Gemstone product filters">
-            <button type="button" class="is-active" data-gemstone-filter="all" aria-pressed="true">All</button>
-            <button type="button" data-gemstone-filter="rings" aria-pressed="false">Rings</button>
+            <button type="button" class="is-active" data-gemstone-filter="rings" aria-pressed="true">Rings</button>
             <button type="button" data-gemstone-filter="pendants" aria-pressed="false">Pendants</button>
             <button type="button" data-gemstone-filter="loose" aria-pressed="false">Loose Stones</button>
+            <button type="button" data-gemstone-filter="malas" aria-pressed="false">Malas</button>
             <button type="button" data-gemstone-filter="caution" aria-pressed="false">High Caution</button>
             <button type="button" data-gemstone-filter="authority" aria-pressed="false">Career</button>
             <button type="button" data-gemstone-filter="calm" aria-pressed="false">Calm</button>
@@ -839,6 +849,14 @@
               <option value="Neelam Loose Stone / Blue Sapphire Loose Stone">Neelam Loose Stone / Blue Sapphire Loose Stone</option>
               <option value="Gomed Loose Stone / Hessonite Loose Stone">Gomed Loose Stone / Hessonite Loose Stone</option>
               <option value="Lehsunia Loose Stone / Cat's Eye Loose Stone">Lehsunia Loose Stone / Cat's Eye Loose Stone</option>
+              <option value="Rudraksha Mala">Rudraksha Mala</option>
+              <option value="Sphatik / Crystal Mala">Sphatik / Crystal Mala</option>
+              <option value="Tulsi Mala">Tulsi Mala</option>
+              <option value="Chandan / Sandalwood Mala">Chandan / Sandalwood Mala</option>
+              <option value="Kamal Gatta / Lotus Seed Mala">Kamal Gatta / Lotus Seed Mala</option>
+              <option value="Hakik Mala">Hakik Mala</option>
+              <option value="Premium Jap Mala">Premium Jap Mala</option>
+              <option value="Ornate Spiritual Mala">Ornate Spiritual Mala</option>
             </select>
           </label>
           <div class="stone-quote-summary full-span" id="stoneQuoteSummary" aria-live="polite">
@@ -859,6 +877,7 @@
               <option value="Loose stone">Loose stone</option>
               <option value="Ring">Ring</option>
               <option value="Pendant">Pendant</option>
+              <option value="Mala">Mala</option>
               <option value="Not sure">Not sure</option>
             </select>
           </label>

@@ -190,7 +190,24 @@
           </figure>
         </div>
       </section>
-      <section class="detail-section premium-detail-section" id="hawan-catalog" aria-labelledby="hawan-options-title">
+      <section class="detail-section public-product-tabs-section" data-public-product-tabs="hawan-front" aria-labelledby="hawan-front-tabs-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Hawan front desk</p>
+          <h2 id="hawan-front-tabs-title">Choose hawan service or hawan samagri first</h2>
+          <p>Open one tab at a time. Hawan booking and hawan samagri products stay separate for a cleaner client journey.</p>
+        </div>
+        <div class="public-product-tabs" role="tablist" aria-label="Hawan product tabs">
+          <button type="button" class="is-active" data-public-product-tab="hawan-front" data-public-product-target="hawan-services" data-public-product-label="Hawan services" data-public-product-body="Hawan services show purpose, place, samagri need, proof option and quote path before payment." aria-pressed="true">
+            <span>Hawan/Pooja</span><strong>Services</strong><small>Temple, home, office and NRI hawan</small>
+          </button>
+          <button type="button" data-public-product-tab="hawan-front" data-public-product-target="hawan-samagri" data-public-product-label="Hawan samagri products" data-public-product-body="Hawan samagri shows separate items, real product photos, final list confirmation and delivery quote." aria-pressed="false">
+            <span>Hawan Samagri</span><strong>Products</strong><small>Wood, herbs, ghee and offering items</small>
+          </button>
+        </div>
+        <p class="public-product-active">Showing: <strong data-public-product-count="hawan-front">Hawan services</strong><span data-public-product-note="hawan-front">Hawan services show purpose, place, samagri need, proof option and quote path before payment.</span></p>
+      </section>
+
+      <section class="detail-section premium-detail-section" id="hawan-catalog" aria-labelledby="hawan-options-title" data-public-product-panel="hawan-front" data-public-product-category="hawan-services">
         <div class="section-heading compact">
           <p class="eyebrow">Premium hawan catalogue</p>
           <h2 id="hawan-options-title">Choose hawan by purpose, place and proof option</h2>
@@ -392,7 +409,7 @@
           </ul>
         </div>
       </section>
-      <section class="detail-section hawan-samagri-section" id="hawan-samagri" aria-labelledby="hawan-samagri-title">
+      <section class="detail-section hawan-samagri-section" id="hawan-samagri" aria-labelledby="hawan-samagri-title" data-public-product-panel="hawan-front" data-public-product-category="hawan-samagri">
         <div class="section-heading compact">
           <p class="eyebrow">Hawan samagri with real photos</p>
           <h2 id="hawan-samagri-title">41 hawan samagri items with separate product pictures</h2>

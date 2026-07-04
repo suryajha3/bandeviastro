@@ -190,7 +190,24 @@
           </figure>
         </div>
       </section>
-      <section class="detail-section premium-detail-section" id="pooja-catalog" aria-labelledby="pooja-options-title">
+      <section class="detail-section public-product-tabs-section" data-public-product-tabs="pooja-front" aria-labelledby="pooja-front-tabs-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Pooja front desk</p>
+          <h2 id="pooja-front-tabs-title">Choose service or pooja samagri first</h2>
+          <p>Open one tab at a time. Online pooja/jaap and pooja samagri kits are kept separate for easier booking.</p>
+        </div>
+        <div class="public-product-tabs" role="tablist" aria-label="Online pooja product tabs">
+          <button type="button" class="is-active" data-public-product-tab="pooja-front" data-public-product-target="pooja-services" data-public-product-label="Online pooja and jaap" data-public-product-body="Pooja services show sankalp, proof option, date and quote path before payment." aria-pressed="true">
+            <span>Hawan/Pooja</span><strong>Services</strong><small>Jaap, path, dosh and temple proof</small>
+          </button>
+          <button type="button" data-public-product-tab="pooja-front" data-public-product-target="pooja-samagri" data-public-product-label="Pooja samagri kits" data-public-product-body="Pooja samagri shows separate kits, product pictures, item confirmation and delivery quote." aria-pressed="false">
+            <span>Pooja Samagri</span><strong>Kits</strong><small>Hindi pooja kits and product quote</small>
+          </button>
+        </div>
+        <p class="public-product-active">Showing: <strong data-public-product-count="pooja-front">Online pooja and jaap</strong><span data-public-product-note="pooja-front">Pooja services show sankalp, proof option, date and quote path before payment.</span></p>
+      </section>
+
+      <section class="detail-section premium-detail-section" id="pooja-catalog" aria-labelledby="pooja-options-title" data-public-product-panel="pooja-front" data-public-product-category="pooja-services">
         <div class="section-heading compact">
           <p class="eyebrow">Premium online pooja catalogue</p>
           <h2 id="pooja-options-title">Choose pooja by name, purpose and proof option</h2>
@@ -403,7 +420,7 @@
           </article>
         </div>
       </section>
-      <section class="detail-section pooja-kit-section" aria-labelledby="pooja-kit-title">
+      <section class="detail-section pooja-kit-section" id="pooja-samagri" aria-labelledby="pooja-kit-title" data-public-product-panel="pooja-front" data-public-product-category="pooja-samagri">
         <div class="section-heading compact">
           <p class="eyebrow">Hindi pooja kits with real pictures</p>
           <h2 id="pooja-kit-title">Ready pooja kit enquiries for home, NRI and online families</h2>

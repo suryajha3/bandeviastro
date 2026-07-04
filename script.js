@@ -71,6 +71,7 @@ const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
+const packagePricingStorageKey = "bandeviAstroPackagePricing";
 const adminAccessCode = "BA-ADMIN-2026";
 const headerPreferenceKeys = {
   currency: "bandeviAstroDisplayCurrency",
@@ -178,6 +179,8 @@ let authMode = "sign-in";
 let authContactMode = "email";
 let authPhoneOtpSent = false;
 let accountPortalUnlocked = false;
+let activePricingPackages = [];
+const pricingManagerCategoryState = { admin: "", backoffice: "" };
 
 const bookingStatuses = [
   "Enquiry Received",
@@ -264,6 +267,80 @@ const serviceStartingPrices = {
   "Marriage Guidance": "From Rs 1,501",
   "Business Guidance": "From Rs 2,100"
 };
+
+const defaultPricingPackages = [
+  ["navgraha-shanti-online", "Navgraha Shanti Online", "Navgraha Shanti Pooja", "Temple pooja with proof", "Pooja", "Rs 7,100", "Rs 5,100", "Rs 2,000 off", "Rs 5,100"],
+  ["marriage-kundli-match", "Marriage Kundli Match", "Marriage Kundali Match", "Online video call", "Kundali", "Rs 2,100", "Rs 1,501", "Rs 599 off", "Rs 1,501"],
+  ["shop-opening-muhurat", "Shop Opening Muhurat", "Business Opening Hawan", "Home / office visit", "Muhurat", "Rs 3,100", "Rs 2,100", "Rs 1,000 off", "Rs 2,100"],
+  ["sankalp-pooja", "Sankalp Pooja", "Online Pooja", "Temple pooja with proof", "Online Pooja", "Rs 2,100", "Rs 1,501", "Rs 599 off", "Rs 1,501"],
+  ["live-video-pooja", "Live Video Pooja", "Online Pooja", "Online video call", "Online Pooja", "Rs 3,100", "Rs 2,100", "Rs 1,000 off", "Rs 2,100"],
+  ["family-pooja-abroad", "Family Pooja Abroad", "NRI Online Pooja", "Temple pooja with proof", "Online Pooja", "Rs 5,100+", "Custom quote", "NRI offer", "Custom quote"],
+  ["remedy-pooja", "Remedy Pooja", "Navgraha Shanti Pooja", "Temple pooja with proof", "Online Pooja", "Rs 7,100", "Rs 5,100", "Rs 2,000 off", "Rs 5,100"],
+  ["temple-hawan-proof", "Temple Hawan With Proof", "Hawan / Havan", "Temple pooja with proof", "Hawan", "Rs 7,100", "Rs 5,100", "Rs 2,000 off", "Rs 5,100"],
+  ["visit-based-hawan", "Visit-Based Hawan", "Vastu Shanti Hawan", "Home / office visit", "Hawan", "Rs 11,000", "From Rs 7,100", "Up to Rs 3,900", "From Rs 7,100"],
+  ["nri-hawan-guidance", "NRI Hawan Guidance", "NRI Hawan / Homam Booking", "Temple pooja with proof", "Hawan", "Rs 8,100+", "Custom quote", "NRI offer", "Custom quote"],
+  ["hawan-samagri-desk", "Hawan Samagri Desk", "Hawan Samagri Guidance", "Online video call", "Hawan Samagri", "Rs 1,100", "Rs 501", "Rs 599 off", "Rs 501"],
+  ["hawan-samagri-premium-mix", "Hawan Samagri Premium Mix", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["navgrah-hawan-samagri", "Navgrah Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["lakshmi-hawan-samagri", "Lakshmi Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["durga-hawan-samagri", "Durga Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["ganesh-hawan-samagri", "Ganesh Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["mahamrityunjay-hawan-samagri", "Mahamrityunjay Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["vastu-shanti-hawan-samagri", "Vastu Shanti Hawan Samagri", "Hawan Samagri Product", "Product quote", "Hawan Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["ganesh-pooja-samagri-kit", "Ganesh Pooja Samagri Kit", "Pooja Samagri Product", "Product quote", "Pooja Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["lakshmi-pooja-samagri-kit", "Lakshmi Pooja Samagri Kit", "Pooja Samagri Product", "Product quote", "Pooja Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["durga-pooja-samagri-kit", "Durga Pooja Samagri Kit", "Pooja Samagri Product", "Product quote", "Pooja Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["satyanarayan-pooja-samagri-kit", "Satyanarayan Pooja Samagri Kit", "Pooja Samagri Product", "Product quote", "Pooja Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["navgrah-pooja-samagri-kit", "Navgrah Pooja Samagri Kit", "Pooja Samagri Product", "Product quote", "Pooja Samagri", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["rudraksha-mala", "Rudraksha Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["sphatik-crystal-mala", "Sphatik / Crystal Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["tulsi-mala", "Tulsi Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["chandan-sandalwood-mala", "Chandan / Sandalwood Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["kamal-gatta-lotus-seed-mala", "Kamal Gatta / Lotus Seed Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["premium-jap-mala", "Premium Jap Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["hakik-mala", "Hakik Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["ornate-spiritual-mala", "Ornate Spiritual Mala", "Astro Mala Product", "Mala product quote", "Mala", "Stock price", "Staff quote", "Before payment", "Staff quote"],
+  ["focused-question-review", "Focused Question Review", "Kundli Consultation", "Online video call", "Kundali", "Rs 2,100", "Rs 1,501", "Rs 599 off", "Rs 1,501"],
+  ["full-kundali-reading", "Full Kundali Reading", "Janam Kundali Reading", "Online video call", "Kundali", "Rs 5,100", "Rs 3,100", "Rs 2,000 off", "Rs 3,100"],
+  ["dosh-deep-review", "Dosh Deep Review", "Dasha and Antardasha Review", "Online video call", "Kundali", "Rs 3,100", "Rs 2,100", "Rs 1,000 off", "Rs 2,100"],
+  ["gemstone-marriage-check", "Gemstone and Marriage Check", "Gemstone Suitability Kundali Check", "Online video call", "Kundali", "Rs 2,100", "Rs 1,501", "Rs 599 off", "Rs 1,501"],
+  ["gemstone-suitability", "Gemstone Suitability", "Gemstone Guidance", "Online video call", "Gemstone", "Rs 2,100", "Rs 1,501", "Rs 599 off", "Rs 1,501"],
+  ["certificate-stone-proof", "Certificate and Stone Proof", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "Stock price", "Staff quote", "Approved offer", "Staff quote"],
+  ["ring-pendant-finish", "Ring or Pendant Finish", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "By metal", "Custom quote", "Before payment", "Custom quote"],
+  ["tracked-order-delivery", "Tracked Order and Delivery", "Buy Gemstone Online", "Gemstone delivery", "Gemstone", "Item total", "Final quote", "Shown in ID", "Final quote"]
+].map(([id, title, service, mode, category, mrpPrice, offerPrice, discountPrice, amount], index) => ({
+  id,
+  title,
+  service,
+  mode,
+  category,
+  mrpPrice,
+  offerPrice,
+  discountPrice,
+  amount,
+  sortOrder: index + 1,
+  isActive: true
+}));
+
+const pricingManagerTabs = [
+  ["pooja-hawan", "Hawan/Pooja", "Online pooja, hawan, jaap and muhurat packages"],
+  ["hawan-samagri", "Hawan Samagri", "Hawan kits, wood, herbs and ritual items"],
+  ["pooja-samagri", "Pooja Samagri", "Hindi pooja kits and deity samagri"],
+  ["mala", "Mala", "Rudraksha, Sphatik, Tulsi and Jap Mala"],
+  ["gemstone", "Gemstones", "Stone, ring, pendant and certificate quote"],
+  ["kundali", "Kundali", "Kundali, dosh, dasha and guidance packages"]
+].map(([id, label, detail]) => ({ id, label, detail }));
+
+const pricingCategoryFieldOptions = [
+  "Online Pooja",
+  "Hawan Pooja",
+  "Hawan Samagri",
+  "Pooja Samagri",
+  "Mala",
+  "Kundali",
+  "Gemstone",
+  "Muhurat"
+];
 
 const serviceProfileRules = [
   {
@@ -783,6 +860,201 @@ function safeExternalUrl(value) {
   } catch {
     return "#";
   }
+}
+
+function normalizePackageId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80) || `package-${Date.now()}`;
+}
+
+function normalizePricingPackage(item = {}, fallback = {}) {
+  const title = String(item.title || item.package_title || fallback.title || "").trim();
+  return {
+    id: String(item.id || item.package_id || fallback.id || normalizePackageId(title)).trim(),
+    title,
+    service: String(item.service || fallback.service || "").trim(),
+    mode: String(item.mode || fallback.mode || "").trim(),
+    category: String(item.category || fallback.category || "Service").trim(),
+    mrpPrice: String(item.mrpPrice || item.mrp_price || fallback.mrpPrice || "").trim(),
+    offerPrice: String(item.offerPrice || item.offer_price || fallback.offerPrice || "").trim(),
+    discountPrice: String(item.discountPrice || item.discount_price || fallback.discountPrice || "").trim(),
+    amount: String(item.amount || item.final_quote || fallback.amount || item.offerPrice || item.offer_price || "").trim(),
+    sortOrder: Number(item.sortOrder || item.sort_order || fallback.sortOrder || 0),
+    isActive: item.isActive ?? item.is_active ?? fallback.isActive ?? true
+  };
+}
+
+function getDefaultPricingPackages() {
+  return defaultPricingPackages.map((item) => ({ ...item }));
+}
+
+function readPricingPackages() {
+  const defaults = getDefaultPricingPackages();
+  try {
+    const stored = JSON.parse(localStorage.getItem(packagePricingStorageKey) || "[]");
+    if (!Array.isArray(stored) || !stored.length) return defaults;
+    const byId = new Map(defaults.map((item) => [item.id, item]));
+    stored.forEach((item) => {
+      const normalized = normalizePricingPackage(item, byId.get(item.id) || {});
+      if (normalized.id) byId.set(normalized.id, normalized);
+    });
+    return [...byId.values()].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  } catch {
+    return defaults;
+  }
+}
+
+function writePricingPackages(packages) {
+  const normalized = packages.map((item, index) => normalizePricingPackage(item, { sortOrder: index + 1 }));
+  localStorage.setItem(packagePricingStorageKey, JSON.stringify(normalized));
+  activePricingPackages = normalized;
+  return normalized;
+}
+
+function getPricingPackages() {
+  if (!activePricingPackages.length) activePricingPackages = readPricingPackages();
+  return activePricingPackages;
+}
+
+function findPricingPackage({ id = "", title = "", service = "" } = {}) {
+  const packages = getPricingPackages();
+  const normalizedTitle = normalizePackageId(title);
+  const normalizedService = normalizePackageId(service);
+  return packages.find((item) => id && item.id === id)
+    || packages.find((item) => normalizedTitle && normalizePackageId(item.title) === normalizedTitle)
+    || packages.find((item) => normalizedService && normalizePackageId(item.service) === normalizedService)
+    || null;
+}
+
+function packageFromCard(card, link) {
+  const title = card.querySelector("h3")?.textContent.trim() || "Selected package";
+  const params = new URL(link.getAttribute("href"), window.location.href).searchParams;
+  const existingPackage = findPricingPackage({ title, service: params.get("service") || "" });
+  const mrpPrice = card.querySelector(".mrp-price strong")?.textContent.trim() || existingPackage?.mrpPrice || "";
+  const offerPrice = card.querySelector(".offer-price strong")?.textContent.trim() || existingPackage?.offerPrice || "";
+  const discountPrice = card.querySelector(".discount-price strong")?.textContent.trim() || existingPackage?.discountPrice || "";
+  return normalizePricingPackage({
+    id: existingPackage?.id || normalizePackageId(title),
+    title,
+    service: params.get("service") || existingPackage?.service || title,
+    mode: params.get("mode") || existingPackage?.mode || "Temple pooja with proof",
+    category: card.querySelector(".quote-chip, .package-kicker")?.textContent.trim() || existingPackage?.category || "Service",
+    mrpPrice,
+    offerPrice,
+    discountPrice,
+    amount: existingPackage?.amount || offerPrice || params.get("amount") || "",
+    sortOrder: existingPackage?.sortOrder || 999,
+    isActive: true
+  });
+}
+
+function addPackageParamsToUrl(href, pricingPackage) {
+  const url = new URL(href, window.location.href);
+  url.searchParams.set("packageId", pricingPackage.id);
+  url.searchParams.set("packageTitle", pricingPackage.title);
+  url.searchParams.set("service", pricingPackage.service);
+  url.searchParams.set("mode", pricingPackage.mode);
+  if (pricingPackage.category) url.searchParams.set("category", pricingPackage.category);
+  if (pricingPackage.mrpPrice) url.searchParams.set("mrpPrice", pricingPackage.mrpPrice);
+  if (pricingPackage.offerPrice) url.searchParams.set("offerPrice", pricingPackage.offerPrice);
+  if (pricingPackage.discountPrice) url.searchParams.set("discountPrice", pricingPackage.discountPrice);
+  if (pricingPackage.amount) url.searchParams.set("amount", pricingPackage.amount);
+  return `${url.pathname.replace(/^\//, "")}?${url.searchParams.toString()}`;
+}
+
+function enhanceBookablePackageLinks() {
+  document.querySelectorAll(".service-package-card .text-button[href*='book-online.html'], .package-card a[href*='book-online.html']").forEach((link) => {
+    const card = link.closest(".service-package-card, .package-card");
+    if (!card || !card.querySelector(".price-stack")) return;
+    const pricingPackage = packageFromCard(card, link);
+    link.href = addPackageParamsToUrl(link.getAttribute("href"), pricingPackage);
+    link.dataset.packageBook = pricingPackage.id;
+    link.textContent = "Book this package";
+    link.setAttribute("aria-label", `Book ${pricingPackage.title}`);
+  });
+}
+
+function getPortalPackageFromParams() {
+  const params = new URLSearchParams(window.location.search);
+  const packageId = params.get("packageId") || "";
+  const packageTitle = params.get("packageTitle") || "";
+  if (!packageId && !packageTitle) return null;
+  return normalizePricingPackage({
+    id: packageId,
+    title: packageTitle,
+    service: params.get("service") || "",
+    mode: params.get("mode") || "",
+    category: params.get("category") || "",
+    mrpPrice: params.get("mrpPrice") || "",
+    offerPrice: params.get("offerPrice") || "",
+    discountPrice: params.get("discountPrice") || "",
+    amount: params.get("amount") || ""
+  }, findPricingPackage({ id: packageId, title: packageTitle }) || {});
+}
+
+function readPortalPackageSelection() {
+  const panel = document.querySelector("#selectedPackagePanel");
+  if (!panel || panel.hidden) return null;
+  return normalizePricingPackage({
+    id: document.querySelector("#portalPackageId")?.value,
+    title: document.querySelector("#portalPackageTitle")?.value,
+    service: document.querySelector("#portalService")?.value,
+    mode: document.querySelector("#portalMode")?.value,
+    category: document.querySelector("#portalPackageCategory")?.value,
+    mrpPrice: document.querySelector("#portalPackageMrp")?.value,
+    offerPrice: document.querySelector("#portalPackageOffer")?.value,
+    discountPrice: document.querySelector("#portalPackageDiscount")?.value,
+    amount: document.querySelector("#portalPackageAmount")?.value
+  });
+}
+
+function setHiddenValue(selector, value) {
+  const field = document.querySelector(selector);
+  if (field) field.value = value || "";
+}
+
+function renderSelectedPackagePanel(pricingPackage) {
+  const panel = document.querySelector("#selectedPackagePanel");
+  if (!panel) return;
+  const packageData = pricingPackage ? normalizePricingPackage(pricingPackage) : null;
+  panel.hidden = !packageData?.title;
+  if (!packageData?.title) return;
+
+  setHiddenValue("#portalPackageId", packageData.id);
+  setHiddenValue("#portalPackageTitle", packageData.title);
+  setHiddenValue("#portalPackageCategory", packageData.category);
+  setHiddenValue("#portalPackageMrp", packageData.mrpPrice);
+  setHiddenValue("#portalPackageOffer", packageData.offerPrice);
+  setHiddenValue("#portalPackageDiscount", packageData.discountPrice);
+  setHiddenValue("#portalPackageAmount", packageData.amount);
+
+  const title = panel.querySelector("[data-selected-package-title]");
+  const service = panel.querySelector("[data-selected-package-service]");
+  const values = panel.querySelector("[data-selected-package-values]");
+  if (title) title.textContent = packageData.title;
+  if (service) service.textContent = `${packageData.service || "Service"} | ${packageData.mode || "Mode to confirm"}`;
+  if (values) {
+    values.innerHTML = [
+      ["MRP", packageData.mrpPrice || "To be confirmed"],
+      ["Offer", packageData.offerPrice || "Quote pending"],
+      ["Discount", packageData.discountPrice || "Staff offer pending"],
+      ["Final quote", packageData.amount || packageData.offerPrice || "Quote pending"]
+    ].map(([label, value]) => `<span><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</span>`).join("");
+  }
+}
+
+function packageLinesForConcern(pricingPackage) {
+  if (!pricingPackage?.title) return [];
+  return [
+    `Selected package: ${pricingPackage.title}`,
+    pricingPackage.mrpPrice ? `MRP: ${pricingPackage.mrpPrice}` : "",
+    pricingPackage.offerPrice ? `Offer Price: ${pricingPackage.offerPrice}` : "",
+    pricingPackage.discountPrice ? `Discount: ${pricingPackage.discountPrice}` : "",
+    pricingPackage.amount ? `Final quote shown: ${pricingPackage.amount}` : ""
+  ].filter(Boolean);
 }
 
 function parseStaffNotePaymentLink(value) {
@@ -1688,6 +1960,9 @@ function matchesStaffQueueFilter(booking, filter) {
   if (filter === "due") return isDueSoonBooking(booking);
   if (filter === "proof") return isProofPendingBooking(booking);
   if (filter === "pooja") return isPoojaHawanBooking(booking);
+  if (filter === "hawan-samagri") return isHawanSamagriBooking(booking);
+  if (filter === "pooja-samagri") return isPoojaSamagriBooking(booking);
+  if (filter === "mala") return isMalaBooking(booking);
   if (filter === "kundali") return isKundaliBooking(booking);
   if (filter === "gemstone") return isGemstoneBooking(booking);
   if (filter === "products") return isProductQuoteBooking(booking);
@@ -1705,7 +1980,10 @@ function getStaffQueueItems(bookings) {
     ["payment", "Payment", bookings.filter((booking) => matchesStaffQueueFilter(booking, "payment")).length, "Payment link or receipt"],
     ["due", "Due soon", bookings.filter((booking) => matchesStaffQueueFilter(booking, "due")).length, "Date is close"],
     ["proof", "Proof", bookings.filter((booking) => matchesStaffQueueFilter(booking, "proof")).length, "Proof/update pending"],
-    ["pooja", "Pooja", bookings.filter((booking) => matchesStaffQueueFilter(booking, "pooja")).length, "Pooja and hawan work"],
+    ["pooja", "Hawan/Pooja", bookings.filter((booking) => matchesStaffQueueFilter(booking, "pooja")).length, "Ritual service work"],
+    ["hawan-samagri", "Hawan Samagri", bookings.filter((booking) => matchesStaffQueueFilter(booking, "hawan-samagri")).length, "Hawan item quotes"],
+    ["pooja-samagri", "Pooja Samagri", bookings.filter((booking) => matchesStaffQueueFilter(booking, "pooja-samagri")).length, "Pooja kit quotes"],
+    ["mala", "Mala", bookings.filter((booking) => matchesStaffQueueFilter(booking, "mala")).length, "Mala product quotes"],
     ["kundali", "Kundali", bookings.filter((booking) => matchesStaffQueueFilter(booking, "kundali")).length, "Birth chart and dosh"],
     ["gemstone", "Gems", bookings.filter((booking) => matchesStaffQueueFilter(booking, "gemstone")).length, "Stone and ring quote"],
     ["nri", "NRI", bookings.filter((booking) => matchesStaffQueueFilter(booking, "nri")).length, "Global family handling"]
@@ -1843,6 +2121,226 @@ function renderAdminTemplateLinks(booking) {
   `;
 }
 
+function pricingPackageToCloudRow(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    service: item.service,
+    mode: item.mode,
+    category: item.category,
+    mrp_price: item.mrpPrice,
+    offer_price: item.offerPrice,
+    discount_price: item.discountPrice,
+    final_quote: item.amount,
+    sort_order: item.sortOrder || 0,
+    is_active: item.isActive !== false
+  };
+}
+
+function pricingPackageFromCloudRow(row) {
+  return normalizePricingPackage({
+    id: row.id,
+    title: row.title,
+    service: row.service,
+    mode: row.mode,
+    category: row.category,
+    mrpPrice: row.mrp_price,
+    offerPrice: row.offer_price,
+    discountPrice: row.discount_price,
+    amount: row.final_quote,
+    sortOrder: row.sort_order,
+    isActive: row.is_active
+  });
+}
+
+async function readPricingPackagesOnline() {
+  if (!isCloudEnabled()) return [];
+  try {
+    const { data, error } = await supabaseClient
+      .from("pricing_packages")
+      .select("id,title,service,mode,category,mrp_price,offer_price,discount_price,final_quote,sort_order,is_active")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    return (data || []).map(pricingPackageFromCloudRow).filter((item) => item.id && item.title);
+  } catch (error) {
+    console.warn("Pricing package cloud read failed", error);
+    return [];
+  }
+}
+
+async function savePricingPackagesOnline(packages) {
+  if (!isCloudEnabled()) return { savedCloud: false, mode: "local" };
+  if (!(await currentUserIsAdmin())) return { savedCloud: false, mode: "local" };
+  try {
+    const { error } = await supabaseClient
+      .from("pricing_packages")
+      .upsert(packages.map(pricingPackageToCloudRow), { onConflict: "id" });
+    if (error) throw error;
+    return { savedCloud: true, mode: "cloud" };
+  } catch (error) {
+    console.warn("Pricing package cloud save failed", error);
+    return { savedCloud: false, mode: "local", error };
+  }
+}
+
+function getPricingManagerHost(scope) {
+  if (scope === "backoffice") return backofficePanel;
+  return document.querySelector("#adminDashboardTools");
+}
+
+function ensurePricingManager(scope = "admin") {
+  const host = getPricingManagerHost(scope);
+  if (!host) return null;
+  let manager = host.querySelector(`[data-package-pricing-manager="${scope}"]`);
+  if (!manager) {
+    manager = document.createElement("section");
+    manager.className = "package-pricing-manager";
+    manager.dataset.packagePricingManager = scope;
+    if (scope === "backoffice" && backofficeOperations) {
+      host.insertBefore(manager, backofficeOperations);
+    } else {
+      host.appendChild(manager);
+    }
+  }
+  return manager;
+}
+
+function getPricingPackageDesk(item = {}) {
+  const category = normalizeCatalogText(item.category || "");
+  if (/mala/.test(category)) return "mala";
+  if (/hawan samagri|havan samagri/.test(category)) return "hawan-samagri";
+  if (/pooja samagri|puja samagri|pooja kit|puja kit/.test(category)) return "pooja-samagri";
+  if (/kundali|kundli/.test(category)) return "kundali";
+  if (/gemstone|gem|ratna/.test(category)) return "gemstone";
+
+  const text = normalizeCatalogText([
+    item.category,
+    item.service,
+    item.mode,
+    item.title
+  ].filter(Boolean).join(" "));
+
+  if (/mala|rudraksha|sphatik|crystal|tulsi|sandalwood|chandan|lotus seed|kamal gatta|hakik|jap/.test(text)) {
+    return "mala";
+  }
+  if (/hawan samagri|havan samagri|samagri product/.test(text) && /hawan|havan/.test(text)) {
+    return "hawan-samagri";
+  }
+  if (/pooja samagri|puja samagri|pooja kit|puja kit|hindi pooja kit|kit/.test(text)) {
+    return "pooja-samagri";
+  }
+  if (/gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera|opal/.test(text)) {
+    return "gemstone";
+  }
+  if (/kundali|kundli|janam|birth chart|dosh|dasha|rahu|ketu|shani|mangal|pitra|kaal sarp|guna|marriage kundali|focused question|full kundali/.test(text)) {
+    return "kundali";
+  }
+  return "pooja-hawan";
+}
+
+function getPricingManagerTab(categoryId) {
+  return pricingManagerTabs.find((tab) => tab.id === categoryId) || null;
+}
+
+function renderPricingCategoryOptions(selectedCategory = "") {
+  const options = pricingCategoryFieldOptions.includes(selectedCategory) || !selectedCategory
+    ? pricingCategoryFieldOptions
+    : [selectedCategory, ...pricingCategoryFieldOptions];
+  return options.map((category) => `
+    <option value="${escapeHtml(category)}" ${category === selectedCategory ? "selected" : ""}>${escapeHtml(category)}</option>
+  `).join("");
+}
+
+function renderPricingManager(scope = "admin", message = "") {
+  const manager = ensurePricingManager(scope);
+  if (!manager) return;
+  const packages = getPricingPackages();
+  const activeCategory = pricingManagerCategoryState[scope] || "";
+  const activeTab = getPricingManagerTab(activeCategory);
+  const visiblePackages = activeCategory
+    ? packages.filter((item) => getPricingPackageDesk(item) === activeCategory)
+    : [];
+  const scopeLabel = scope === "backoffice" ? "Backoffice" : "Staff";
+  manager.innerHTML = `
+    <div class="package-pricing-head">
+      <div>
+        <p class="eyebrow">Product desk</p>
+        <h3>${escapeHtml(scopeLabel)} product tabs and price controls</h3>
+        <p>Select one desk first. Only that product group opens, so the dashboard stays light and easy to manage.</p>
+      </div>
+      <div class="package-pricing-actions">
+        <button type="button" class="btn btn-primary" data-package-pricing-save="${escapeHtml(scope)}">Save package prices</button>
+        <button type="button" class="btn btn-secondary" data-package-pricing-reset="${escapeHtml(scope)}">Reset local prices</button>
+      </div>
+    </div>
+    ${message ? `<p class="package-pricing-status">${escapeHtml(message)}</p>` : ""}
+    <div class="package-pricing-tabs" role="tablist" aria-label="${escapeHtml(scopeLabel)} product desks">
+      ${pricingManagerTabs.map((tab) => {
+        const count = packages.filter((item) => getPricingPackageDesk(item) === tab.id).length;
+        const isActive = activeCategory === tab.id;
+        return `
+          <button type="button" class="${isActive ? "is-active" : ""}" data-package-pricing-tab="${escapeHtml(scope)}" data-pricing-category="${escapeHtml(tab.id)}" aria-pressed="${isActive ? "true" : "false"}">
+            <span>${escapeHtml(tab.label)}</span>
+            <strong>${escapeHtml(count)}</strong>
+            <small>${escapeHtml(tab.detail)}</small>
+          </button>
+        `;
+      }).join("")}
+    </div>
+    ${activeCategory ? `
+      <p class="package-pricing-status">Showing ${escapeHtml(visiblePackages.length)} item${visiblePackages.length === 1 ? "" : "s"} in ${escapeHtml(activeTab?.label || "selected desk")}.</p>
+      <div class="package-pricing-grid">
+      ${visiblePackages.map((item) => `
+        <article class="package-pricing-card" data-pricing-package-id="${escapeHtml(item.id)}">
+          <label>Package<input data-pricing-field="title" type="text" value="${escapeHtml(item.title)}" /></label>
+          <label>Service<input data-pricing-field="service" type="text" value="${escapeHtml(item.service)}" /></label>
+          <label>Mode<input data-pricing-field="mode" type="text" value="${escapeHtml(item.mode)}" /></label>
+          <label>Desk<select data-pricing-field="category">${renderPricingCategoryOptions(item.category)}</select></label>
+          <label>MRP<input data-pricing-field="mrpPrice" type="text" value="${escapeHtml(item.mrpPrice)}" /></label>
+          <label>Offer Price<input data-pricing-field="offerPrice" type="text" value="${escapeHtml(item.offerPrice)}" /></label>
+          <label>Discount<input data-pricing-field="discountPrice" type="text" value="${escapeHtml(item.discountPrice)}" /></label>
+          <label>Final Quote<input data-pricing-field="amount" type="text" value="${escapeHtml(item.amount)}" /></label>
+          <a class="text-button" href="${escapeHtml(addPackageParamsToUrl("book-online.html", item))}">Create Booking ID</a>
+        </article>
+      `).join("")}
+      </div>
+    ` : `
+      <div class="package-pricing-empty">
+        <h4>Select a product tab</h4>
+        <p>Hawan/Pooja, Hawan Samagri, Pooja Samagri, Mala, Gemstones and Kundali are separated. Click a tab to open only that product desk.</p>
+      </div>
+    `}
+  `;
+}
+
+function collectPricingManagerPackages(manager) {
+  const byId = new Map(getPricingPackages().map((item) => [item.id, { ...item }]));
+  [...manager.querySelectorAll("[data-pricing-package-id]")].forEach((card) => {
+    const base = findPricingPackage({ id: card.dataset.pricingPackageId }) || {};
+    const next = { ...base, id: card.dataset.pricingPackageId, sortOrder: base.sortOrder || byId.size + 1, isActive: true };
+    card.querySelectorAll("[data-pricing-field]").forEach((field) => {
+      next[field.dataset.pricingField] = field.value.trim();
+    });
+    byId.set(next.id, normalizePricingPackage(next));
+  });
+  return [...byId.values()].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+}
+
+async function initializePricingPackages() {
+  activePricingPackages = readPricingPackages();
+  enhanceBookablePackageLinks();
+  const cloudPackages = await readPricingPackagesOnline();
+  if (cloudPackages.length) {
+    const byId = new Map(getDefaultPricingPackages().map((item) => [item.id, item]));
+    cloudPackages.forEach((item) => byId.set(item.id, normalizePricingPackage(item, byId.get(item.id) || {})));
+    writePricingPackages([...byId.values()]);
+    enhanceBookablePackageLinks();
+  }
+  renderPricingManager("admin");
+  renderPricingManager("backoffice");
+}
+
 function applyAdminWorkflow(booking, actionKey) {
   const action = adminWorkflowActions.find((item) => item.key === actionKey);
   if (!action) return false;
@@ -1859,6 +2357,7 @@ function renderAdminDashboard() {
   const bookings = getFilteredAdminBookings();
   renderAdminStats(bookings);
   renderStaffQueueBoard();
+  renderPricingManager("admin");
 
   if (!adminBookingsCache.length) {
     const emptyMessage = adminBookingsSource === "cloud"
@@ -1974,12 +2473,31 @@ function isKundaliBooking(booking) {
 
 function isGemstoneBooking(booking) {
   const text = getBackofficeSearchText(booking);
-  return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera|opal/.test(text);
+  return /gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|cat.?s eye|diamond|heera|opal/.test(text)
+    && !isMalaBooking(booking);
+}
+
+function isMalaBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /astro mala|mala quote|rudraksha|sphatik|crystal mala|tulsi mala|sandalwood mala|chandan mala|lotus seed mala|kamal gatta mala|hakik mala|jap mala|spiritual mala/.test(text);
+}
+
+function isHawanSamagriBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /hawan samagri|havan samagri|hawan item|havan item|samidha|mango wood|peepal wood|guggul|loban|kapoor|cow ghee|ghee|bel patra|akshat|kala til|jau barley/.test(text);
+}
+
+function isPoojaSamagriBooking(booking) {
+  const text = getBackofficeSearchText(booking);
+  return /pooja samagri|puja samagri|pooja kit|puja kit|hindi pooja kit|ganesh pooja kit|lakshmi pooja kit|durga pooja kit|satyanarayan pooja kit|navgrah pooja kit|kumkum|haldi|chandan powder/.test(text);
 }
 
 function isProductQuoteBooking(booking) {
   const text = getBackofficeSearchText(booking);
-  return /pooja kit|puja kit|hindi pooja kit|hawan samagri|samagri -|product category|product quote|delivery country|durga pooja kit|lakshmi pooja kit|ganesh pooja kit|navgrah pooja kit/.test(text);
+  return isHawanSamagriBooking(booking)
+    || isPoojaSamagriBooking(booking)
+    || isMalaBooking(booking)
+    || /samagri -|product category|product quote|delivery country/.test(text);
 }
 
 function isNriBooking(booking) {
@@ -2010,6 +2528,9 @@ function renderBackofficeStats(visibleBookings) {
   const kundaliQueue = backofficeBookingsCache.filter(isKundaliBooking).length;
   const gemstoneQueue = backofficeBookingsCache.filter(isGemstoneBooking).length;
   const productQueue = backofficeBookingsCache.filter(isProductQuoteBooking).length;
+  const hawanSamagriQueue = backofficeBookingsCache.filter(isHawanSamagriBooking).length;
+  const poojaSamagriQueue = backofficeBookingsCache.filter(isPoojaSamagriBooking).length;
+  const malaQueue = backofficeBookingsCache.filter(isMalaBooking).length;
   const nriQueue = backofficeBookingsCache.filter(isNriBooking).length;
   const poojaQueue = backofficeBookingsCache.filter(isPoojaHawanBooking).length;
   const dueSoon = backofficeBookingsCache.filter(isDueSoonBooking).length;
@@ -2024,6 +2545,9 @@ function renderBackofficeStats(visibleBookings) {
     ["Due soon", dueSoon],
     ["Proof pending", proofPending],
     ["Pooja/Hawan", poojaQueue],
+    ["Hawan Samagri", hawanSamagriQueue],
+    ["Pooja Samagri", poojaSamagriQueue],
+    ["Mala", malaQueue],
     ["Kundali", kundaliQueue],
     ["Gemstones", gemstoneQueue],
     ["Kits/Samagri", productQueue],
@@ -2388,6 +2912,7 @@ function renderBackofficeDashboard() {
   const bookings = getBackofficeFilteredBookings();
   renderBackofficeStats(bookings);
   renderBackofficeQueueOverview();
+  renderPricingManager("backoffice");
   renderBackofficeOperations(bookings);
   renderBackofficeCustomers(bookings);
   renderBackofficeQueue(
@@ -2435,16 +2960,25 @@ document.querySelectorAll("[data-service]").forEach((button) => {
 
 function getStoneQuoteProfile(stoneName) {
   const text = normalizeCatalogText(stoneName);
+  const isMala = /mala|rudraksha|sphatik|crystal|tulsi|sandalwood|chandan|lotus seed|kamal gatta|hakik|jap/.test(text);
   const isPendant = text.includes("pendant");
   const isLoose = text.includes("loose");
   const isHighCaution = /neelam|blue sapphire|lehsunia|cat.?s eye|shani|ketu/.test(text);
   const profile = {
-    form: isPendant ? "Pendant" : isLoose ? "Loose stone" : "Ring",
+    form: isMala ? "Mala" : isPendant ? "Pendant" : isLoose ? "Loose stone" : "Ring",
     metal: "Need guidance",
     badge: "Certificate quote",
     check: "Kundli suitability, product proof and final quote before payment",
     note: "Staff will confirm available stone photo/video, certificate detail, carat or ratti, metal, delivery and policy clarity before payment."
   };
+
+  if (isMala) {
+    profile.metal = "Not required";
+    profile.badge = "Mala quote";
+    profile.check = "Bead type, count, purpose and delivery confirmation";
+    profile.note = "Staff will confirm mala type, bead count, use guidance, packaging, delivery and final quote before payment.";
+    return profile;
+  }
 
   if (/ruby|manik|pukhraj|yellow sapphire|emerald|panna|coral|moonga/.test(text)) {
     profile.metal = "Gold";
@@ -2541,6 +3075,9 @@ function getPortalServiceType(serviceName) {
   if (/gemstone|gem|ratna|stone|ring|pendant|ruby|manik|emerald|panna|sapphire|pukhraj|neelam|coral|moonga|pearl|moti|gomed|hessonite|lehsunia|diamond|heera|opal/.test(service)) {
     return "gemstone";
   }
+  if (/mala|rudraksha|sphatik|crystal|tulsi|sandalwood|chandan|lotus seed|kamal gatta|hakik|jap/.test(service)) {
+    return "gemstone";
+  }
   return "pooja";
 }
 
@@ -2578,6 +3115,11 @@ function updateServicePreview() {
   if (!servicePreview || !portalServiceField) return;
   const service = portalServiceField.value;
   const profile = getServiceProfile(service);
+  let selectedPackage = readPortalPackageSelection();
+  if (selectedPackage?.service && service && selectedPackage.service !== service) {
+    renderSelectedPackagePanel(null);
+    selectedPackage = null;
+  }
   const title = document.querySelector("#servicePreviewTitle");
   const body = document.querySelector("#servicePreviewBody");
   const quote = document.querySelector("#servicePreviewQuote");
@@ -2586,7 +3128,7 @@ function updateServicePreview() {
 
   if (title) title.textContent = profile.title;
   if (body) body.textContent = profile.body;
-  if (quote) quote.textContent = profile.quote;
+  if (quote) quote.textContent = selectedPackage?.amount || selectedPackage?.offerPrice || profile.quote;
   if (proof) proof.textContent = profile.proof;
   if (details) details.textContent = profile.details;
 
@@ -2613,6 +3155,7 @@ function prefillPortalBookingFromUrl() {
   const requestedCategory = params.get("category");
   const requestedQuoteType = params.get("quoteType");
   const requestedDelivery = params.get("delivery");
+  const requestedPackage = getPortalPackageFromParams();
   const portalService = document.querySelector("#portalService");
   const portalMode = document.querySelector("#portalMode");
   const portalConcern = document.querySelector("#portalConcern");
@@ -2625,6 +3168,7 @@ function prefillPortalBookingFromUrl() {
     portalMode.dataset.touched = "true";
   }
   setSelectValue(portalMode, requestedMode);
+  renderSelectedPackagePanel(requestedPackage);
   updateServicePreview();
 
   if (portalConcern && requestedConcern && !portalConcern.value) {
@@ -2663,6 +3207,9 @@ function applyPortalPreset(button) {
   const service = button.dataset.service || "";
   const mode = button.dataset.mode || "";
   const concern = button.dataset.concern || "";
+  const packageData = button.dataset.packageBook
+    ? findPricingPackage({ id: button.dataset.packageBook })
+    : null;
 
   setSelectValue(portalService, service);
   if (portalMode && mode) {
@@ -2675,6 +3222,7 @@ function applyPortalPreset(button) {
   if (portalRitualPurpose && service && !portalRitualPurpose.value) {
     portalRitualPurpose.value = service;
   }
+  renderSelectedPackagePanel(packageData);
 
   document.querySelectorAll("[data-portal-preset]").forEach((preset) => {
     preset.classList.toggle("is-selected", preset === button);
@@ -2695,6 +3243,7 @@ function updateServiceFinder(finder) {
   const cards = [...section.querySelectorAll(".pooja-product-card")];
   const activeFilter = finder.querySelector("[data-filter][aria-pressed='true']");
   const search = normalizeCatalogText(finder.querySelector("[data-service-search]")?.value);
+  const activeCategory = activeFilter?.dataset.productCategory || "";
   const terms = activeFilter && activeFilter.dataset.filter !== "all"
     ? (activeFilter.dataset.keywords || activeFilter.dataset.filter).split(",").map(normalizeCatalogText).filter(Boolean)
     : [];
@@ -2704,7 +3253,8 @@ function updateServiceFinder(finder) {
   cards.forEach((card) => {
     const cardText = card.dataset.searchText || normalizeCatalogText(card.textContent);
     card.dataset.searchText = cardText;
-    const matchesFilter = !terms.length || terms.some((term) => cardText.includes(term));
+    const matchesCategory = !activeCategory || card.dataset.productCategory === activeCategory;
+    const matchesFilter = matchesCategory && (!terms.length || terms.some((term) => cardText.includes(term)));
     const matchesSearch = !searchTerms.length || searchTerms.every((term) => cardText.includes(term));
     const isVisible = matchesFilter && matchesSearch;
     card.classList.toggle("is-filtered-out", !isVisible);
@@ -2719,6 +3269,22 @@ function updateServiceFinder(finder) {
   const emptyMessage = finder.querySelector("[data-empty-message]");
   if (emptyMessage) {
     emptyMessage.hidden = visibleCount !== 0;
+  }
+
+  const insight = finder.querySelector("[data-service-finder-insight]");
+  if (insight && activeFilter) {
+    const title = activeFilter.dataset.filterTitle || activeFilter.textContent.trim() || "Selected desk";
+    const body = activeFilter.dataset.filterBody || "Choose an item from the selected desk and create a Booking ID before payment.";
+    const action = activeFilter.dataset.filterAction || "Create Booking ID";
+    const href = activeFilter.dataset.filterHref || "book-online.html";
+    insight.innerHTML = `
+      <div>
+        <span>Active desk</span>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(body)} ${visibleCount} ${visibleCount === 1 ? "option is" : "options are"} visible.</p>
+      </div>
+      <a class="text-button" href="${escapeHtml(href)}">${escapeHtml(action)}</a>
+    `;
   }
 }
 
@@ -2746,11 +3312,66 @@ function initializeServiceFinders() {
   });
 }
 
+function setPublicProductTab(group, target) {
+  if (!group || !target) return;
+  const buttons = [...document.querySelectorAll(`[data-public-product-tab="${group}"]`)];
+  const panels = [...document.querySelectorAll(`[data-public-product-panel="${group}"]`)];
+  let visibleCount = 0;
+
+  buttons.forEach((button) => {
+    const isActive = button.dataset.publicProductTarget === target;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  panels.forEach((panel) => {
+    const isVisible = panel.dataset.publicProductCategory === target;
+    panel.hidden = !isVisible;
+    panel.classList.toggle("is-public-product-hidden", !isVisible);
+    if (isVisible) visibleCount += 1;
+  });
+
+  document.querySelectorAll(`[data-public-product-count="${group}"]`).forEach((countEl) => {
+    const activeButton = buttons.find((button) => button.dataset.publicProductTarget === target);
+    countEl.textContent = activeButton?.dataset.publicProductLabel || activeButton?.textContent.trim() || "Selected desk";
+    const activeNote = countEl.closest(".public-product-active")?.querySelector(`[data-public-product-note="${group}"]`);
+    if (activeNote) {
+      activeNote.textContent = activeButton?.dataset.publicProductBody || "Only this selected product desk is visible below.";
+    }
+  });
+}
+
+function initializePublicProductTabs() {
+  document.querySelectorAll("[data-public-product-tabs]").forEach((tabRoot) => {
+    const group = tabRoot.dataset.publicProductTabs;
+    const buttons = [...tabRoot.querySelectorAll(`[data-public-product-tab="${group}"]`)];
+    if (!group || !buttons.length) return;
+
+    buttons.forEach((button) => {
+      if (!button.hasAttribute("aria-pressed")) {
+        button.setAttribute("aria-pressed", "false");
+      }
+      button.addEventListener("click", () => {
+        setPublicProductTab(group, button.dataset.publicProductTarget);
+      });
+    });
+
+    const hashTarget = window.location.hash ? document.querySelector(window.location.hash) : null;
+    const hashPanel = hashTarget?.closest(`[data-public-product-panel="${group}"]`);
+    const hashButton = hashPanel
+      ? buttons.find((button) => button.dataset.publicProductTarget === hashPanel.dataset.publicProductCategory)
+      : null;
+    const activeButton = hashButton || buttons.find((button) => button.classList.contains("is-active")) || buttons[0];
+    setPublicProductTab(group, activeButton.dataset.publicProductTarget);
+  });
+}
+
 const gemstoneFilterCopy = {
-  all: ["Full catalogue", "Showing rings, pendants and loose stones for every gemstone product."],
+  all: ["Full catalogue", "Showing rings, pendants, loose stones and malas for every gemstone product."],
   rings: ["Ring products", "Use this when the customer already wants a wearable ring with metal and finger size guidance."],
   pendants: ["Pendant products", "Use this for customers who prefer a pendant, chain option or non-ring wearing path."],
   loose: ["Loose stones", "Use this when the buyer wants certificate, carat/ratti and proof before deciding ring or pendant setting."],
+  malas: ["Astro malas", "Rudraksha, Sphatik, Tulsi, Chandan, Kamal Gatta, Hakik and Jap Mala enquiries stay separate."],
   caution: ["High-caution review", "Neelam and Lehsunia enquiries need suitability, trial guidance and wearing method before payment."],
   authority: ["Authority and growth", "Ruby, Pukhraj and Emerald paths are useful for confidence, learning, career and business discussions."],
   calm: ["Calm and courage", "Pearl and Red Coral paths support Chandra or Mangal-related enquiries after kundli review."],
@@ -2765,6 +3386,7 @@ function matchesGemstoneFilter(filter, cardText, kind) {
   if (filter === "rings") return kind === "rings";
   if (filter === "pendants") return kind === "pendants";
   if (filter === "loose") return kind === "loose";
+  if (filter === "malas") return kind === "malas";
   if (filter === "international") return true;
   if (filter === "caution") return /high-caution|neelam|blue sapphire|cat.?s eye|lehsunia|ketu|shani/.test(cardText);
   if (filter === "authority") return /ruby|manik|pukhraj|yellow sapphire|panna|emerald|surya|guru|budh|career|business|study|prosperity|confidence|authority/.test(cardText);
@@ -2786,7 +3408,7 @@ function renderGemstoneFilterInsight(finder, filter, visibleCount) {
 }
 
 function updateGemstoneProductFinder(finder) {
-  const cards = [...document.querySelectorAll("#ring-products .ring-product-card, #pendant-products .ring-product-card, #loose-stones .premium-product-card")];
+  const cards = [...document.querySelectorAll("#ring-products .ring-product-card, #pendant-products .ring-product-card, #loose-stones .premium-product-card, #mala-products .mala-product-card")];
   if (!cards.length) return;
 
   const activeFilter = finder.querySelector("[data-gemstone-filter][aria-pressed='true']");
@@ -2802,7 +3424,9 @@ function updateGemstoneProductFinder(finder) {
       ? "rings"
       : parentSection?.id === "pendant-products"
         ? "pendants"
-        : "loose";
+        : parentSection?.id === "mala-products"
+          ? "malas"
+          : "loose";
     const matchesFilter = matchesGemstoneFilter(filter, cardText, kind);
     const matchesSearch = !searchTerms.length || searchTerms.every((term) => cardText.includes(term));
     const isVisible = matchesFilter && matchesSearch;
@@ -2812,10 +3436,10 @@ function updateGemstoneProductFinder(finder) {
     if (isVisible) visibleCount += 1;
   });
 
-  ["ring-products", "pendant-products", "loose-stones"].forEach((sectionId) => {
+  ["ring-products", "pendant-products", "loose-stones", "mala-products"].forEach((sectionId) => {
     const section = document.getElementById(sectionId);
     if (!section) return;
-    section.hidden = ![...section.querySelectorAll(".ring-product-card, .premium-product-card")].some((card) => !card.hidden);
+    section.hidden = ![...section.querySelectorAll(".ring-product-card, .premium-product-card, .mala-product-card")].some((card) => !card.hidden);
   });
 
   const countEl = finder.querySelector("[data-gemstone-match-count]");
@@ -2835,6 +3459,13 @@ function initializeGemstoneProductFinder() {
   document.querySelectorAll("[data-gemstone-finder]").forEach((finder) => {
     const buttons = [...finder.querySelectorAll("[data-gemstone-filter]")];
     const searchInput = finder.querySelector("[data-gemstone-search]");
+    const hashFilterMap = {
+      "#ring-products": "rings",
+      "#pendant-products": "pendants",
+      "#loose-stones": "loose",
+      "#mala-products": "malas"
+    };
+    const hashFilter = hashFilterMap[window.location.hash] || "";
 
     buttons.forEach((button) => {
       if (!button.hasAttribute("aria-pressed")) {
@@ -2850,12 +3481,21 @@ function initializeGemstoneProductFinder() {
       });
     });
 
+    if (hashFilter) {
+      buttons.forEach((button) => {
+        const isActive = button.dataset.gemstoneFilter === hashFilter;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
     searchInput?.addEventListener("input", () => updateGemstoneProductFinder(finder));
     updateGemstoneProductFinder(finder);
   });
 
   document.querySelectorAll("[data-gemstone-filter-target]").forEach((trigger) => {
-    trigger.addEventListener("click", () => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
       const targetFilter = trigger.dataset.gemstoneFilterTarget;
       const finder = document.querySelector("[data-gemstone-finder]");
       const targetButton = finder?.querySelector(`[data-gemstone-filter="${targetFilter}"]`);
@@ -2934,6 +3574,17 @@ const mainSamagriDetailNames = new Set([
   "Vastu Shanti Hawan Samagri"
 ]);
 
+const malaProducts = [
+  ["Rudraksha Mala", "assets/mala-products/rudraksha_mala_with_divine_elegance.png", "5 Mukhi / Shiva", "Premium Rudraksha mala enquiry for jaap, meditation and spiritual discipline with bead type and count confirmation."],
+  ["Sphatik / Crystal Mala", "assets/mala-products/elegant_crystal_mala_with_premium_packaging.png", "Shanti / clarity", "Sphatik mala quote for peaceful worship, mantra practice and calm focus after purpose and quality are confirmed."],
+  ["Tulsi Mala", "assets/mala-products/sacred_tulsi_mala_divine_harmony.png", "Vishnu bhakti", "Tulsi mala enquiry for Vishnu, Krishna and daily bhakti practice with packaging and delivery confirmation."],
+  ["Chandan / Sandalwood Mala", "assets/mala-products/luxury_sandalwood_mala_product_display.png", "Calm jaap", "Chandan mala quote for mantra jaap, fragrance preference and traditional worship support."],
+  ["Kamal Gatta / Lotus Seed Mala", "assets/mala-products/elegant_lotus_seed_mala_display.png", "Lakshmi sadhana", "Kamal Gatta mala enquiry for Lakshmi worship, prosperity sankalp and guided ritual use."],
+  ["Premium Jap Mala", "assets/mala-products/premium_spiritual_mala_with_ornate_details.png", "108 bead quote", "Premium Jap Mala option for mantra practice, gifting and pooja support with final quote before payment."],
+  ["Hakik Mala", "assets/mala-products/luxury_hakik_mala_with_gold_accents.png", "Protection focus", "Hakik mala quote for protection-focused guidance where the Acharya or staff confirms suitability and use."],
+  ["Ornate Spiritual Mala", "assets/mala-products/elegant_spiritual_mala_product_design.png", "Gift / puja desk", "Ornate spiritual mala enquiry for pooja, gifting or personal practice with product proof and delivery tracking."]
+];
+
 function productDetailUrl(name) {
   return `${String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.html`;
 }
@@ -2998,6 +3649,26 @@ function renderHawanSamagriCatalog() {
   `).join("");
 }
 
+function renderMalaProductCatalog() {
+  const catalog = document.querySelector("[data-mala-products-catalog]");
+  if (!catalog) return;
+  catalog.innerHTML = malaProducts.map(([name, image, badge, body]) => `
+    <article class="pooja-product-card mala-product-card">
+      <div class="pooja-product-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(name)} product image" loading="lazy" /><span>${escapeHtml(badge)}</span></div>
+      <div class="pooja-product-body">
+        <span class="quote-chip">Astro mala</span>
+        <h3>${escapeHtml(name)}</h3>
+        <p>${escapeHtml(body)}</p>
+        <div class="pooja-product-meta"><div><span>Quote</span><strong>Before payment</strong></div><div><span>Confirm</span><strong>Bead type + count</strong></div></div>
+        <ul class="pooja-product-list"><li>Product picture shown before quote</li><li>Use guidance confirmed by purpose</li><li>Booking ID for delivery updates</li></ul>
+        <div class="product-card-actions single-action">
+          <a class="text-button" href="${escapeHtml(bookingUrl(`Astro Mala - ${name}`, "Mala product quote", { product: name, category: "Astro Mala", quoteType: "Mala quote before payment", delivery: "To be confirmed", concern: productConcern(name, "Astro Mala") }))}">Create Quote ID</a>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
 function getPortalFieldValue(selector) {
   return document.querySelector(selector)?.value.trim() || "";
 }
@@ -3012,8 +3683,10 @@ function buildPortalConcern() {
   const timezone = document.querySelector("#portalTimezone")?.value.trim();
   const selectedService = document.querySelector("#portalService")?.value || "";
   const serviceType = getPortalServiceType(selectedService);
+  const selectedPackage = readPortalPackageSelection();
   const details = [];
 
+  details.push(...packageLinesForConcern(selectedPackage));
   if (requirement) details.push(`Requirement: ${requirement}`);
   if (sankalp) details.push(`Additional details: ${sankalp}`);
   if (timezone) details.push(`Country time zone: ${timezone}`);
@@ -3160,6 +3833,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const selectedService = document.querySelector("#portalService").value;
   const serviceProfile = getServiceProfile(selectedService);
+  const selectedPackage = readPortalPackageSelection();
 
   const booking = {
     id: generateBookingId(),
@@ -3174,9 +3848,12 @@ portalBookingForm?.addEventListener("submit", async (event) => {
     concern: buildPortalConcern(),
     status: "Enquiry Received",
     paymentStatus: "Not Requested",
-    amount: serviceProfile.quote,
+    amount: selectedPackage?.amount || selectedPackage?.offerPrice || serviceProfile.quote,
+    mrpPrice: selectedPackage?.mrpPrice || "",
+    offerPrice: selectedPackage?.offerPrice || "",
+    discountPrice: selectedPackage?.discountPrice || "",
     proofUrl: "",
-    staffNote: "",
+    staffNote: selectedPackage?.title ? `Selected package: ${selectedPackage.title}` : "",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -3490,7 +4167,51 @@ adminExportButton?.addEventListener("click", () => {
 });
 backofficeSearchInput?.addEventListener("input", renderBackofficeDashboard);
 backofficeQueueFilter?.addEventListener("change", renderBackofficeDashboard);
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
+  const packageTabButton = event.target.closest("[data-package-pricing-tab]");
+  if (packageTabButton) {
+    const scope = packageTabButton.dataset.packagePricingTab || "admin";
+    pricingManagerCategoryState[scope] = packageTabButton.dataset.pricingCategory || "";
+    renderPricingManager(scope);
+    return;
+  }
+
+  const packageSaveButton = event.target.closest("[data-package-pricing-save]");
+  if (packageSaveButton) {
+    const scope = packageSaveButton.dataset.packagePricingSave || "admin";
+    const manager = packageSaveButton.closest("[data-package-pricing-manager]");
+    if (!manager) return;
+    packageSaveButton.textContent = "Saving...";
+    packageSaveButton.disabled = true;
+    const packages = writePricingPackages(collectPricingManagerPackages(manager));
+    const result = await savePricingPackagesOnline(packages);
+    enhanceBookablePackageLinks();
+    renderPricingManager(scope, result.savedCloud
+      ? "Package prices saved to secure cloud and local browser."
+      : "Package prices saved locally. Run the pricing package SQL once to share changes across devices.");
+    if (scope === "backoffice") {
+      setBackofficeStatus(result.savedCloud ? "Package pricing saved to secure cloud." : "Package pricing saved locally.");
+    } else {
+      setAdminStatus(result.savedCloud ? "Package pricing saved to secure cloud." : "Package pricing saved locally.");
+    }
+    return;
+  }
+
+  const packageResetButton = event.target.closest("[data-package-pricing-reset]");
+  if (packageResetButton) {
+    const scope = packageResetButton.dataset.packagePricingReset || "admin";
+    localStorage.removeItem(packagePricingStorageKey);
+    activePricingPackages = readPricingPackages();
+    enhanceBookablePackageLinks();
+    renderPricingManager(scope, "Local package prices reset to default website prices.");
+    if (scope === "backoffice") {
+      setBackofficeStatus("Local package prices reset.");
+    } else {
+      setAdminStatus("Local package prices reset.");
+    }
+    return;
+  }
+
   const adminQuickButton = event.target.closest("[data-admin-quick-filter]");
   if (adminQuickButton) {
     applyAdminQuickFilter(adminQuickButton.dataset.adminQuickFilter);
@@ -4183,8 +4904,11 @@ if (customerAuthForm) {
 
 prefillPortalBookingFromUrl();
 updateServicePreview();
+initializePricingPackages();
 renderPoojaKitCatalog();
 renderHawanSamagriCatalog();
+renderMalaProductCatalog();
+initializePublicProductTabs();
 initializeServiceFinders();
 initializeGemstoneProductFinder();
 prefillPortalFromSession();

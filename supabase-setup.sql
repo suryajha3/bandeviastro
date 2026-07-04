@@ -40,6 +40,22 @@ create table if not exists public.bookings (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.pricing_packages (
+  id text primary key,
+  title text not null,
+  service text not null,
+  mode text,
+  category text,
+  mrp_price text,
+  offer_price text,
+  discount_price text,
+  final_quote text,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists bookings_booking_code_idx on public.bookings (booking_code);
 create index if not exists bookings_customer_user_idx on public.bookings (customer_user_id);
 create index if not exists bookings_email_idx on public.bookings (lower(email));
@@ -70,6 +86,11 @@ for each row execute function public.set_updated_at();
 drop trigger if exists bookings_set_updated_at on public.bookings;
 create trigger bookings_set_updated_at
 before update on public.bookings
+for each row execute function public.set_updated_at();
+
+drop trigger if exists pricing_packages_set_updated_at on public.pricing_packages;
+create trigger pricing_packages_set_updated_at
+before update on public.pricing_packages
 for each row execute function public.set_updated_at();
 
 create or replace function public.handle_new_user()
@@ -192,6 +213,7 @@ $$;
 
 alter table public.profiles enable row level security;
 alter table public.bookings enable row level security;
+alter table public.pricing_packages enable row level security;
 
 drop policy if exists "profiles owner read" on public.profiles;
 create policy "profiles owner read"
@@ -245,9 +267,26 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
+drop policy if exists "pricing packages public read active" on public.pricing_packages;
+create policy "pricing packages public read active"
+on public.pricing_packages
+for select
+to anon, authenticated
+using (is_active = true);
+
+drop policy if exists "pricing packages admin manage" on public.pricing_packages;
+create policy "pricing packages admin manage"
+on public.pricing_packages
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
 grant usage on schema public to anon, authenticated;
 grant insert on public.bookings to anon;
 grant select, insert, update on public.bookings to authenticated;
+grant select on public.pricing_packages to anon;
+grant select, insert, update on public.pricing_packages to authenticated;
 grant select, update on public.profiles to authenticated;
 grant execute on function public.lookup_booking(text, text) to anon, authenticated;
 grant execute on function public.is_admin() to authenticated;

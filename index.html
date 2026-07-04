@@ -553,35 +553,35 @@
 
       <section class="section home-service-finder-section" id="home-service-finder" aria-labelledby="home-service-finder-title">
         <div class="section-heading compact home-service-heading">
-          <p class="eyebrow">Premium service finder</p>
-          <h2 id="home-service-finder-title">Choose pooja, hawan, kundli or gemstone from one trusted desk</h2>
-          <p>Search by concern, filter by service type and create a Booking ID with the right option already selected.</p>
+          <p class="eyebrow">Premium product desk</p>
+          <h2 id="home-service-finder-title">Choose one product or service family first</h2>
+          <p>Open Hawan/Pooja, Hawan Samagri, Pooja Samagri, Mala, Gemstone or Kundali separately. Only the selected desk appears.</p>
         </div>
         <div class="service-finder home-service-finder" data-service-finder="#home-service-finder">
           <div class="service-finder-head">
             <div>
-              <p class="eyebrow">Find faster</p>
-              <h3>Popular services ready to book</h3>
+              <p class="eyebrow">Front desk tabs</p>
+              <h3>Select one category</h3>
             </div>
             <span data-match-count>10 services</span>
           </div>
           <div class="service-filter-row" aria-label="Filter homepage services">
-            <button type="button" class="is-active" data-filter="all" aria-pressed="true">All</button>
-            <button type="button" data-filter="pooja" data-keywords="pooja, jaap, path">Pooja</button>
-            <button type="button" data-filter="hawan" data-keywords="hawan, havan, homam">Hawan</button>
-            <button type="button" data-filter="kundli" data-keywords="kundli, horoscope, janam, marriage">Kundli</button>
-            <button type="button" data-filter="dosh" data-keywords="dosh, nivaran, kaal sarp, mangal, pitra">Dosh</button>
-            <button type="button" data-filter="gemstone" data-keywords="gemstone, ring, stone, suitability">Gemstone</button>
-            <button type="button" data-filter="life" data-keywords="marriage, business, office, shop, family">Marriage / Business</button>
+            <button type="button" class="is-active" data-filter="hawan-pooja" data-product-category="hawan-pooja" data-keywords="pooja, puja, hawan, havan, jaap, path" data-filter-title="Hawan/Pooja service desk" data-filter-body="Book online pooja, jaap, hawan, dosh nivaran and temple proof services with Booking ID tracking before payment." data-filter-action="Open booking desk" data-filter-href="book-online.html" aria-pressed="true"><span>Hawan/Pooja</span><strong>Services</strong><small>Pooja, jaap, hawan</small></button>
+            <button type="button" data-filter="hawan-samagri" data-product-category="hawan-samagri" data-keywords="hawan samagri, samagri, hawan item" data-filter-title="Hawan Samagri product desk" data-filter-body="See hawan samagri items separately, then request the final list and delivery quote before payment." data-filter-action="View hawan samagri" data-filter-href="hawan.html#hawan-samagri"><span>Hawan Samagri</span><strong>Products</strong><small>Wood, herbs, offerings</small></button>
+            <button type="button" data-filter="pooja-samagri" data-product-category="pooja-samagri" data-keywords="pooja samagri, pooja kit, puja kit" data-filter-title="Pooja Samagri product desk" data-filter-body="Open Hindi pooja kits with real pictures, item confirmation and country-wise delivery support." data-filter-action="View pooja kits" data-filter-href="online-pooja.html#pooja-samagri"><span>Pooja Samagri</span><strong>Kits</strong><small>Hindi pooja kits</small></button>
+            <button type="button" data-filter="mala" data-product-category="mala" data-keywords="mala, rudraksha, sphatik, tulsi" data-filter-title="Astro Mala product desk" data-filter-body="Choose Rudraksha, Sphatik, Tulsi, Chandan, Kamal Gatta, Hakik or Jap Mala with bead confirmation." data-filter-action="View malas" data-filter-href="gemstone-shop.html#mala-products"><span>Mala</span><strong>Jap Mala</strong><small>Rudraksha, Sphatik</small></button>
+            <button type="button" data-filter="gemstone" data-product-category="gemstone" data-keywords="gemstone, ring, stone, suitability" data-filter-title="Gemstone product desk" data-filter-body="Open rings, pendants, loose stones and certificate-based quote flow with kundli suitability guidance." data-filter-action="Open gemstone shop" data-filter-href="gemstone-shop.html"><span>Gemstones</span><strong>Ratna</strong><small>Ring, pendant, stone</small></button>
+            <button type="button" data-filter="kundali" data-product-category="kundali" data-keywords="kundli, kundali, horoscope, janam, marriage, dosh" data-filter-title="Kundali guidance desk" data-filter-body="Book Kundali, dosh, dasha, marriage matching and remedy guidance with private birth-detail intake." data-filter-action="Open kundali desk" data-filter-href="kundli.html"><span>Kundali</span><strong>Dosh</strong><small>Birth chart guidance</small></button>
           </div>
           <label class="service-search">
             <span>Search</span>
-            <input type="search" data-service-search placeholder="Search pooja, hawan, kundli, gemstone..." autocomplete="off">
+            <input type="search" data-service-search placeholder="Search within selected desk..." autocomplete="off">
           </label>
-          <p class="service-empty-message" data-empty-message hidden>No matching service found. Try pooja, hawan, kundli, dosh or gemstone.</p>
+          <p class="service-empty-message" data-empty-message hidden>No matching item found in this selected desk.</p>
+          <div class="service-finder-insight" data-service-finder-insight aria-live="polite"></div>
         </div>
         <div class="home-service-grid" aria-label="Premium homepage services">
-          <article class="pooja-product-card home-service-card" data-search-text="online pooja ganesh lakshmi satyanarayan navgraha sankalp nri live proof temple pooja family">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="online pooja ganesh lakshmi satyanarayan navgraha sankalp nri live proof temple pooja family">
             <div class="pooja-product-media media-focus-center">
               <img src="assets/online-pooja-premium.jpg" alt="Online pooja setup with lamp and ritual items">
               <span>Online Pooja</span>
@@ -611,7 +611,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="mahamrityunjay jaap pooja health protection shiv mantra family recovery sankalp temple proof">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="mahamrityunjay jaap pooja health protection shiv mantra family recovery sankalp temple proof">
             <div class="pooja-product-media media-focus-right">
               <img src="assets/online-pooja-premium.jpg" alt="Premium pooja thali and sacred ritual lamp">
               <span>Mahamrityunjay Jaap</span>
@@ -641,7 +641,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="pitra dosh nivaran pooja family shanti ancestors kaal sarp mangal dosh remedy kundli temple proof">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="pitra dosh nivaran pooja family shanti ancestors kaal sarp mangal dosh remedy kundli temple proof">
             <div class="pooja-product-media media-focus-left">
               <img src="assets/kundli-premium.jpg" alt="Kundli chart and ritual lamp for dosh remedy guidance">
               <span>Pitra Dosh</span>
@@ -671,7 +671,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="durga pooja durga saptashati path navratri protection shakti family pooja temple proof">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="durga pooja durga saptashati path navratri protection shakti family pooja temple proof">
             <div class="pooja-product-media media-focus-center">
               <img src="assets/online-pooja-premium.jpg" alt="Sacred lamp for Durga pooja and path service">
               <span>Durga Pooja</span>
@@ -701,7 +701,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="hawan havan grah shanti vastu shanti griha pravesh business office shop home temple fire ritual samagri">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="hawan havan grah shanti vastu shanti griha pravesh business office shop home temple fire ritual samagri">
             <div class="pooja-product-media media-focus-center">
               <img src="assets/hawan-premium.jpg" alt="Premium hawan fire setup with samagri">
               <span>Hawan / Havan</span>
@@ -731,7 +731,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="navgraha shanti hawan grah dosh shani rahu ketu mangal surya chandra budh guru shukra temple proof">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-pooja" data-search-text="navgraha shanti hawan grah dosh shani rahu ketu mangal surya chandra budh guru shukra temple proof">
             <div class="pooja-product-media media-focus-right">
               <img src="assets/hawan-premium.jpg" alt="Navgraha shanti hawan fire and sacred items">
               <span>Navgraha Hawan</span>
@@ -761,7 +761,79 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="kundli consultation janam kundli horoscope dosh check kaal sarp mangal shani rahu ketu career business family health">
+          <article class="pooja-product-card home-service-card" data-product-category="hawan-samagri" data-search-text="hawan samagri navgrah lakshmi durga ganesh mahamrityunjay vastu samidha guggul loban kapoor product quote">
+            <div class="pooja-product-media">
+              <img src="assets/hawan-samagri/items/10-hawan-samagri-single-item.png" alt="Premium hawan samagri product for quote request">
+              <span>Hawan Samagri</span>
+            </div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Product quote</span>
+              <h3>Hawan Samagri Products</h3>
+              <p>Open the hawan samagri desk for Navgrah, Lakshmi, Durga, Ganesh, Mahamrityunjay, wood, herbs and offering items.</p>
+              <div class="pooja-product-meta">
+                <div><span>Items</span><strong>41 products</strong></div>
+                <div><span>Quote</span><strong>Before payment</strong></div>
+              </div>
+              <ul class="pooja-product-list">
+                <li>Separate item pictures</li>
+                <li>Final list confirmed by hawan type</li>
+              </ul>
+              <div class="home-service-actions">
+                <a class="text-button" href="hawan.html#hawan-samagri">View samagri</a>
+                <a class="text-button secondary" href="book-online.html?service=Hawan%20Samagri%20Guidance&mode=Product%20quote">Create Quote ID</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="pooja-product-card home-service-card" data-product-category="pooja-samagri" data-search-text="pooja samagri hindi pooja kit puja kit ganesh lakshmi durga satyanarayan navgrah product quote">
+            <div class="pooja-product-media">
+              <img src="assets/pooja-kits/display/01-durga-puja-kit-hindi.jpg" alt="Hindi pooja samagri kit product for quote request">
+              <span>Pooja Samagri</span>
+            </div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Hindi kits</span>
+              <h3>Pooja Samagri and Kits</h3>
+              <p>Choose Ganesh, Lakshmi, Durga, Satyanarayan, Navgrah and other pooja kits with item confirmation before payment.</p>
+              <div class="pooja-product-meta">
+                <div><span>Kits</span><strong>Separate products</strong></div>
+                <div><span>Delivery</span><strong>Country checked</strong></div>
+              </div>
+              <ul class="pooja-product-list">
+                <li>Real kit pictures</li>
+                <li>Item list and alternatives confirmed</li>
+              </ul>
+              <div class="home-service-actions">
+                <a class="text-button" href="online-pooja.html#pooja-kit-title">View kits</a>
+                <a class="text-button secondary" href="book-online.html?service=Pooja%20Samagri%20Kit&mode=Product%20quote">Create Quote ID</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="pooja-product-card home-service-card" data-product-category="mala" data-search-text="mala rudraksha sphatik crystal tulsi chandan sandalwood kamal gatta hakik jap mala product quote">
+            <div class="pooja-product-media">
+              <img src="assets/mala-products/rudraksha_mala_with_divine_elegance.png" alt="Premium Rudraksha mala product for quote request">
+              <span>Astro Mala</span>
+            </div>
+            <div class="pooja-product-body">
+              <span class="quote-chip">Mala products</span>
+              <h3>Rudraksha, Sphatik and Jap Mala</h3>
+              <p>Open the mala desk for Rudraksha, Sphatik, Tulsi, Chandan, Kamal Gatta, Hakik and premium Jap Mala enquiries.</p>
+              <div class="pooja-product-meta">
+                <div><span>Confirm</span><strong>Bead type</strong></div>
+                <div><span>Track</span><strong>Booking ID</strong></div>
+              </div>
+              <ul class="pooja-product-list">
+                <li>Product picture shown before quote</li>
+                <li>Bead count and purpose confirmed</li>
+              </ul>
+              <div class="home-service-actions">
+                <a class="text-button" href="gemstone-shop.html#mala-products">View malas</a>
+                <a class="text-button secondary" href="book-online.html?service=Astro%20Mala%20Product&mode=Mala%20product%20quote">Create Quote ID</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="pooja-product-card home-service-card" data-product-category="kundali" data-search-text="kundli consultation janam kundli horoscope dosh check kaal sarp mangal shani rahu ketu career business family health">
             <div class="pooja-product-media media-focus-center">
               <img src="assets/kundli-premium.jpg" alt="Premium kundli chart consultation setup">
               <span>Kundli Check</span>
@@ -791,7 +863,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="marriage kundali match guna milan mangal dosh relationship compatibility family marriage guidance horoscope kundli">
+          <article class="pooja-product-card home-service-card" data-product-category="kundali" data-search-text="marriage kundali match guna milan mangal dosh relationship compatibility family marriage guidance horoscope kundli">
             <div class="pooja-product-media media-focus-left">
               <img src="assets/kundli-premium.jpg" alt="Kundli matching charts for marriage guidance">
               <span>Marriage Kundli</span>
@@ -821,7 +893,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="gemstone suitability kundali check stone recommendation ruby emerald yellow sapphire blue sapphire ring pendant before wearing">
+          <article class="pooja-product-card home-service-card" data-product-category="gemstone" data-search-text="gemstone suitability kundali check stone recommendation ruby emerald yellow sapphire blue sapphire ring pendant before wearing">
             <div class="pooja-product-media media-focus-center">
               <img src="assets/gemstone-ring-collection.png" alt="Premium gemstone rings arranged for suitability check">
               <span>Gemstone Suitability</span>
@@ -851,7 +923,7 @@
             </div>
           </article>
 
-          <article class="pooja-product-card home-service-card" data-search-text="certified gemstone ring buy online ruby emerald yellow sapphire blue sapphire pearl coral hessonite cats eye stone quote certificate">
+          <article class="pooja-product-card home-service-card" data-product-category="gemstone" data-search-text="certified gemstone ring buy online ruby emerald yellow sapphire blue sapphire pearl coral hessonite cats eye stone quote certificate">
             <div class="pooja-product-media media-focus-right">
               <img src="assets/gemstone-ring-collection.png" alt="Certified gemstone rings for online enquiry">
               <span>Gemstone Rings</span>
