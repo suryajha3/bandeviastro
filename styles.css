@@ -319,6 +319,123 @@ h3 {
   line-height: 1.55;
 }
 
+.regional-hero {
+  min-height: min(680px, calc(100svh - 118px));
+}
+
+.regional-page-main .section {
+  scroll-margin-top: 120px;
+}
+
+.regional-hub-section,
+.regional-intent-section,
+.regional-services-section,
+.regional-process-section,
+.regional-trust-section,
+.regional-links-section,
+.regional-faq-section {
+  background: #fffaf1;
+}
+
+.regional-keyword-grid,
+.regional-card-grid,
+.regional-link-grid,
+.regional-trust-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.regional-keyword-grid span,
+.regional-card,
+.regional-link-grid a,
+.regional-trust-list article {
+  border: 1px solid rgba(111, 24, 31, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 30px rgba(49, 16, 9, 0.08);
+}
+
+.regional-keyword-grid span {
+  padding: 14px 16px;
+  color: var(--maroon);
+  font-weight: 850;
+}
+
+.regional-card {
+  padding: 24px;
+}
+
+.regional-card p,
+.regional-trust-list p,
+.regional-link-grid span {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.regional-process-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: regional-step;
+}
+
+.regional-process-list li {
+  position: relative;
+  min-height: 150px;
+  padding: 24px 22px 22px;
+  border: 1px solid rgba(13, 99, 92, 0.16);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  line-height: 1.62;
+  box-shadow: 0 14px 30px rgba(13, 99, 92, 0.08);
+  counter-increment: regional-step;
+}
+
+.regional-process-list li::before {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 14px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--maroon);
+  color: #ffffff;
+  font-weight: 900;
+  content: counter(regional-step);
+}
+
+.regional-trust-list article {
+  padding: 20px;
+}
+
+.regional-trust-list span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.regional-link-grid a {
+  display: grid;
+  min-height: 120px;
+  align-content: start;
+  padding: 20px;
+  text-decoration: none;
+}
+
+.regional-link-grid strong {
+  margin-bottom: 8px;
+  color: var(--maroon);
+  font-size: 1.08rem;
+}
+
 .hero-hindi {
   max-width: 610px;
   margin: -12px 0 28px;
