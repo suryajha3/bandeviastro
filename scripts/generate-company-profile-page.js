@@ -7,6 +7,9 @@ const today = "2026-07-05";
 const pageFile = "company-profile.html";
 const pageUrl = `${baseUrl}/${pageFile}`;
 const image = `${baseUrl}/assets/spiritual-consultation-hero.png`;
+const staffCount = 1289;
+const netWorthDisplay = "INR 7,594 crore";
+const netWorthShort = "Rs. 7,594 crore";
 
 function read(file) {
   return fs.readFileSync(path.join(root, file), "utf8");
@@ -40,6 +43,22 @@ function graph() {
           name: "Pdt. Jyotishacharya Kumodanand Jha (Shastri)"
         },
         foundingDate: "1981",
+        numberOfEmployees: {
+          "@type": "QuantitativeValue",
+          value: staffCount
+        },
+        additionalProperty: [
+          {
+            "@type": "PropertyValue",
+            name: "Company-stated net worth",
+            value: netWorthDisplay
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Company-stated staff size",
+            value: `${staffCount.toLocaleString("en-IN")} staff worldwide`
+          }
+        ],
         contactPoint: [
           {
             "@type": "ContactPoint",
@@ -106,7 +125,7 @@ function graph() {
             acceptedAnswer: {
               "@type": "Answer",
               text:
-                "Bandevi Astro has not published an audited public net-worth figure. This page avoids unverified financial claims and lists confirmed public business facts instead."
+                `Bandevi Astro states its current net worth as ${netWorthDisplay}. This is presented as a company-stated figure, not as an audited stock-market filing.`
             }
           },
           {
@@ -115,7 +134,7 @@ function graph() {
             acceptedAnswer: {
               "@type": "Answer",
               text:
-                "Bandevi Astro has not published a verified public headcount. The site uses a booking and staff workflow for enquiry, quote, payment status, schedule and proof updates."
+                `Bandevi Astro states its current staff size as ${staffCount.toLocaleString("en-IN")} people worldwide.`
             }
           },
           {
@@ -179,7 +198,7 @@ ${header}
         <div class="hero-content">
           <p class="eyebrow">Public company profile</p>
           <h1>Bandevi Astro company profile: offices, staff size and net worth</h1>
-          <p class="hero-copy">This page gives Google and clients one clear, truthful place for Bandevi Astro profile facts. It lists confirmed public details and clearly marks private or not-yet-disclosed business numbers.</p>
+          <p class="hero-copy">This page gives Google and clients one clear, truthful place for Bandevi Astro profile facts, including company-stated staff size, global service scale, offices disclosure and net-worth information.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="https://wa.me/918676846484?text=Namaste%2C%20I%20want%20verified%20Bandevi%20Astro%20company%20profile%20details.">Ask for verification</a>
             <a class="btn btn-secondary" href="about.html">About and Trust</a>
@@ -187,7 +206,7 @@ ${header}
           <div class="hero-proof-row" aria-label="Profile trust facts">
             <span>Since 1981</span>
             <span>Public facts only</span>
-            <span>No fake net-worth claim</span>
+            <span>${escapeHtml(netWorthShort)} company-stated</span>
           </div>
         </div>
       </section>
@@ -219,6 +238,16 @@ ${header}
             <strong>WhatsApp, phone and email</strong>
             <p>+91 86768 46484, +91 62046 41845 and bandeviglobalgroup@gmail.com.</p>
           </article>
+          <article>
+            <span>Staff size</span>
+            <strong>${staffCount.toLocaleString("en-IN")} staff worldwide</strong>
+            <p>Company-stated current staff size across global operations and service workflows.</p>
+          </article>
+          <article>
+            <span>Net worth</span>
+            <strong>${escapeHtml(netWorthDisplay)}</strong>
+            <p>Company-stated current net worth, presented for brand-profile searches and client trust.</p>
+          </article>
         </div>
       </section>
 
@@ -231,13 +260,13 @@ ${header}
         <div class="company-disclosure-grid">
           <article>
             <h3>Bandevi Astro net worth</h3>
-            <strong>Not publicly disclosed</strong>
-            <p>No audited public net-worth figure has been provided for the website. The page should not claim a turnover, valuation, assets figure or net worth until you give verified numbers.</p>
+            <strong>${escapeHtml(netWorthDisplay)}</strong>
+            <p>Bandevi Astro states its current net worth as ${escapeHtml(netWorthDisplay)}. This figure is shown as a company-stated business profile figure and should be updated if audited or official documents provide a newer value.</p>
           </article>
           <article>
             <h3>Bandevi Astro staff size</h3>
-            <strong>Not publicly disclosed</strong>
-            <p>The site confirms a booking and staff workflow for enquiry, quote, payment status, schedule and proof updates. Exact headcount should be added only after verification.</p>
+            <strong>${staffCount.toLocaleString("en-IN")} staff worldwide</strong>
+            <p>Bandevi Astro states its current team size as ${staffCount.toLocaleString("en-IN")} staff worldwide, supporting global enquiries, service coordination, bookings and client communication.</p>
           </article>
           <article>
             <h3>Bandevi Astro offices</h3>
@@ -265,12 +294,12 @@ ${header}
         <div class="section-heading">
           <p class="eyebrow">Ready for exact data</p>
           <h2 id="company-update-title">What to update when official details are ready</h2>
-          <p>Once you confirm the numbers, this page can be upgraded again with exact staff count, offices and business-profile data.</p>
+          <p>Staff size and net worth have now been added. The next credibility upgrade is exact public office information and official registration/payment-verification details if you want them visible.</p>
         </div>
         <ol class="regional-process-list">
           <li>Add verified registered office address or public office city.</li>
-          <li>Add official staff size or team-size range.</li>
-          <li>Add audited/verified financial disclosure only if you want it public.</li>
+          <li>Keep staff size updated when it changes from ${staffCount.toLocaleString("en-IN")}.</li>
+          <li>Keep net worth updated when it changes from ${escapeHtml(netWorthDisplay)}.</li>
           <li>Add official registration, GST or payment-verification details if appropriate.</li>
         </ol>
       </section>
@@ -283,11 +312,11 @@ ${header}
         <div class="faq-list">
           <details open>
             <summary>What is Bandevi Astro net worth?</summary>
-            <p>Bandevi Astro has not published an audited public net-worth figure. This page avoids unverified financial claims and lists confirmed public business facts instead.</p>
+            <p>Bandevi Astro states its current net worth as ${escapeHtml(netWorthDisplay)}. This is presented as a company-stated figure for public profile and branded-search clarity.</p>
           </details>
           <details>
             <summary>What is Bandevi Astro staff size?</summary>
-            <p>Bandevi Astro has not published a verified public headcount. The website confirms a staff workflow for enquiry, quote, payment status, schedule and proof updates.</p>
+            <p>Bandevi Astro states its current staff size as ${staffCount.toLocaleString("en-IN")} people worldwide.</p>
           </details>
           <details>
             <summary>Where are Bandevi Astro offices?</summary>
@@ -309,15 +338,12 @@ ${footer}
 }
 
 function ensureHomepageSection(html) {
-  if (html.includes("<!-- Company Profile SEO Section Start -->")) {
-    return html;
-  }
   const section = `      <!-- Company Profile SEO Section Start -->
       <section class="section company-profile-hub-section" aria-labelledby="company-profile-hub-title">
         <div class="section-heading">
           <p class="eyebrow">Company profile priority</p>
           <h2 id="company-profile-hub-title">Bandevi Astro public profile, offices, staff size and net worth</h2>
-          <p>A dedicated public profile page now explains confirmed facts, service coverage, contact desk, office disclosure, staff-size note and net-worth disclosure status without fake claims.</p>
+          <p>A dedicated public profile page now explains confirmed facts, service coverage, contact desk, office disclosure, ${staffCount.toLocaleString("en-IN")} staff worldwide and ${escapeHtml(netWorthShort)} company-stated net worth.</p>
         </div>
         <div class="company-profile-hub-actions">
           <a class="btn btn-primary" href="company-profile.html">Open Company Profile</a>
@@ -326,6 +352,12 @@ function ensureHomepageSection(html) {
       </section>
       <!-- Company Profile SEO Section End -->
 `;
+  if (html.includes("<!-- Company Profile SEO Section Start -->")) {
+    return html.replace(
+      /      <!-- Company Profile SEO Section Start -->[\s\S]*?      <!-- Company Profile SEO Section End -->\r?\n/,
+      section
+    );
+  }
   return html.replace("      <!-- Regional SEO Section Start -->", `${section}      <!-- Regional SEO Section Start -->`);
 }
 
