@@ -1,0 +1,16 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://bandeviastro.com/#organization",
+  "name": "Bandevi Astro",
+  "url": "https://bandeviastro.com/",
+  "email": "bandeviglobalgroup@gmail.com",
+  "telephone": [
+    "+918676846484",
+    "+916204641845"
+  ],
+  "founder": {
+    "@type": "Person",
+    "name": "Pdt. Jyotishacharya Kumodanand Jha (Shastri)"
+  }
+}

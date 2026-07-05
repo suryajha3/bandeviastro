@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://bandeviastro.com/#professional-service",
+  "name": "Pdt. Jyotishacharya Kumodanand Jha (Shastri)",
+  "url": "https://bandeviastro.com/",
+  "description": "Online pooja, hawan, kundli, hast rekha, gemstone guidance, vastu and muhurat consultation for India and NRI families.",
+  "provider": {
+    "@id": "https://bandeviastro.com/#organization"
+  },
+  "areaServed": [
+    "India",
+    "United States",
+    "United Kingdom",
+    "Canada",
+    "United Arab Emirates",
+    "NRI families"
+  ],
+  "serviceType": [
+    "Online Pooja",
+    "Hawan",
+    "Kundli Consultation",
+    "Hast Rekha",
+    "Gemstone Guidance",
+    "Vastu",
+    "Muhurat"
+  ]
+}
