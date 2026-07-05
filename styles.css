@@ -496,6 +496,58 @@ h3 {
   line-height: 1.65;
 }
 
+.global-offices-hero {
+  min-height: min(690px, calc(100svh - 118px));
+}
+
+.global-offices-hub-section,
+.office-source-section,
+.office-network-section,
+.office-faq-section {
+  background: #fffaf1;
+}
+
+.office-network-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.office-card {
+  display: grid;
+  min-height: 220px;
+  align-content: start;
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid rgba(111, 24, 31, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 30px rgba(49, 16, 9, 0.08);
+}
+
+.office-card span {
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.office-card h3 {
+  margin-bottom: 0;
+  color: var(--maroon);
+}
+
+.office-card p {
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.office-card a {
+  color: var(--maroon);
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .hero-hindi {
   max-width: 610px;
   margin: -12px 0 28px;
