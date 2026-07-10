@@ -440,7 +440,14 @@ h3 {
   min-height: min(690px, calc(100svh - 118px));
 }
 
+.chairman-profile-hero {
+  min-height: min(690px, calc(100svh - 118px));
+}
+
 .company-profile-hub-section,
+.chairman-profile-hub-section,
+.chairman-profile-section,
+.chairman-search-section,
 .company-facts-section,
 .company-disclosure-section,
 .company-coverage-section,
