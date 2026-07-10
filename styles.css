@@ -328,6 +328,7 @@ h3 {
 }
 
 .regional-hub-section,
+.service-area-map-section,
 .regional-intent-section,
 .regional-services-section,
 .regional-process-section,
@@ -338,6 +339,7 @@ h3 {
 }
 
 .regional-keyword-grid,
+.service-area-grid,
 .regional-card-grid,
 .regional-link-grid,
 .regional-trust-list {
@@ -347,6 +349,7 @@ h3 {
 }
 
 .regional-keyword-grid span,
+.service-area-card,
 .regional-card,
 .regional-link-grid a,
 .regional-trust-list article {
@@ -360,6 +363,32 @@ h3 {
   padding: 14px 16px;
   color: var(--maroon);
   font-weight: 850;
+}
+
+.service-area-card {
+  display: grid;
+  min-height: 250px;
+  padding: 24px;
+  align-content: start;
+}
+
+.service-area-card span {
+  margin-bottom: 12px;
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.service-area-card p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.service-area-card a {
+  align-self: end;
+  color: var(--maroon);
+  font-weight: 900;
 }
 
 .regional-card {
