@@ -4,7 +4,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const today = "2026-07-11";
 const site = "https://bandeviastro.com";
-const heroImage = "assets/spiritual-consultation-hero.png";
+const heroImage = "assets/spiritual-consultation-hero.jpg";
 
 const cityPages = [
   {

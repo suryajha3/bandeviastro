@@ -232,7 +232,7 @@ img {
 }
 
 .hero-media {
-  background-image: url("assets/spiritual-consultation-hero.png");
+  background-image: url("assets/spiritual-consultation-hero.jpg");
   background-size: cover;
   background-position: center;
   transform: scale(1.02);
@@ -1599,7 +1599,7 @@ h3 {
 .shop-hero {
   background:
     linear-gradient(90deg, rgba(32, 15, 20, 0.94), rgba(15, 118, 110, 0.72)),
-    url("assets/spiritual-consultation-hero.png") center / cover;
+    url("assets/spiritual-consultation-hero.jpg") center / cover;
 }
 
 .shop-assurance {
@@ -2518,7 +2518,7 @@ details p {
   color: #ffffff;
   background:
     linear-gradient(90deg, rgba(32, 15, 20, 0.96), rgba(91, 18, 32, 0.82), rgba(15, 118, 110, 0.62)),
-    url("assets/spiritual-consultation-hero.png") center / cover;
+    url("assets/spiritual-consultation-hero.jpg") center / cover;
 }
 
 .policy-hero-inner {
@@ -2617,7 +2617,7 @@ details p {
   color: #ffffff;
   background:
     linear-gradient(90deg, rgba(32, 15, 20, 0.96), rgba(91, 18, 32, 0.82), rgba(15, 118, 110, 0.64)),
-    url("assets/spiritual-consultation-hero.png") center / cover;
+    url("assets/spiritual-consultation-hero.jpg") center / cover;
 }
 
 .portal-hero-inner,
@@ -5171,7 +5171,7 @@ details p {
   color: #ffffff;
   background:
     linear-gradient(90deg, rgba(32, 15, 20, 0.95), rgba(91, 18, 32, 0.82)),
-    url("assets/spiritual-consultation-hero.png") center / cover;
+    url("assets/spiritual-consultation-hero.jpg") center / cover;
 }
 
 .detail-hero-inner,

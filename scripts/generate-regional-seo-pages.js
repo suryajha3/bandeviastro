@@ -4,7 +4,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const today = "2026-07-05";
 const baseUrl = "https://bandeviastro.com";
-const heroImage = `${baseUrl}/assets/spiritual-consultation-hero.png`;
+const heroImage = `${baseUrl}/assets/spiritual-consultation-hero.jpg`;
 
 const pages = [
   {
@@ -456,9 +456,9 @@ ${hreflangLinks(page.file)}
       ${JSON.stringify(graphFor(page), null, 8)}
     </script>
     <!-- Regional SEO Upgrade End -->
-    <link rel="preload" href="assets/spiritual-consultation-hero.png" as="image" />
-    <link rel="icon" type="image/png" href="assets/spiritual-consultation-hero.png" />
-    <link rel="apple-touch-icon" href="assets/spiritual-consultation-hero.png" />
+    <link rel="preload" href="assets/spiritual-consultation-hero.jpg" as="image" />
+    <link rel="icon" type="image/png" href="assets/bandevi-favicon.png" />
+    <link rel="apple-touch-icon" href="assets/bandevi-favicon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -466,7 +466,7 @@ ${header}
 
     <main id="top" class="regional-page-main">
       <section class="hero regional-hero" aria-label="${escapeHtml(page.region)} service introduction">
-        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.png" alt="${escapeHtml(page.h1)}" />
+        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.jpg" alt="${escapeHtml(page.h1)}" />
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">${escapeHtml(page.eyebrow)}</p>

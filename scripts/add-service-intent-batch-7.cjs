@@ -4,7 +4,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const site = "https://bandeviastro.com";
 const today = "2026-07-13";
-const heroImage = "assets/spiritual-consultation-hero.png";
+const heroImage = "assets/spiritual-consultation-hero.jpg";
 
 const batch6Pages = [
   previous("online-satyanarayan-pooja-usa.html", "Online Satyanarayan pooja in USA for NRI families", "Online Satyanarayan pooja", "satyanarayan-pooja", "USA"),

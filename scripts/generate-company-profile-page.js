@@ -6,7 +6,7 @@ const baseUrl = "https://bandeviastro.com";
 const today = "2026-07-05";
 const pageFile = "company-profile.html";
 const pageUrl = `${baseUrl}/${pageFile}`;
-const image = `${baseUrl}/assets/spiritual-consultation-hero.png`;
+const image = `${baseUrl}/assets/spiritual-consultation-hero.jpg`;
 const staffCount = 1289;
 const netWorthDisplay = "INR 7,594 crore";
 const netWorthShort = "Rs. 7,594 crore";
@@ -183,9 +183,9 @@ function profilePage(header, footer) {
       ${JSON.stringify(graph(), null, 8)}
     </script>
     <!-- Company Profile SEO End -->
-    <link rel="preload" href="assets/spiritual-consultation-hero.png" as="image" />
-    <link rel="icon" type="image/png" href="assets/spiritual-consultation-hero.png" />
-    <link rel="apple-touch-icon" href="assets/spiritual-consultation-hero.png" />
+    <link rel="preload" href="assets/spiritual-consultation-hero.jpg" as="image" />
+    <link rel="icon" type="image/png" href="assets/bandevi-favicon.png" />
+    <link rel="apple-touch-icon" href="assets/bandevi-favicon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -193,7 +193,7 @@ ${header}
 
     <main id="top" class="company-profile-main">
       <section class="hero company-profile-hero" aria-label="Bandevi Astro company profile">
-        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.png" alt="Bandevi Astro company profile and trust information" />
+        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.jpg" alt="Bandevi Astro company profile and trust information" />
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">Public company profile</p>

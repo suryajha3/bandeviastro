@@ -7,7 +7,7 @@ const pageFile = "global-offices.html";
 const pageUrl = `${baseUrl}/${pageFile}`;
 const today = "2026-07-05";
 const sourceUrl = "https://theholidaysgroup.com/about-us";
-const heroImage = `${baseUrl}/assets/spiritual-consultation-hero.png`;
+const heroImage = `${baseUrl}/assets/spiritual-consultation-hero.jpg`;
 
 const offices = [
   {
@@ -248,9 +248,9 @@ function page(header, footer) {
       ${JSON.stringify(graph(), null, 8)}
     </script>
     <!-- Global Offices SEO End -->
-    <link rel="preload" href="assets/spiritual-consultation-hero.png" as="image" />
-    <link rel="icon" type="image/png" href="assets/spiritual-consultation-hero.png" />
-    <link rel="apple-touch-icon" href="assets/spiritual-consultation-hero.png" />
+    <link rel="preload" href="assets/spiritual-consultation-hero.jpg" as="image" />
+    <link rel="icon" type="image/png" href="assets/bandevi-favicon.png" />
+    <link rel="apple-touch-icon" href="assets/bandevi-favicon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -258,7 +258,7 @@ ${header}
 
     <main id="top" class="global-offices-main">
       <section class="hero global-offices-hero" aria-label="Global offices and service network">
-        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.png" alt="Bandevi Astro global offices and service network" />
+        <img class="hero-slide-image" src="assets/spiritual-consultation-hero.jpg" alt="Bandevi Astro global offices and service network" />
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">Global office network</p>

@@ -4,7 +4,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const site = "https://bandeviastro.com";
 const today = "2026-07-11";
-const heroImage = "assets/spiritual-consultation-hero.png";
+const heroImage = "assets/spiritual-consultation-hero.jpg";
 
 const newCityPages = [
   page("online-pandit-chicago.html", "Chicago", "Chicago USA", "USA", "en-US", "en_US", "online-pandit-usa.html", "Online Pandit USA", "US time planned", "Chicago, Naperville, Schaumburg, Devon Avenue, Aurora and nearby Illinois areas"),

@@ -3877,14 +3877,14 @@ const mainSamagriDetailNames = new Set([
 ]);
 
 const malaProducts = [
-  ["Rudraksha Mala", "assets/mala-products/rudraksha_mala_with_divine_elegance.png", "5 Mukhi / Shiva", "Premium Rudraksha mala enquiry for jaap, meditation and spiritual discipline with bead type and count confirmation."],
-  ["Sphatik / Crystal Mala", "assets/mala-products/elegant_crystal_mala_with_premium_packaging.png", "Shanti / clarity", "Sphatik mala quote for peaceful worship, mantra practice and calm focus after purpose and quality are confirmed."],
-  ["Tulsi Mala", "assets/mala-products/sacred_tulsi_mala_divine_harmony.png", "Vishnu bhakti", "Tulsi mala enquiry for Vishnu, Krishna and daily bhakti practice with packaging and delivery confirmation."],
-  ["Chandan / Sandalwood Mala", "assets/mala-products/luxury_sandalwood_mala_product_display.png", "Calm jaap", "Chandan mala quote for mantra jaap, fragrance preference and traditional worship support."],
-  ["Kamal Gatta / Lotus Seed Mala", "assets/mala-products/elegant_lotus_seed_mala_display.png", "Lakshmi sadhana", "Kamal Gatta mala enquiry for Lakshmi worship, prosperity sankalp and guided ritual use."],
-  ["Premium Jap Mala", "assets/mala-products/premium_spiritual_mala_with_ornate_details.png", "108 bead quote", "Premium Jap Mala option for mantra practice, gifting and pooja support with final quote before payment."],
-  ["Hakik Mala", "assets/mala-products/luxury_hakik_mala_with_gold_accents.png", "Protection focus", "Hakik mala quote for protection-focused guidance where the Acharya or staff confirms suitability and use."],
-  ["Ornate Spiritual Mala", "assets/mala-products/elegant_spiritual_mala_product_design.png", "Gift / puja desk", "Ornate spiritual mala enquiry for pooja, gifting or personal practice with product proof and delivery tracking."]
+  ["Rudraksha Mala", "assets/mala-products/rudraksha_mala_with_divine_elegance.jpg", "5 Mukhi / Shiva", "Premium Rudraksha mala enquiry for jaap, meditation and spiritual discipline with bead type and count confirmation."],
+  ["Sphatik / Crystal Mala", "assets/mala-products/elegant_crystal_mala_with_premium_packaging.jpg", "Shanti / clarity", "Sphatik mala quote for peaceful worship, mantra practice and calm focus after purpose and quality are confirmed."],
+  ["Tulsi Mala", "assets/mala-products/sacred_tulsi_mala_divine_harmony.jpg", "Vishnu bhakti", "Tulsi mala enquiry for Vishnu, Krishna and daily bhakti practice with packaging and delivery confirmation."],
+  ["Chandan / Sandalwood Mala", "assets/mala-products/luxury_sandalwood_mala_product_display.jpg", "Calm jaap", "Chandan mala quote for mantra jaap, fragrance preference and traditional worship support."],
+  ["Kamal Gatta / Lotus Seed Mala", "assets/mala-products/elegant_lotus_seed_mala_display.jpg", "Lakshmi sadhana", "Kamal Gatta mala enquiry for Lakshmi worship, prosperity sankalp and guided ritual use."],
+  ["Premium Jap Mala", "assets/mala-products/premium_spiritual_mala_with_ornate_details.jpg", "108 bead quote", "Premium Jap Mala option for mantra practice, gifting and pooja support with final quote before payment."],
+  ["Hakik Mala", "assets/mala-products/luxury_hakik_mala_with_gold_accents.jpg", "Protection focus", "Hakik mala quote for protection-focused guidance where the Acharya or staff confirms suitability and use."],
+  ["Ornate Spiritual Mala", "assets/mala-products/elegant_spiritual_mala_product_design.jpg", "Gift / puja desk", "Ornate spiritual mala enquiry for pooja, gifting or personal practice with product proof and delivery tracking."]
 ];
 
 function productDetailUrl(name) {
