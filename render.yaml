@@ -4,8 +4,6 @@ services:
     runtime: node
     buildCommand: node scripts/build-config.js
     startCommand: node server.js
-    domains:
-      - bandeviastro.com
     envVars:
       - key: SUPABASE_URL
         sync: false
