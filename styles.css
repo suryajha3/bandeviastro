@@ -465,6 +465,51 @@ h3 {
   font-size: 1.08rem;
 }
 
+.international-trust-link-section {
+  background: #fffaf1;
+}
+
+.international-trust-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.international-trust-link-grid a {
+  display: grid;
+  min-height: 142px;
+  align-content: start;
+  padding: 20px;
+  border: 1px solid rgba(111, 24, 31, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(49, 16, 9, 0.08);
+  text-decoration: none;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.international-trust-link-grid a:hover {
+  border-color: rgba(13, 99, 92, 0.28);
+  box-shadow: 0 18px 36px rgba(13, 99, 92, 0.1);
+  transform: translateY(-2px);
+}
+
+.international-trust-link-grid strong,
+.international-trust-link-grid span {
+  display: block;
+}
+
+.international-trust-link-grid strong {
+  margin-bottom: 8px;
+  color: var(--maroon);
+  font-size: 1.04rem;
+}
+
+.international-trust-link-grid span {
+  color: var(--muted);
+  line-height: 1.62;
+}
+
 .company-profile-hero {
   min-height: min(690px, calc(100svh - 118px));
 }
