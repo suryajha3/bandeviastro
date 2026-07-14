@@ -3233,6 +3233,104 @@ details p {
   gap: 10px;
 }
 
+.payment-option-panel,
+.payment-choice-panel {
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 184, 75, 0.12)),
+    #ffffff;
+}
+
+.payment-option-panel legend {
+  padding: 0 8px;
+  color: var(--maroon);
+  font-weight: 950;
+}
+
+.payment-option-panel p,
+.payment-choice-head p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.payment-option-grid,
+.payment-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.payment-option-card,
+.payment-choice-card {
+  min-height: 112px;
+  border: 1px solid rgba(91, 18, 32, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.payment-option-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.payment-option-card:has(input:checked),
+.payment-choice-card.is-selected {
+  border-color: rgba(15, 118, 110, 0.42);
+  background: rgba(15, 118, 110, 0.1);
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.08);
+}
+
+.payment-option-card input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--teal);
+}
+
+.payment-option-card strong,
+.payment-option-card small,
+.payment-choice-card span,
+.payment-choice-card strong,
+.payment-choice-card p,
+.payment-choice-head span,
+.payment-choice-head strong {
+  display: block;
+}
+
+.payment-option-card strong,
+.payment-choice-card strong,
+.payment-choice-head strong {
+  color: var(--maroon);
+  line-height: 1.3;
+}
+
+.payment-option-card small,
+.payment-choice-card p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.payment-choice-head span,
+.payment-choice-card span {
+  color: var(--teal);
+  font-size: 0.75rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.payment-choice-panel .payment-ready-panel {
+  margin-top: 14px;
+}
+
 .full-span {
   grid-column: 1 / -1;
 }
@@ -5803,6 +5901,8 @@ details p {
   .service-preview,
   .portal-intake-fields,
   .admin-filter-row,
+  .payment-option-grid,
+  .payment-choice-grid,
   .ticket-step-grid,
   .admin-service-hints {
     grid-template-columns: 1fr 1fr;
@@ -6033,6 +6133,8 @@ details p {
   .client-journey-rail,
   .booking-product-grid,
   .booking-submit-promise,
+  .payment-option-grid,
+  .payment-choice-grid,
   .dashboard-step-board,
   .account-action-rail,
   .remedy-grid,

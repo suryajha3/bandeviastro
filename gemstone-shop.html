@@ -1185,6 +1185,28 @@
             Purpose / birth details
             <textarea id="stonePurpose" rows="4" placeholder="Example: kundli recommendation, career, marriage, health tendency, birth date/time/place"></textarea>
           </label>
+          <fieldset class="payment-option-panel full-span">
+            <legend>Choose payment option</legend>
+            <p>Staff confirms stone proof, certificate, delivery eligibility and final quote before collecting payment.</p>
+            <div class="payment-option-grid" aria-label="Gemstone payment options">
+              <label class="payment-option-card">
+                <input type="radio" name="stonePaymentMethod" value="Staff quote first" checked />
+                <span><strong>Quote first</strong><small>Confirm suitability and price first.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="stonePaymentMethod" value="Razorpay online payment" />
+                <span><strong>Razorpay online payment</strong><small>Pay through gateway after approval.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="stonePaymentMethod" value="UPI / bank transfer" />
+                <span><strong>UPI / bank transfer</strong><small>Official transfer details after approval.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="stonePaymentMethod" value="COD / Pay on delivery" />
+                <span><strong>COD / Pay on delivery</strong><small>Only for eligible delivery orders.</small></span>
+              </label>
+            </div>
+          </fieldset>
           <label class="checkbox-line full-span">
             <input type="checkbox" required />
             <span>I agree to the <a href="terms-and-conditions.html">Terms</a>, <a href="privacy-policy.html">Privacy Policy</a>, <a href="refund-policy.html">Refund Policy</a> and <a href="shipping-policy.html">Shipping Policy</a>.</span>
@@ -1192,12 +1214,15 @@
           <button class="btn btn-primary full-span" type="submit">Create gemstone quote ID</button>
           <p class="form-note full-span" id="stoneOrderStatus" aria-live="polite">Gemstones are faith-based remedies. Wear only after suitability guidance.</p>
           <div class="booking-ticket" id="portalTicket">
-            <p class="eyebrow">Gemstone enquiry created</p>
-            <h3>Your Booking ID</h3>
+            <p class="eyebrow">Gemstone request created</p>
+            <h3>Booking request ID</h3>
             <span class="ticket-id" id="ticketId"></span>
             <p id="ticketSummary"></p>
+            <div class="ticket-detail-grid" id="ticketDetails"></div>
+            <div class="ticket-next-steps" id="ticketNextSteps"></div>
             <p class="sync-note" id="ticketSyncNote"></p>
             <div class="ticket-actions">
+              <button class="btn btn-secondary" id="ticketCopy" type="button">Copy Booking ID</button>
               <a class="btn btn-primary" id="ticketTrackLink" href="track-booking.html">Track status</a>
               <a class="btn btn-secondary" id="ticketWhatsApp" href="https://wa.me/918676846484">Send on WhatsApp</a>
             </div>

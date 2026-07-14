@@ -209,6 +209,30 @@ const paymentStatuses = [
   "Refund Processed"
 ];
 
+const defaultPaymentMethod = "Staff quote first";
+const paymentMethodOptions = [
+  {
+    value: "Staff quote first",
+    label: "Quote first",
+    detail: "Staff confirms quote, date and terms before payment."
+  },
+  {
+    value: "Razorpay online payment",
+    label: "Razorpay online payment",
+    detail: "Gateway opens after exact INR quote is approved."
+  },
+  {
+    value: "UPI / bank transfer",
+    label: "UPI / bank transfer",
+    detail: "Official transfer details are shared after quote approval."
+  },
+  {
+    value: "COD / Pay on delivery",
+    label: "COD / Pay on delivery",
+    detail: "Available only for eligible products or local delivery."
+  }
+];
+
 const adminWorkflowActions = [
   {
     key: "quote",
@@ -1281,15 +1305,17 @@ function parseStaffNoteBookingMeta(value) {
     paymentLink: "",
     mrpPrice: "",
     offerPrice: "",
-    discountPrice: ""
+    discountPrice: "",
+    paymentMethod: ""
   };
   const fieldMap = {
     payment_link: "paymentLink",
     mrp_price: "mrpPrice",
     offer_price: "offerPrice",
-    discount_price: "discountPrice"
+    discount_price: "discountPrice",
+    payment_method: "paymentMethod"
   };
-  rawNote.replace(/\[\[(payment_link|mrp_price|offer_price|discount_price):([^\]]*)\]\]/gi, (_match, key, encodedValue) => {
+  rawNote.replace(/\[\[(payment_link|mrp_price|offer_price|discount_price|payment_method):([^\]]*)\]\]/gi, (_match, key, encodedValue) => {
     const target = fieldMap[String(key || "").toLowerCase()];
     if (!target) return "";
     try {
@@ -1299,7 +1325,7 @@ function parseStaffNoteBookingMeta(value) {
     }
     return "";
   });
-  const note = rawNote.replace(/\s*\[\[(payment_link|mrp_price|offer_price|discount_price):[^\]]*\]\]\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
+  const note = rawNote.replace(/\s*\[\[(payment_link|mrp_price|offer_price|discount_price|payment_method):[^\]]*\]\]\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
   return { note, ...meta };
 }
 
@@ -1314,13 +1340,38 @@ function serializeStaffNoteBookingMeta(note, booking = {}) {
     ["payment_link", booking.paymentLink],
     ["mrp_price", booking.mrpPrice],
     ["offer_price", booking.offerPrice],
-    ["discount_price", booking.discountPrice]
+    ["discount_price", booking.discountPrice],
+    ["payment_method", booking.paymentMethod]
   ]
     .map(([key, value]) => [key, String(value || "").trim()])
     .filter(([, value]) => value);
   if (!metaItems.length) return cleanNote;
   const metaText = metaItems.map(([key, value]) => `[[${key}:${encodeURIComponent(value)}]]`).join("\n");
   return `${cleanNote}${cleanNote ? "\n\n" : ""}${metaText}`;
+}
+
+function getBookingPaymentMethod(booking = {}) {
+  const directMethod = String(booking?.paymentMethod || "").trim();
+  if (directMethod) return directMethod;
+  const parsedMethod = parseStaffNoteBookingMeta(booking?.staffNote || "").paymentMethod;
+  return parsedMethod || defaultPaymentMethod;
+}
+
+function readSelectedPaymentMethod(groupName, fallback = defaultPaymentMethod) {
+  return document.querySelector(`input[name="${groupName}"]:checked`)?.value || fallback;
+}
+
+function getPaymentMethodOption(value) {
+  return paymentMethodOptions.find((option) => option.value === value)
+    || paymentMethodOptions.find((option) => option.value === defaultPaymentMethod)
+    || paymentMethodOptions[0];
+}
+
+function renderPaymentMethodOptions(selectedValue = defaultPaymentMethod) {
+  const selected = selectedValue || defaultPaymentMethod;
+  return paymentMethodOptions.map((option) => `
+    <option value="${escapeHtml(option.value)}" ${option.value === selected ? "selected" : ""}>${escapeHtml(option.value)}</option>
+  `).join("");
 }
 
 function getBookingPaymentLink(booking) {
@@ -1478,6 +1529,31 @@ function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
   `;
 }
 
+function renderPaymentChoiceBoard(booking, className = "payment-choice-panel") {
+  const selectedMethod = getBookingPaymentMethod(booking);
+  const selectedOption = getPaymentMethodOption(selectedMethod);
+
+  return `
+    <div class="${escapeHtml(className)}" aria-label="Selected payment option">
+      <div class="payment-choice-head">
+        <span>Selected payment option</span>
+        <strong>${escapeHtml(selectedOption.value)}</strong>
+        <p>${escapeHtml(selectedOption.detail)} Final confirmation happens only after staff review.</p>
+      </div>
+      <div class="payment-choice-grid" aria-label="Available payment options">
+        ${paymentMethodOptions.map((option) => `
+          <div class="payment-choice-card ${option.value === selectedOption.value ? "is-selected" : ""}">
+            <span>${option.value === selectedOption.value ? "Selected" : "Available"}</span>
+            <strong>${escapeHtml(option.label)}</strong>
+            <p>${escapeHtml(option.detail)}</p>
+          </div>
+        `).join("")}
+      </div>
+      ${renderPaymentReadyPanel(booking, "payment-ready-panel ticket-payment-ready-panel")}
+    </div>
+  `;
+}
+
 function loadRazorpayCheckout() {
   if (window.Razorpay) return Promise.resolve(window.Razorpay);
   if (razorpayCheckoutPromise) return razorpayCheckoutPromise;
@@ -1623,6 +1699,7 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       "Service",
       "Status",
       "Payment",
+      "Payment Option",
       "MRP",
       "Offer Price",
       "Discount",
@@ -1645,6 +1722,7 @@ function downloadBookingsCsv(bookings, filenamePrefix = "bandevi-bookings") {
       booking.service,
       booking.status,
       booking.paymentStatus,
+      getBookingPaymentMethod(booking),
       booking.mrpPrice || "",
       booking.offerPrice || "",
       booking.discountPrice || "",
@@ -1982,6 +2060,7 @@ function fromCloudBooking(row) {
     mrpPrice: row.mrp_price || row.mrpPrice || parsedStaffNote.mrpPrice || "",
     offerPrice: row.offer_price || row.offerPrice || parsedStaffNote.offerPrice || "",
     discountPrice: row.discount_price || row.discountPrice || parsedStaffNote.discountPrice || "",
+    paymentMethod: row.payment_method || row.paymentMethod || parsedStaffNote.paymentMethod || defaultPaymentMethod,
     paymentLink: row.payment_link || row.paymentLink || parsedStaffNote.paymentLink || "",
     proofUrl: row.proof_url || row.proofUrl || "",
     staffNote: parsedStaffNote.note,
@@ -2109,6 +2188,7 @@ function bookingWhatsAppUrl(booking) {
     `Preferred date: ${booking.date || "Flexible"}`,
     `Preferred time: ${booking.time || "Flexible"}`,
     `Mode: ${booking.mode}`,
+    `Payment option: ${getBookingPaymentMethod(booking)}`,
     `Concern: ${booking.concern || "Please call me to discuss."}`,
     "",
     "Please confirm quote, schedule and payment process."
@@ -2123,7 +2203,8 @@ function getStaffTemplateMessage(booking, templateKey = "status") {
     "",
     "Bandevi Astro booking update:",
     `Booking ID: ${booking.id}`,
-    `Service: ${booking.service}`
+    `Service: ${booking.service}`,
+    `Payment option: ${getBookingPaymentMethod(booking)}`
   ];
 
   const templateLines = {
@@ -2185,9 +2266,10 @@ function renderTicket(booking, syncResult = {}) {
   const ticketNextSteps = document.querySelector("#ticketNextSteps");
   if (!ticket || !ticketId || !ticketSummary || !ticketTrackLink || !ticketWhatsApp) return;
 
+  const paymentMethod = getBookingPaymentMethod(booking);
   ticket.classList.add("is-visible");
   ticketId.textContent = booking.id;
-  ticketSummary.textContent = `${booking.service} request received for ${booking.name}. Status: ${booking.status}.`;
+  ticketSummary.textContent = `${booking.service} request created for ${booking.name}. Status: ${booking.status}. This is not final confirmation until staff reviews quote, schedule and payment option.`;
   ticketTrackLink.href = `track-booking.html?id=${encodeURIComponent(booking.id)}`;
   ticketWhatsApp.href = bookingWhatsAppUrl(booking);
   if (ticketCopyButton) {
@@ -2201,7 +2283,8 @@ function renderTicket(booking, syncResult = {}) {
       ["Final Quote", booking.amount || booking.offerPrice || "Quote pending"],
       ["Date / time", formatBookingDate(booking)],
       ["Mode", booking.mode],
-      ["Payment", booking.paymentStatus],
+      ["Payment status", booking.paymentStatus],
+      ["Payment option", paymentMethod],
       ["Next action", getStatusGuidance(booking)]
     ];
     ticketDetails.innerHTML = detailItems.map(([label, value]) => `
@@ -2215,9 +2298,10 @@ function renderTicket(booking, syncResult = {}) {
   if (ticketNextSteps) {
     ticketNextSteps.innerHTML = `
       ${renderProgressBar(booking, "Booking flow")}
+      ${renderPaymentChoiceBoard(booking, "payment-choice-panel ticket-payment-choice")}
       <div class="ticket-step-grid" aria-label="Next booking steps">
         <div><span>1</span><strong>Send ID on WhatsApp</strong><p>Share ${escapeHtml(booking.id)} so staff can confirm quickly.</p></div>
-        <div><span>2</span><strong>Wait for quote</strong><p>Amount, payment method and schedule are confirmed before payment.</p></div>
+        <div><span>2</span><strong>Staff review</strong><p>Amount, schedule and selected ${escapeHtml(paymentMethod)} route are checked before payment.</p></div>
         <div><span>3</span><strong>Track status</strong><p>Use this ID anytime for quote, payment, schedule and proof updates.</p></div>
       </div>
     `;
@@ -2227,9 +2311,9 @@ function renderTicket(booking, syncResult = {}) {
     if (syncResult.savedCloud) {
       ticketSyncNote.textContent = "Saved to the secure booking system for staff updates across devices.";
     } else if (syncResult.error) {
-      ticketSyncNote.textContent = "Booking ID created. Send it on WhatsApp now; the team can confirm and update your status.";
+      ticketSyncNote.textContent = "Booking request created. Send it on WhatsApp now; the team can confirm quote, payment option and status.";
     } else {
-      ticketSyncNote.textContent = "Booking ID created. Send it on WhatsApp now; secure account tracking will activate shortly.";
+      ticketSyncNote.textContent = "Booking request created. Send it on WhatsApp now; secure account tracking will activate shortly.";
     }
   }
 }
@@ -2294,7 +2378,8 @@ function renderStatusPanel(booking) {
   const pricing = getBookingPriceBreakdown(booking, serviceProfile.quote || "Quote pending");
   const metaItems = [
     ["Service", booking.service],
-    ["Payment", booking.paymentStatus],
+    ["Payment status", booking.paymentStatus],
+    ["Payment option", getBookingPaymentMethod(booking)],
     ["MRP", pricing.mrpPrice || "To be confirmed"],
     ["Offer Price", pricing.offerPrice || "Quote pending"],
     ["Discount", pricing.discountPrice || "Staff offer pending"],
@@ -2806,6 +2891,7 @@ function renderAdminDashboard() {
     const serviceProfile = getServiceProfile(booking.service);
     const statusOptions = bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
     const paymentOptions = paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
+    const paymentMethodSelectOptions = renderPaymentMethodOptions(getBookingPaymentMethod(booking));
     return `
       <article data-booking-id="${escapeHtml(booking.id)}">
         <div class="admin-booking-head">
@@ -2827,11 +2913,13 @@ function renderAdminDashboard() {
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Date / time</span><strong>${escapeHtml(formatBookingDate(booking))}</strong></div>
           <div><span>Mode</span><strong>${escapeHtml(booking.mode || "Not selected")}</strong></div>
+          <div><span>Payment option</span><strong>${escapeHtml(getBookingPaymentMethod(booking))}</strong></div>
           <div><span>Updated</span><strong>${escapeHtml(new Date(booking.updatedAt).toLocaleString())}</strong></div>
         </div>
         <div class="admin-edit-grid">
           <label>Status<select data-field="status">${statusOptions}</select></label>
           <label>Payment<select data-field="paymentStatus">${paymentOptions}</select></label>
+          <label>Payment option<select data-field="paymentMethod">${paymentMethodSelectOptions}</select></label>
           <label>MRP<input data-field="mrpPrice" type="text" value="${escapeHtml(booking.mrpPrice || "")}" placeholder="Rs 7,100" /></label>
           <label>Offer Price<input data-field="offerPrice" type="text" value="${escapeHtml(booking.offerPrice || "")}" placeholder="Rs 5,100" /></label>
           <label>Discount Price<input data-field="discountPrice" type="text" value="${escapeHtml(booking.discountPrice || "")}" placeholder="Rs 2,000 off" /></label>
@@ -2886,6 +2974,7 @@ function getBackofficeSearchText(booking) {
     booking.concern,
     booking.status,
     booking.paymentStatus,
+    getBookingPaymentMethod(booking),
     booking.mrpPrice,
     booking.offerPrice,
     booking.discountPrice,
@@ -3275,6 +3364,7 @@ function renderBackofficeOperations(bookings) {
     const serviceProfile = getServiceProfile(booking.service);
     const statusOptions = bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
     const paymentOptions = paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("");
+    const paymentMethodSelectOptions = renderPaymentMethodOptions(getBookingPaymentMethod(booking));
 
     return `
       <article data-backoffice-id="${escapeHtml(booking.id)}">
@@ -3296,6 +3386,7 @@ function renderBackofficeOperations(bookings) {
           <div><span>Email</span><strong>${escapeHtml(booking.email || "Not shared")}</strong></div>
           <div><span>Country</span><strong>${escapeHtml(booking.country || "Not shared")}</strong></div>
           <div><span>Payment</span><strong>${escapeHtml(booking.paymentStatus)}</strong></div>
+          <div><span>Payment option</span><strong>${escapeHtml(getBookingPaymentMethod(booking))}</strong></div>
           <div><span>MRP</span><strong>${escapeHtml(booking.mrpPrice || "To be confirmed")}</strong></div>
           <div><span>Offer</span><strong>${escapeHtml(booking.offerPrice || "Quote pending")}</strong></div>
           <div><span>Discount</span><strong>${escapeHtml(booking.discountPrice || "Staff offer pending")}</strong></div>
@@ -3310,6 +3401,7 @@ function renderBackofficeOperations(bookings) {
         <div class="backoffice-edit-grid">
           <label>Status<select data-backoffice-field="status">${statusOptions}</select></label>
           <label>Payment<select data-backoffice-field="paymentStatus">${paymentOptions}</select></label>
+          <label>Payment option<select data-backoffice-field="paymentMethod">${paymentMethodSelectOptions}</select></label>
           <label>MRP<input data-backoffice-field="mrpPrice" type="text" value="${escapeHtml(booking.mrpPrice || "")}" placeholder="Rs 7,100" /></label>
           <label>Offer Price<input data-backoffice-field="offerPrice" type="text" value="${escapeHtml(booking.offerPrice || "")}" placeholder="Rs 5,100" /></label>
           <label>Discount Price<input data-backoffice-field="discountPrice" type="text" value="${escapeHtml(booking.discountPrice || "")}" placeholder="Rs 2,000 off" /></label>
@@ -4336,6 +4428,7 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
   };
   const orderProfile = getStoneQuoteProfile(order.stone);
   const orderPricing = getStoneProductPricing(order.stone, orderProfile, activeStonePricingPackage);
+  const paymentMethod = readSelectedPaymentMethod("stonePaymentMethod");
 
   const booking = {
     id: generateBookingId(),
@@ -4359,6 +4452,7 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     ].join("\n"),
     status: "Enquiry Received",
     paymentStatus: "Not Requested",
+    paymentMethod,
     amount: orderPricing.amount || orderPricing.offerPrice || "Certificate-based quote pending",
     mrpPrice: orderPricing.mrpPrice || "",
     offerPrice: orderPricing.offerPrice || "",
@@ -4400,6 +4494,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
   const selectedService = document.querySelector("#portalService").value;
   const serviceProfile = getServiceProfile(selectedService);
   const selectedPackage = readPortalPackageSelection();
+  const paymentMethod = readSelectedPaymentMethod("portalPaymentMethod");
 
   const booking = {
     id: generateBookingId(),
@@ -4414,6 +4509,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
     concern: buildPortalConcern(),
     status: "Enquiry Received",
     paymentStatus: "Not Requested",
+    paymentMethod,
     amount: selectedPackage?.amount || selectedPackage?.offerPrice || serviceProfile.quote,
     mrpPrice: selectedPackage?.mrpPrice || "",
     offerPrice: selectedPackage?.offerPrice || "",
@@ -4432,7 +4528,7 @@ portalBookingForm?.addEventListener("submit", async (event) => {
   updateServicePreview();
   updatePortalServiceIntake();
   await prefillPortalFromSession();
-  if (submitButton) submitButton.textContent = "Create booking ID";
+  if (submitButton) submitButton.textContent = "Create secure Booking ID";
 });
 
 trackBookingForm?.addEventListener("submit", async (event) => {
@@ -5132,7 +5228,8 @@ function renderAccountBookingCard(booking) {
         ${renderCustomerStageBoard(booking, "account-stage-board")}
         ${renderPaymentReadyPanel(booking, "payment-ready-panel account-payment-ready-panel")}
         <div class="mini-booking-meta">
-          <span><strong>Payment</strong>${escapeHtml(booking.paymentStatus)}</span>
+          <span><strong>Payment status</strong>${escapeHtml(booking.paymentStatus)}</span>
+          <span><strong>Payment option</strong>${escapeHtml(getBookingPaymentMethod(booking))}</span>
           <span><strong>MRP</strong>${escapeHtml(booking.mrpPrice || "To be confirmed")}</span>
           <span><strong>Offer</strong>${escapeHtml(booking.offerPrice || "Quote pending")}</span>
           <span><strong>Discount</strong>${escapeHtml(booking.discountPrice || "Staff offer pending")}</span>

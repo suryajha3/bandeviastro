@@ -523,6 +523,28 @@
           </label>
           <label class="full-span">Additional details<input id="portalSankalp" type="text" placeholder="Any extra birth, sankalp, family, samagri or gemstone note" /></label>
           <label class="full-span">Concern / requirement<textarea id="portalConcern" rows="4" placeholder="Marriage, business, grah shanti, gemstone, muhurat..."></textarea></label>
+          <fieldset class="payment-option-panel full-span">
+            <legend>Choose payment option</legend>
+            <p>Payment is collected only after staff confirms the final quote, schedule, delivery and policy terms.</p>
+            <div class="payment-option-grid" aria-label="Payment options">
+              <label class="payment-option-card">
+                <input type="radio" name="portalPaymentMethod" value="Staff quote first" checked />
+                <span><strong>Quote first</strong><small>Staff confirms amount before payment.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="portalPaymentMethod" value="Razorpay online payment" />
+                <span><strong>Razorpay online payment</strong><small>Gateway opens after exact INR quote approval.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="portalPaymentMethod" value="UPI / bank transfer" />
+                <span><strong>UPI / bank transfer</strong><small>Official transfer details after approval.</small></span>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="portalPaymentMethod" value="COD / Pay on delivery" />
+                <span><strong>COD / Pay on delivery</strong><small>For eligible product or local delivery cases.</small></span>
+              </label>
+            </div>
+          </fieldset>
           <label class="checkbox-line full-span">
             <input type="checkbox" required />
             <span>I agree to the <a href="terms-and-conditions.html">Terms</a>, <a href="privacy-policy.html">Privacy Policy</a>, <a href="cancellation-policy.html">Cancellation Policy</a> and <a href="refund-policy.html">Refund Policy</a>.</span>
@@ -535,8 +557,8 @@
           <button class="btn btn-primary full-span" type="submit">Create secure Booking ID</button>
           <p class="form-note">After creating the Booking ID, send it on WhatsApp so the team can confirm quote, payment and schedule.</p>
           <div class="booking-ticket" id="portalTicket">
-            <p class="eyebrow">Booking created</p>
-            <h3>Your Booking ID</h3>
+            <p class="eyebrow">Request created</p>
+            <h3>Booking request ID</h3>
             <span class="ticket-id" id="ticketId"></span>
             <p id="ticketSummary"></p>
             <div class="ticket-detail-grid" id="ticketDetails"></div>
