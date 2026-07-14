@@ -1,9 +1,9 @@
 services:
   - type: web
     name: bandeviastro
-    runtime: static
+    runtime: node
     buildCommand: node scripts/build-config.js
-    staticPublishPath: .
+    startCommand: node server.js
     domains:
       - bandeviastro.com
     envVars:
@@ -15,3 +15,9 @@ services:
         value: "918676846484"
       - key: PHONE_NUMBERS
         value: "918676846484,916204641845"
+      - key: RAZORPAY_KEY_ID
+        value: "rzp_test_TDG0MpJzA4GhVM"
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_MODE
+        value: "test"

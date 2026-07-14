@@ -18,7 +18,11 @@ const config = {
   whatsappNumber: configuredWhatsappNumber === "919876543210"
     ? defaultWhatsappNumber
     : configuredWhatsappNumber,
-  phoneNumbers: configuredPhoneNumbers.length ? configuredPhoneNumbers : defaultPhoneNumbers
+  phoneNumbers: configuredPhoneNumbers.length ? configuredPhoneNumbers : defaultPhoneNumbers,
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID || "",
+  razorpayMode: process.env.RAZORPAY_MODE || "test",
+  razorpayOrderEndpoint: "/api/razorpay/order",
+  razorpayVerifyEndpoint: "/api/razorpay/verify"
 };
 
 fs.writeFileSync(

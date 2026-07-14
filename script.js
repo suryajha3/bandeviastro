@@ -4,6 +4,10 @@ const businessCallNumbers = Array.isArray(siteConfig.phoneNumbers) && siteConfig
   ? siteConfig.phoneNumbers
   : [businessWhatsApp, "916204641845"];
 const primaryCallNumber = businessCallNumbers[0] || businessWhatsApp;
+const razorpayKeyId = siteConfig.razorpayKeyId || "";
+const razorpayMode = siteConfig.razorpayMode || "test";
+const razorpayOrderEndpoint = siteConfig.razorpayOrderEndpoint || "/api/razorpay/order";
+const razorpayVerifyEndpoint = siteConfig.razorpayVerifyEndpoint || "/api/razorpay/verify";
 const supabaseClient = createSupabaseClient();
 
 const serviceSelect = document.querySelector("#clientService");
@@ -174,6 +178,7 @@ let selectedLanguage = supportedLanguages[readPreference(headerPreferenceKeys.la
   : "en";
 let currencyRates = { ...fallbackCurrencyRates };
 let currencyObserverTimer = null;
+let razorpayCheckoutPromise = null;
 let adminBookingsCache = [];
 let adminBookingsSource = "local";
 let adminQuickFilter = "all";
@@ -1377,17 +1382,83 @@ function getVisiblePaymentLink(booking) {
   return safeLink === "#" ? "" : safeLink;
 }
 
+function parseExactInrAmountPaise(value) {
+  const text = String(value || "").trim();
+  if (!text) return 0;
+  if (/quote|pending|custom|staff|stock|before payment|to be confirmed|need|from|\+|by stone|certificate/i.test(text)) {
+    return 0;
+  }
+
+  const match = text.match(/(?:rs\.?|inr|₹)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i)
+    || text.match(/^([0-9][0-9,]*(?:\.[0-9]{1,2})?)$/);
+  if (!match) return 0;
+
+  const amount = Number(match[1].replace(/,/g, ""));
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  return Math.round(amount * 100);
+}
+
+function getRazorpayAmountPaise(booking) {
+  return parseExactInrAmountPaise(booking?.amount)
+    || parseExactInrAmountPaise(booking?.offerPrice)
+    || 0;
+}
+
+function formatRazorpayAmount(amountPaise) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: amountPaise % 100 ? 2 : 0
+  }).format(amountPaise / 100);
+}
+
+function isRazorpayPaymentAvailable(booking) {
+  return Boolean(razorpayKeyId && isPaymentPendingStage(booking) && getRazorpayAmountPaise(booking));
+}
+
+function getRazorpayPaymentPayload(booking) {
+  const amountPaise = getRazorpayAmountPaise(booking);
+  return {
+    bookingId: booking.id,
+    amountPaise,
+    amountDisplay: formatRazorpayAmount(amountPaise),
+    service: booking.service,
+    name: booking.name,
+    email: booking.email || "",
+    phone: normalizePhoneForCall(booking.phone || ""),
+    mode: razorpayMode
+  };
+}
+
+function renderRazorpayButton(booking) {
+  if (!isRazorpayPaymentAvailable(booking)) return "";
+  const payload = getRazorpayPaymentPayload(booking);
+  return `
+    <button
+      class="btn btn-primary razorpay-pay-button"
+      type="button"
+      data-razorpay-pay
+      data-payment="${escapeHtml(JSON.stringify(payload))}"
+    >Pay by Razorpay</button>
+  `;
+}
+
 function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
   if (!booking) return "";
   const amount = booking.amount || booking.offerPrice || getServiceProfile(booking.service).quote || "Quote pending";
   const paymentLink = getVisiblePaymentLink(booking);
+  const razorpayButton = renderRazorpayButton(booking);
   const isPending = isPaymentPendingStage(booking);
   const stateLabel = isPending
-    ? paymentLink ? "Payment link ready" : "Payment link pending"
+    ? paymentLink || razorpayButton ? "Payment ready" : "Payment link pending"
     : "Locked until quote approval";
-  const pendingActionLabel = isPending ? "Awaiting payment link" : "Payment locked";
+  const pendingActionLabel = isPending
+    ? razorpayKeyId ? "Exact INR quote needed" : "Gateway setup pending"
+    : "Payment locked";
   const action = paymentLink
     ? `<a class="btn btn-primary" href="${escapeHtml(paymentLink)}" target="_blank" rel="noopener">Pay Now</a>`
+    : razorpayButton
+      ? razorpayButton
     : `<span class="payment-pending-chip">${escapeHtml(pendingActionLabel)}</span>`;
 
   return `
@@ -1396,14 +1467,145 @@ function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
         <span>${escapeHtml(stateLabel)}</span>
         <strong>${escapeHtml(amount)}</strong>
         ${hasPriceBreakdown(booking) ? renderBookingPriceBreakdown(booking, "payment-price-breakdown") : ""}
-        <p>Payment opens only after staff confirms the quote. UPI, bank transfer or gateway link can be shared here before full payment gateway integration.</p>
+        <p>Payment opens only after staff confirms the quote. Razorpay appears for exact INR quotes marked Payment Pending.</p>
       </div>
       <div class="payment-ready-actions">
         ${action}
+        <small data-razorpay-status></small>
         <small>Pay only after confirming the quote and Booking ID with staff.</small>
       </div>
     </div>
   `;
+}
+
+function loadRazorpayCheckout() {
+  if (window.Razorpay) return Promise.resolve(window.Razorpay);
+  if (razorpayCheckoutPromise) return razorpayCheckoutPromise;
+
+  razorpayCheckoutPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => window.Razorpay ? resolve(window.Razorpay) : reject(new Error("Razorpay checkout failed to load."));
+    script.onerror = () => reject(new Error("Razorpay checkout script could not be loaded."));
+    document.head.appendChild(script);
+  });
+
+  return razorpayCheckoutPromise;
+}
+
+function setRazorpayButtonState(button, message, isDisabled = false) {
+  const panel = button.closest(".payment-ready-panel");
+  const status = panel?.querySelector("[data-razorpay-status]");
+  if (status) status.textContent = message || "";
+  button.disabled = isDisabled;
+  button.classList.toggle("is-loading", isDisabled);
+}
+
+async function createRazorpayOrder(payment) {
+  const response = await fetch(razorpayOrderEndpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      bookingId: payment.bookingId,
+      amountPaise: payment.amountPaise,
+      service: payment.service
+    })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.ok || !result.order?.id) {
+    throw new Error(result.error || "Could not create Razorpay order.");
+  }
+  return result.order;
+}
+
+async function verifyRazorpayPayment(responsePayload, payment) {
+  const response = await fetch(razorpayVerifyEndpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      bookingId: payment.bookingId,
+      razorpay_order_id: responsePayload.razorpay_order_id,
+      razorpay_payment_id: responsePayload.razorpay_payment_id,
+      razorpay_signature: responsePayload.razorpay_signature
+    })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.verified) {
+    throw new Error(result.error || "Payment verification failed.");
+  }
+  return result;
+}
+
+function openRazorpayCheckout(order, payment, button) {
+  const checkout = new window.Razorpay({
+    key: razorpayKeyId,
+    amount: order.amount,
+    currency: order.currency || "INR",
+    name: "Bandevi Astro",
+    description: `${payment.service} | ${payment.bookingId}`,
+    image: "https://bandeviastro.com/assets/bandevi-favicon.png",
+    order_id: order.id,
+    prefill: {
+      name: payment.name || "",
+      email: payment.email || "",
+      contact: payment.phone || ""
+    },
+    notes: {
+      booking_id: payment.bookingId,
+      service: payment.service || ""
+    },
+    theme: {
+      color: "#5b1220"
+    },
+    handler: async (razorpayResponse) => {
+      try {
+        setRazorpayButtonState(button, "Verifying payment...", true);
+        const verified = await verifyRazorpayPayment(razorpayResponse, payment);
+        button.textContent = "Payment verified";
+        setRazorpayButtonState(button, `Payment verified. ID: ${verified.paymentId}`, true);
+      } catch (error) {
+        setRazorpayButtonState(button, error.message || "Payment verification failed.", false);
+      }
+    },
+    modal: {
+      ondismiss: () => {
+        setRazorpayButtonState(button, "Payment window closed before completion.", false);
+      }
+    }
+  });
+
+  checkout.open();
+}
+
+async function handleRazorpayButtonClick(button) {
+  let payment;
+  try {
+    payment = JSON.parse(button.dataset.payment || "{}");
+  } catch {
+    setRazorpayButtonState(button, "Payment details are not readable.", false);
+    return;
+  }
+
+  if (!razorpayKeyId) {
+    setRazorpayButtonState(button, "Razorpay public key is not configured.", false);
+    return;
+  }
+
+  if (!payment.bookingId || !payment.amountPaise) {
+    setRazorpayButtonState(button, "Exact payment amount is required.", false);
+    return;
+  }
+
+  try {
+    setRazorpayButtonState(button, `Opening Razorpay for ${payment.amountDisplay}...`, true);
+    await loadRazorpayCheckout();
+    const order = await createRazorpayOrder(payment);
+    button.disabled = false;
+    openRazorpayCheckout(order, payment, button);
+  } catch (error) {
+    setRazorpayButtonState(button, error.message || "Razorpay could not be opened.", false);
+  }
 }
 
 function csvCell(value) {
@@ -4078,6 +4280,12 @@ if (stoneSelect) {
   }
   stoneSelect.addEventListener("change", () => setStone(stoneSelect.value, { scroll: false }));
 }
+
+document.addEventListener("click", (event) => {
+  const paymentButton = event.target.closest("[data-razorpay-pay]");
+  if (!paymentButton) return;
+  handleRazorpayButtonClick(paymentButton);
+});
 
 form?.addEventListener("submit", (event) => {
   event.preventDefault();

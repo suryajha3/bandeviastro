@@ -5,5 +5,9 @@ window.BANDEVI_CONFIG = {
   "phoneNumbers": [
     "918676846484",
     "916204641845"
-  ]
+  ],
+  "razorpayKeyId": "rzp_test_TDG0MpJzA4GhVM",
+  "razorpayMode": "test",
+  "razorpayOrderEndpoint": "/api/razorpay/order",
+  "razorpayVerifyEndpoint": "/api/razorpay/verify"
 };

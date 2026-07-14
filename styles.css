@@ -3537,6 +3537,21 @@ details p {
   justify-content: center;
 }
 
+.razorpay-pay-button.is-loading {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.payment-ready-actions [data-razorpay-status]:empty {
+  display: none;
+}
+
+.payment-ready-actions [data-razorpay-status] {
+  max-width: 240px;
+  color: var(--teal);
+  font-weight: 800;
+}
+
 .admin-payment-ready-panel,
 .backoffice-payment-ready-panel,
 .account-payment-ready-panel {
