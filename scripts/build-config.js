@@ -9,6 +9,7 @@ const configuredPhoneNumbers = (process.env.PHONE_NUMBERS || defaultPhoneNumbers
   .split(",")
   .map((number) => number.replace(/[^0-9]/g, ""))
   .filter(Boolean);
+const defaultRazorpayKeyId = "rzp_live_TE2sCmWe7OmNHV";
 
 const config = {
   supabaseUrl: process.env.SUPABASE_URL || "https://ftikypoxakhfethkxvpr.supabase.co",
@@ -19,8 +20,8 @@ const config = {
     ? defaultWhatsappNumber
     : configuredWhatsappNumber,
   phoneNumbers: configuredPhoneNumbers.length ? configuredPhoneNumbers : defaultPhoneNumbers,
-  razorpayKeyId: process.env.RAZORPAY_KEY_ID || "",
-  razorpayMode: process.env.RAZORPAY_MODE || "test",
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID || defaultRazorpayKeyId,
+  razorpayMode: process.env.RAZORPAY_MODE || "live",
   razorpayOrderEndpoint: "/api/razorpay/order",
   razorpayVerifyEndpoint: "/api/razorpay/verify"
 };

@@ -14,8 +14,8 @@ services:
       - key: PHONE_NUMBERS
         value: "918676846484,916204641845"
       - key: RAZORPAY_KEY_ID
-        value: "rzp_test_TDG0MpJzA4GhVM"
+        value: "rzp_live_TE2sCmWe7OmNHV"
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: RAZORPAY_MODE
-        value: "test"
+        value: "live"

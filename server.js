@@ -5,7 +5,8 @@ const path = require("path");
 
 const root = __dirname;
 const port = Number(process.env.PORT || 3000);
-const razorpayKeyId = process.env.RAZORPAY_KEY_ID || "";
+const defaultRazorpayKeyId = "rzp_live_TE2sCmWe7OmNHV";
+const razorpayKeyId = process.env.RAZORPAY_KEY_ID || defaultRazorpayKeyId;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || "";
 
 const mimeTypes = {

@@ -6,8 +6,8 @@ window.BANDEVI_CONFIG = {
     "918676846484",
     "916204641845"
   ],
-  "razorpayKeyId": "rzp_test_TDG0MpJzA4GhVM",
-  "razorpayMode": "test",
+  "razorpayKeyId": "rzp_live_TE2sCmWe7OmNHV",
+  "razorpayMode": "live",
   "razorpayOrderEndpoint": "/api/razorpay/order",
   "razorpayVerifyEndpoint": "/api/razorpay/verify"
 };
