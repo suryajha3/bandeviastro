@@ -77,8 +77,6 @@ const portalServiceIntake = document.querySelector("#portalServiceIntake");
 const portalIntakeTitle = document.querySelector("#portalIntakeTitle");
 const portalIntakeBody = document.querySelector("#portalIntakeBody");
 const portalIntakeBadge = document.querySelector("#portalIntakeBadge");
-const ticketDetails = document.querySelector("#ticketDetails");
-const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
 const checkoutSessionKey = "bandeviAstroCheckoutBookingId";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
@@ -2258,68 +2256,6 @@ function staffWhatsAppUrl(booking, templateKey = "status") {
   const phone = normalizeContact(booking.phone).replace(/[^0-9]/g, "");
   const message = getStaffTemplateMessage(booking, templateKey);
   return `https://wa.me/${phone || businessWhatsApp}?text=${encodeURIComponent(message)}`;
-}
-
-function renderTicket(booking, syncResult = {}) {
-  const ticket = document.querySelector("#portalTicket");
-  const ticketId = document.querySelector("#ticketId");
-  const ticketSummary = document.querySelector("#ticketSummary");
-  const ticketTrackLink = document.querySelector("#ticketTrackLink");
-  const ticketWhatsApp = document.querySelector("#ticketWhatsApp");
-  const ticketSyncNote = document.querySelector("#ticketSyncNote");
-  const ticketNextSteps = document.querySelector("#ticketNextSteps");
-  if (!ticket || !ticketId || !ticketSummary || !ticketTrackLink || !ticketWhatsApp) return;
-
-  const paymentMethod = getBookingPaymentMethod(booking);
-  ticket.classList.add("is-visible");
-  ticketId.textContent = booking.id;
-  ticketSummary.textContent = `${booking.service} request created for ${booking.name}. Status: ${booking.status}. This is not final confirmation until staff reviews quote, schedule and payment option.`;
-  ticketTrackLink.href = `track-booking.html?id=${encodeURIComponent(booking.id)}`;
-  ticketWhatsApp.href = bookingWhatsAppUrl(booking);
-  if (ticketCopyButton) {
-    ticketCopyButton.dataset.bookingId = booking.id;
-    ticketCopyButton.textContent = "Copy Booking ID";
-  }
-
-  if (ticketDetails) {
-    const detailItems = [
-      ["Service", booking.service],
-      ["Final Quote", booking.amount || booking.offerPrice || "Quote pending"],
-      ["Date / time", formatBookingDate(booking)],
-      ["Mode", booking.mode],
-      ["Payment status", booking.paymentStatus],
-      ["Payment option", paymentMethod],
-      ["Next action", getStatusGuidance(booking)]
-    ];
-    ticketDetails.innerHTML = detailItems.map(([label, value]) => `
-      <div>
-        <span>${escapeHtml(label)}</span>
-        <strong>${escapeHtml(value)}</strong>
-      </div>
-    `).join("");
-  }
-
-  if (ticketNextSteps) {
-    ticketNextSteps.innerHTML = `
-      ${renderProgressBar(booking, "Booking flow")}
-      ${renderPaymentChoiceBoard(booking, "payment-choice-panel ticket-payment-choice")}
-      <div class="ticket-step-grid" aria-label="Next booking steps">
-        <div><span>1</span><strong>Send ID on WhatsApp</strong><p>Share ${escapeHtml(booking.id)} so staff can confirm quickly.</p></div>
-        <div><span>2</span><strong>Staff review</strong><p>Amount, schedule and selected ${escapeHtml(paymentMethod)} route are checked before payment.</p></div>
-        <div><span>3</span><strong>Track status</strong><p>Use this ID anytime for quote, payment, schedule and proof updates.</p></div>
-      </div>
-    `;
-  }
-
-  if (ticketSyncNote) {
-    if (syncResult.savedCloud) {
-      ticketSyncNote.textContent = "Saved to the secure booking system for staff updates across devices.";
-    } else if (syncResult.error) {
-      ticketSyncNote.textContent = "Booking request created. Send it on WhatsApp now; the team can confirm quote, payment option and status.";
-    } else {
-      ticketSyncNote.textContent = "Booking request created. Send it on WhatsApp now; secure account tracking will activate shortly.";
-    }
-  }
 }
 
 function rememberCheckoutBooking(booking) {
@@ -5736,17 +5672,6 @@ portalModeField?.addEventListener("change", () => {
 
 document.querySelectorAll("[data-portal-preset]").forEach((button) => {
   button.addEventListener("click", () => applyPortalPreset(button));
-});
-
-ticketCopyButton?.addEventListener("click", async () => {
-  const bookingId = ticketCopyButton.dataset.bookingId;
-  if (!bookingId) return;
-  try {
-    await navigator.clipboard.writeText(bookingId);
-    ticketCopyButton.textContent = "Copied";
-  } catch {
-    ticketCopyButton.textContent = bookingId;
-  }
 });
 
 if (customerAuthForm) {
