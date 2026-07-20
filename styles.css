@@ -4998,6 +4998,10 @@ details p {
     display: grid;
   }
 
+  .quote-approval-head {
+    display: grid;
+  }
+
   .package-pricing-actions {
     justify-content: flex-start;
   }
@@ -5134,6 +5138,88 @@ details p {
 .admin-workflow-strip button:disabled {
   cursor: wait;
   opacity: 0.68;
+}
+
+.quote-approval-panel {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.09), rgba(245, 184, 75, 0.12)),
+    #ffffff;
+  box-shadow: 0 16px 36px rgba(91, 18, 32, 0.07);
+}
+
+.quote-approval-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+
+.quote-approval-head h4 {
+  margin: 0;
+  color: var(--maroon);
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.quote-approval-head p,
+.quote-approval-note p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.quote-approval-head > span {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.quote-approval-head > span.is-ready {
+  color: #ffffff;
+  background: var(--teal);
+}
+
+.quote-approval-head > span.is-locked {
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.24);
+}
+
+.quote-approval-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quote-approval-note {
+  border-left: 4px solid var(--teal);
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.quote-approval-note strong {
+  display: block;
+  color: var(--maroon);
+}
+
+.quote-approval-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quote-approval-actions .btn {
+  justify-content: center;
+  width: 100%;
 }
 
 .status-pill {
@@ -6157,6 +6243,7 @@ details p {
   .checkout-step-strip,
   .checkout-summary-grid,
   .admin-edit-grid,
+  .quote-approval-grid,
   .service-preview,
   .portal-intake-fields,
   .admin-filter-row,
@@ -6418,6 +6505,8 @@ details p {
   .status-lookup,
   .auth-button-row,
   .admin-edit-grid,
+  .quote-approval-grid,
+  .quote-approval-actions,
   .service-preview,
   .service-preview-meta,
   .portal-intake-fields,

@@ -2981,6 +2981,68 @@ function applyAdminWorkflow(booking, actionKey) {
   return true;
 }
 
+function renderQuoteApprovalPanel(booking, scope = "admin") {
+  const fieldAttr = scope === "backoffice" ? "data-backoffice-field" : "data-field";
+  const actionAttr = scope === "backoffice" ? "data-backoffice-quote-action" : "data-admin-quote-action";
+  const bookingAttr = scope === "backoffice" ? "data-backoffice-id" : "data-booking-id";
+  const panelClass = scope === "backoffice" ? "backoffice-quote-panel" : "admin-quote-panel";
+  const finalQuote = booking.amount || booking.offerPrice || "";
+  const hasExactRazorpayAmount = Boolean(getRazorpayAmountPaise({ ...booking, amount: finalQuote }));
+  const paymentMethod = getBookingPaymentMethod(booking);
+  const safeFinalQuote = finalQuote || getServiceProfile(booking.service).quote || "Quote pending";
+  return `
+    <div class="quote-approval-panel ${panelClass}" aria-label="Quote approval and payment unlock" data-quote-booking-id="${escapeHtml(booking.id)}">
+      <div class="quote-approval-head">
+        <div>
+          <p class="eyebrow">Quote approval</p>
+          <h4>Unlock payment in one clean step</h4>
+          <p>Enter the final quote, choose the payment route, then mark Quote Sent or Payment Pending.</p>
+        </div>
+        <span class="${hasExactRazorpayAmount ? "is-ready" : "is-locked"}">${hasExactRazorpayAmount ? "Razorpay ready" : "Exact INR needed"}</span>
+      </div>
+      <div class="quote-approval-grid">
+        <label>Final quote<input ${fieldAttr}="amount" type="text" value="${escapeHtml(finalQuote)}" placeholder="Rs 5,100" /></label>
+        <label>Payment route<select ${fieldAttr}="paymentMethod">${renderPaymentMethodOptions(paymentMethod)}</select></label>
+        <label>Status<select ${fieldAttr}="status">${bookingStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select></label>
+        <label>Payment status<select ${fieldAttr}="paymentStatus">${paymentStatuses.map((status) => `<option value="${escapeHtml(status)}" ${booking.paymentStatus === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select></label>
+      </div>
+      <div class="quote-approval-note">
+        <strong>${escapeHtml(safeFinalQuote)}</strong>
+        <p>${hasExactRazorpayAmount ? "Customer payment page can show Razorpay after Payment Pending is saved." : "For Razorpay, write an exact INR amount like Rs 5100. UPI, bank and COD can still be handled by staff note."}</p>
+      </div>
+      <div class="quote-approval-actions">
+        <button class="btn btn-secondary" type="button" ${actionAttr}="quote" ${bookingAttr}="${escapeHtml(booking.id)}">Save Quote Sent</button>
+        <button class="btn btn-primary" type="button" ${actionAttr}="payment" ${bookingAttr}="${escapeHtml(booking.id)}">Save Payment Pending</button>
+      </div>
+    </div>
+  `;
+}
+
+function collectBookingFieldsFromCard(booking, card, fieldSelector) {
+  card.querySelectorAll(fieldSelector).forEach((field) => {
+    const key = field.dataset.field || field.dataset.backofficeField;
+    if (key) booking[key] = field.value;
+  });
+}
+
+function applyQuoteApprovalAction(booking, actionKey) {
+  const paymentMethod = getBookingPaymentMethod(booking);
+  const amount = booking.amount || booking.offerPrice || getServiceProfile(booking.service).quote;
+  if (actionKey === "quote") {
+    booking.status = "Quote Sent";
+    booking.paymentStatus = "Not Requested";
+    booking.staffNote = `Final quote shared: ${amount}. Payment route selected: ${paymentMethod}. Please confirm before payment.`;
+    return true;
+  }
+  if (actionKey === "payment") {
+    booking.status = "Payment Pending";
+    booking.paymentStatus = "Payment Pending";
+    booking.staffNote = `Payment is pending for final quote ${amount}. Selected route: ${paymentMethod}.`;
+    return true;
+  }
+  return false;
+}
+
 function renderAdminDashboard() {
   if (!adminBookingList) return;
   initAdminStatusFilter();
@@ -3045,6 +3107,7 @@ function renderAdminDashboard() {
           <label>Schedule time<input data-field="time" type="time" value="${escapeHtml(booking.time || "")}" /></label>
           <label>Service mode<input data-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Online, temple proof, delivery..." /></label>
         </div>
+        ${renderQuoteApprovalPanel(booking, "admin")}
         <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         <label>Customer update note<textarea data-field="staffNote" rows="3" placeholder="This note appears in customer tracking">${escapeHtml(booking.staffNote || "")}</textarea></label>
         <div class="admin-service-hints">
@@ -3528,6 +3591,7 @@ function renderBackofficeOperations(bookings) {
           <label>Service mode<input data-backoffice-field="mode" type="text" value="${escapeHtml(booking.mode || "")}" placeholder="Temple proof, live video, delivery..." /></label>
           <label>Proof link<input data-backoffice-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         </div>
+        ${renderQuoteApprovalPanel(booking, "backoffice")}
         ${renderPaymentReadyPanel(booking, "payment-ready-panel backoffice-payment-ready-panel")}
         <label class="backoffice-note-field">Staff work note<textarea data-backoffice-field="staffNote" rows="4" placeholder="Record Kundali birth details, sankalp, samagri, gemstone quote or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
         <p>${escapeHtml(booking.concern || "No concern added yet.")}</p>
@@ -4843,6 +4907,30 @@ if (backofficePanel) {
 }
 
 backofficeOperations?.addEventListener("click", async (event) => {
+  const quoteButton = event.target.closest("[data-backoffice-quote-action]");
+  if (quoteButton) {
+    const bookingId = quoteButton.dataset.backofficeId;
+    const card = quoteButton.closest("[data-backoffice-id]");
+    const booking = backofficeBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !card) return;
+
+    collectBookingFieldsFromCard(booking, card.querySelector(".quote-approval-panel") || card, "[data-backoffice-field]");
+    if (!applyQuoteApprovalAction(booking, quoteButton.dataset.backofficeQuoteAction)) return;
+
+    quoteButton.textContent = "Saving...";
+    quoteButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setBackofficeStatus(result.savedCloud ? "Quote and payment stage saved to secure booking desk." : "Quote and payment stage saved locally.");
+      await renderBackofficeBookings();
+    } catch (error) {
+      console.warn("Backoffice quote approval failed", error);
+      setBackofficeStatus(error.message || "Quote approval could not be saved.");
+      quoteButton.disabled = false;
+    }
+    return;
+  }
+
   const workflowButton = event.target.closest("[data-backoffice-workflow]");
   if (workflowButton) {
     const bookingId = workflowButton.dataset.bookingId;
@@ -4871,9 +4959,7 @@ backofficeOperations?.addEventListener("click", async (event) => {
   const booking = backofficeBookingsCache.find((item) => item.id === bookingId);
   if (!booking || !card) return;
 
-  card.querySelectorAll("[data-backoffice-field]").forEach((field) => {
-    booking[field.dataset.backofficeField] = field.value;
-  });
+  collectBookingFieldsFromCard(booking, card, "[data-backoffice-field]");
 
   saveButton.textContent = "Saving...";
   saveButton.disabled = true;
@@ -4890,6 +4976,30 @@ backofficeOperations?.addEventListener("click", async (event) => {
 });
 
 adminBookingList?.addEventListener("click", async (event) => {
+  const quoteButton = event.target.closest("[data-admin-quote-action]");
+  if (quoteButton) {
+    const bookingId = quoteButton.dataset.bookingId;
+    const card = quoteButton.closest("[data-booking-id]");
+    const booking = adminBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !card) return;
+
+    collectBookingFieldsFromCard(booking, card.querySelector(".quote-approval-panel") || card, "[data-field]");
+    if (!applyQuoteApprovalAction(booking, quoteButton.dataset.adminQuoteAction)) return;
+
+    quoteButton.textContent = "Saving...";
+    quoteButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setAdminStatus(result.savedCloud ? "Quote and payment stage saved to secure booking desk." : "Quote and payment stage saved locally.");
+      await renderAdminBookings();
+    } catch (error) {
+      console.warn("Admin quote approval failed", error);
+      setAdminStatus(error.message || "Quote approval could not be saved.");
+      quoteButton.disabled = false;
+    }
+    return;
+  }
+
   const workflowButton = event.target.closest("[data-admin-workflow]");
   if (workflowButton) {
     const bookingId = workflowButton.dataset.bookingId;
@@ -4918,9 +5028,7 @@ adminBookingList?.addEventListener("click", async (event) => {
   const booking = adminBookingsCache.find((item) => item.id === bookingId);
   if (!booking || !card) return;
 
-  card.querySelectorAll("[data-field]").forEach((field) => {
-    booking[field.dataset.field] = field.value;
-  });
+  collectBookingFieldsFromCard(booking, card, "[data-field]");
 
   saveButton.textContent = "Saving...";
   saveButton.disabled = true;
