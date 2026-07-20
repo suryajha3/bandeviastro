@@ -5132,6 +5132,11 @@ details p {
   background: #fffaf0;
 }
 
+.admin-priority-card.is-paid {
+  border-left-color: var(--teal);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(245, 184, 75, 0.08));
+}
+
 .admin-priority-card.is-complete {
   border-left-color: var(--teal);
   background: rgba(15, 118, 110, 0.06);

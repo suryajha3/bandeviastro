@@ -258,6 +258,13 @@ const adminWorkflowActions = [
     note: "Payment received. Team will confirm schedule and preparation details."
   },
   {
+    key: "schedule-now",
+    label: "Schedule now",
+    status: "Pooja Scheduled",
+    paymentStatus: "Payment Received",
+    note: "Payment received and service is being scheduled. Team will share preparation and proof details."
+  },
+  {
     key: "scheduled",
     label: "Scheduled",
     status: "Pooja Scheduled",
@@ -1943,6 +1950,14 @@ function getBookingPriority(booking) {
     };
   }
 
+  if (booking?.paymentStatus === "Payment Received" && booking?.status !== "Pooja Scheduled") {
+    return {
+      label: "Paid - schedule next",
+      detail: "Payment is received. Confirm receipt, schedule and proof plan now.",
+      tone: "paid"
+    };
+  }
+
   if (daysUntilBooking !== null && daysUntilBooking < 0) {
     return {
       label: "Date passed",
@@ -2636,6 +2651,7 @@ function matchesStaffQueueFilter(booking, filter) {
   if (filter === "new") return booking.status === "Enquiry Received";
   if (filter === "quote") return booking.status === "Quote Sent";
   if (filter === "payment") return booking.paymentStatus === "Payment Pending";
+  if (filter === "paid") return booking.paymentStatus === "Payment Received";
   if (filter === "due") return isDueSoonBooking(booking);
   if (filter === "proof") return isProofPendingBooking(booking);
   if (filter === "pooja") return isPoojaHawanBooking(booking);
@@ -2657,6 +2673,7 @@ function getStaffQueueItems(bookings) {
     ["new", "New", bookings.filter((booking) => matchesStaffQueueFilter(booking, "new")).length, "Needs first review"],
     ["quote", "Quote", bookings.filter((booking) => matchesStaffQueueFilter(booking, "quote")).length, "Quote sent follow-up"],
     ["payment", "Payment", bookings.filter((booking) => matchesStaffQueueFilter(booking, "payment")).length, "Payment link or receipt"],
+    ["paid", "Paid", bookings.filter((booking) => matchesStaffQueueFilter(booking, "paid")).length, "Schedule or proof next"],
     ["due", "Due soon", bookings.filter((booking) => matchesStaffQueueFilter(booking, "due")).length, "Date is close"],
     ["proof", "Proof", bookings.filter((booking) => matchesStaffQueueFilter(booking, "proof")).length, "Proof/update pending"],
     ["pooja", "Hawan/Pooja", bookings.filter((booking) => matchesStaffQueueFilter(booking, "pooja")).length, "Ritual service work"],
@@ -2713,6 +2730,7 @@ function renderAdminStats(visibleBookings) {
   const total = adminBookingsCache.length;
   const newEnquiries = adminBookingsCache.filter((booking) => booking.status === "Enquiry Received").length;
   const pendingPayment = adminBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const paidOrders = adminBookingsCache.filter((booking) => booking.paymentStatus === "Payment Received").length;
   const quotesSent = adminBookingsCache.filter((booking) => booking.status === "Quote Sent").length;
   const scheduled = adminBookingsCache.filter((booking) => booking.status === "Pooja Scheduled").length;
   const dueSoon = adminBookingsCache.filter(isDueSoonBooking).length;
@@ -2726,6 +2744,7 @@ function renderAdminStats(visibleBookings) {
     ["New", newEnquiries],
     ["Quote sent", quotesSent],
     ["Payment pending", pendingPayment],
+    ["Paid orders", paidOrders],
     ["Due soon", dueSoon],
     ["Proof pending", proofPending],
     ["Kundali", kundaliQueue],
@@ -3290,6 +3309,7 @@ function renderBackofficeStats(visibleBookings) {
   const newEnquiries = backofficeBookingsCache.filter((booking) => booking.status === "Enquiry Received").length;
   const quotesSent = backofficeBookingsCache.filter((booking) => booking.status === "Quote Sent").length;
   const pendingPayment = backofficeBookingsCache.filter((booking) => booking.paymentStatus === "Payment Pending").length;
+  const paidOrders = backofficeBookingsCache.filter((booking) => booking.paymentStatus === "Payment Received").length;
   const kundaliQueue = backofficeBookingsCache.filter(isKundaliBooking).length;
   const gemstoneQueue = backofficeBookingsCache.filter(isGemstoneBooking).length;
   const productQueue = backofficeBookingsCache.filter(isProductQuoteBooking).length;
@@ -3307,6 +3327,7 @@ function renderBackofficeStats(visibleBookings) {
     ["New", newEnquiries],
     ["Quote sent", quotesSent],
     ["Payment pending", pendingPayment],
+    ["Paid orders", paidOrders],
     ["Due soon", dueSoon],
     ["Proof pending", proofPending],
     ["Pooja/Hawan", poojaQueue],
