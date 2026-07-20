@@ -20,6 +20,9 @@ const stoneStatusEl = document.querySelector("#stoneOrderStatus");
 const stoneQuoteSummary = document.querySelector("#stoneQuoteSummary");
 const portalBookingForm = document.querySelector("#portalBookingForm");
 const trackBookingForm = document.querySelector("#trackBookingForm");
+const checkoutCartPanel = document.querySelector("#checkoutCartPanel");
+const checkoutPaymentPanel = document.querySelector("#checkoutPaymentPanel");
+const orderConfirmationPanel = document.querySelector("#orderConfirmationPanel");
 const adminAccessForm = document.querySelector("#adminAccessForm");
 const adminPanel = document.querySelector("#adminPanel");
 const adminBookingList = document.querySelector("#adminBookingList");
@@ -77,6 +80,7 @@ const portalIntakeBadge = document.querySelector("#portalIntakeBadge");
 const ticketDetails = document.querySelector("#ticketDetails");
 const ticketCopyButton = document.querySelector("#ticketCopy");
 const bookingStorageKey = "bandeviAstroBookings";
+const checkoutSessionKey = "bandeviAstroCheckoutBookingId";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
 const packagePricingStorageKey = "bandeviAstroPackagePricing";
@@ -2318,6 +2322,182 @@ function renderTicket(booking, syncResult = {}) {
   }
 }
 
+function rememberCheckoutBooking(booking) {
+  try {
+    sessionStorage.setItem(checkoutSessionKey, booking.id);
+  } catch {
+    // Checkout still works from the id in the page URL.
+  }
+}
+
+function checkoutPageUrl(page, booking) {
+  const url = new URL(page, window.location.href);
+  if (booking?.id) url.searchParams.set("id", booking.id);
+  return `${url.pathname.replace(/^\//, "")}?${url.searchParams.toString()}`;
+}
+
+function getCheckoutBookingId() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id") || (() => {
+    try {
+      return sessionStorage.getItem(checkoutSessionKey) || "";
+    } catch {
+      return "";
+    }
+  })();
+  return String(id || "").trim().toUpperCase();
+}
+
+async function findCheckoutBooking() {
+  const id = getCheckoutBookingId();
+  if (!id) return null;
+  return findBookingOnline(id, "");
+}
+
+function renderCheckoutMissing(panel, title = "Booking not found") {
+  panel.innerHTML = `
+    <div class="checkout-empty-state">
+      <p class="eyebrow">Checkout</p>
+      <h2>${escapeHtml(title)}</h2>
+      <p>Create a booking first, or open the tracking page with your Booking ID.</p>
+      <div class="ticket-actions">
+        <a class="btn btn-primary" href="book-online.html">Create Booking ID</a>
+        <a class="btn btn-secondary" href="track-booking.html">Track Booking</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderCheckoutSummaryCards(booking) {
+  const pricing = getBookingPriceBreakdown(booking, getServiceProfile(booking.service).quote || "Quote pending");
+  const rows = [
+    ["Booking ID", booking.id],
+    ["Service", booking.service],
+    ["Customer", booking.name],
+    ["Phone", booking.phone],
+    ["Country", booking.country || "Not shared"],
+    ["Date / time", formatBookingDate(booking)],
+    ["Mode", booking.mode || "To be confirmed"],
+    ["Payment option", getBookingPaymentMethod(booking)],
+    ["Payment status", booking.paymentStatus || "Not Requested"],
+    ["Final quote", pricing.amount || pricing.offerPrice || "Quote pending"]
+  ];
+  return `
+    <div class="checkout-summary-grid" aria-label="Booking checkout summary">
+      ${rows.map(([label, value]) => `
+        <div>
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCheckoutConcern(booking) {
+  return `
+    <div class="checkout-note-card">
+      <span>Requirement</span>
+      <p>${escapeHtml(booking.concern || "Staff will confirm requirement before quote and payment.")}</p>
+    </div>
+  `;
+}
+
+function renderCheckoutCartPage(booking) {
+  checkoutCartPanel.innerHTML = `
+    <div class="checkout-layout">
+      <article class="checkout-main-card">
+        <p class="eyebrow">Step 1 of 3</p>
+        <h2>Review cart and booking details</h2>
+        <p>Check the service, customer details and selected payment option before moving to the payment page.</p>
+        ${renderProgressBar(booking, "Checkout progress")}
+        ${renderCheckoutSummaryCards(booking)}
+        ${renderCheckoutConcern(booking)}
+      </article>
+      <aside class="checkout-side-card">
+        <p class="eyebrow">Next step</p>
+        <h3>Go to payment page</h3>
+        <p>Payment remains locked until staff confirms the quote. You can still review all available options on the next page.</p>
+        ${renderBookingPriceBreakdown(booking, "checkout-price-breakdown")}
+        <div class="ticket-actions checkout-actions">
+          <a class="btn btn-primary" href="${escapeHtml(checkoutPageUrl("payment.html", booking))}">Continue to Payment</a>
+          <a class="btn btn-secondary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Send ID on WhatsApp</a>
+          <a class="btn btn-secondary" href="book-online.html">Create another booking</a>
+        </div>
+      </aside>
+    </div>
+  `;
+}
+
+function renderCheckoutPaymentPage(booking) {
+  checkoutPaymentPanel.innerHTML = `
+    <div class="checkout-layout">
+      <article class="checkout-main-card">
+        <p class="eyebrow">Step 2 of 3</p>
+        <h2>Choose and confirm payment route</h2>
+        <p>This page is only for payment. The request details stay in cart, and the final result stays on the confirmation page.</p>
+        ${renderProgressBar({ ...booking, status: isPaymentPendingStage(booking) ? "Payment Pending" : booking.status }, "Payment progress")}
+        ${renderPaymentChoiceBoard(booking, "payment-choice-panel checkout-payment-choice")}
+      </article>
+      <aside class="checkout-side-card">
+        <p class="eyebrow">Payment safety</p>
+        <h3>Quote first, then payment</h3>
+        <p>Razorpay opens only when staff has entered an exact INR quote and moved the booking to Payment Pending.</p>
+        ${renderCheckoutSummaryCards(booking)}
+        <div class="ticket-actions checkout-actions">
+          <a class="btn btn-primary" href="${escapeHtml(checkoutPageUrl("order-confirmation.html", booking))}">Continue to Confirmation</a>
+          <a class="btn btn-secondary" href="${escapeHtml(checkoutPageUrl("cart.html", booking))}">Back to Cart</a>
+          <a class="btn btn-secondary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Ask on WhatsApp</a>
+        </div>
+      </aside>
+    </div>
+  `;
+}
+
+function renderOrderConfirmationPage(booking) {
+  orderConfirmationPanel.innerHTML = `
+    <div class="checkout-layout">
+      <article class="checkout-main-card">
+        <p class="eyebrow">Step 3 of 3</p>
+        <h2>Booking request created</h2>
+        <p>Your Booking ID is ready. This is the result page only; cart and payment are now on separate pages.</p>
+        <div class="confirmation-id-card">
+          <span>Booking ID</span>
+          <strong>${escapeHtml(booking.id)}</strong>
+          <button class="btn btn-secondary" type="button" data-copy-confirmation-id="${escapeHtml(booking.id)}">Copy Booking ID</button>
+        </div>
+        ${renderCompactStatusRail(booking, "compact-status-rail checkout-status-rail")}
+        ${renderCustomerStageBoard(booking, "customer-stage-board checkout-stage-board")}
+      </article>
+      <aside class="checkout-side-card">
+        <p class="eyebrow">Next action</p>
+        <h3>Send the Booking ID to staff</h3>
+        <p>${escapeHtml(getStatusGuidance(booking))}</p>
+        ${renderCheckoutSummaryCards(booking)}
+        <div class="ticket-actions checkout-actions">
+          <a class="btn btn-primary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Send on WhatsApp</a>
+          <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track Booking</a>
+          <a class="btn btn-secondary" href="${escapeHtml(checkoutPageUrl("payment.html", booking))}">Open Payment Page</a>
+        </div>
+      </aside>
+    </div>
+  `;
+}
+
+async function initSeparatedCheckoutPages() {
+  if (!checkoutCartPanel && !checkoutPaymentPanel && !orderConfirmationPanel) return;
+  const activePanel = checkoutCartPanel || checkoutPaymentPanel || orderConfirmationPanel;
+  const booking = await findCheckoutBooking();
+  if (!booking) {
+    renderCheckoutMissing(activePanel);
+    return;
+  }
+  rememberCheckoutBooking(booking);
+  if (checkoutCartPanel) renderCheckoutCartPage(booking);
+  if (checkoutPaymentPanel) renderCheckoutPaymentPage(booking);
+  if (orderConfirmationPanel) renderOrderConfirmationPage(booking);
+}
+
 function renderStatusPanel(booking) {
   const statusPanel = document.querySelector("#statusPanel");
   const statusMessage = document.querySelector("#statusMessage");
@@ -4375,8 +4555,20 @@ if (stoneSelect) {
 
 document.addEventListener("click", (event) => {
   const paymentButton = event.target.closest("[data-razorpay-pay]");
-  if (!paymentButton) return;
-  handleRazorpayButtonClick(paymentButton);
+  if (paymentButton) {
+    handleRazorpayButtonClick(paymentButton);
+    return;
+  }
+
+  const confirmationCopyButton = event.target.closest("[data-copy-confirmation-id]");
+  if (!confirmationCopyButton) return;
+  const bookingId = confirmationCopyButton.dataset.copyConfirmationId || "";
+  if (!bookingId) return;
+  navigator.clipboard?.writeText(bookingId).then(() => {
+    confirmationCopyButton.textContent = "Copied";
+  }).catch(() => {
+    confirmationCopyButton.textContent = bookingId;
+  });
 });
 
 form?.addEventListener("submit", (event) => {
@@ -4474,19 +4666,18 @@ stoneOrderForm?.addEventListener("submit", async (event) => {
     stoneStatusEl.textContent = "Creating gemstone quote request...";
   }
 
-  const syncResult = await saveBookingOnline(booking);
-  renderTicket(booking, syncResult);
+  await saveBookingOnline(booking);
+  rememberCheckoutBooking(booking);
   stoneOrderForm.reset();
   activeStonePricingPackage = null;
   updateStoneQuoteSummary(stoneSelect?.value || "");
 
   if (stoneStatusEl) {
-    stoneStatusEl.textContent = syncResult.savedCloud
-      ? "Gemstone quote ID created and saved for staff follow-up."
-      : "Gemstone quote ID created. Send it on WhatsApp for staff follow-up.";
+    stoneStatusEl.textContent = "Gemstone quote ID created. Opening cart review page...";
   }
 
   if (submitButton) submitButton.textContent = "Create gemstone quote ID";
+  window.location.href = checkoutPageUrl("cart.html", booking);
 });
 
 portalBookingForm?.addEventListener("submit", async (event) => {
@@ -4522,13 +4713,14 @@ portalBookingForm?.addEventListener("submit", async (event) => {
 
   const submitButton = portalBookingForm.querySelector("button[type='submit']");
   if (submitButton) submitButton.textContent = "Creating booking...";
-  const syncResult = await saveBookingOnline(booking);
-  renderTicket(booking, syncResult);
+  await saveBookingOnline(booking);
+  rememberCheckoutBooking(booking);
   portalBookingForm.reset();
   updateServicePreview();
   updatePortalServiceIntake();
   await prefillPortalFromSession();
   if (submitButton) submitButton.textContent = "Create secure Booking ID";
+  window.location.href = checkoutPageUrl("cart.html", booking);
 });
 
 trackBookingForm?.addEventListener("submit", async (event) => {
@@ -4546,6 +4738,8 @@ if (trackBookingForm) {
     findBookingOnline(requestedBookingId, "").then(renderStatusPanel);
   }
 }
+
+initSeparatedCheckoutPages();
 
 function setAdminStatus(message) {
   const status = document.querySelector("#adminAccessStatus");
