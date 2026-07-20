@@ -272,6 +272,13 @@ const adminWorkflowActions = [
     note: "Service scheduled. Team will share proof or completion update where applicable."
   },
   {
+    key: "proof-pending",
+    label: "Proof pending",
+    status: "Pooja Scheduled",
+    paymentStatus: "Payment Received",
+    note: "Service is scheduled/completed and proof or delivery update is pending."
+  },
+  {
     key: "completed",
     label: "Completed",
     status: "Completed",
@@ -2063,6 +2070,18 @@ function renderCustomerStageBoard(booking, className = "customer-stage-board") {
   `;
 }
 
+function renderCustomerProofCard(booking) {
+  if (!booking?.proofUrl) return "";
+  return `
+    <div class="customer-proof-card">
+      <span>Proof / update ready</span>
+      <strong>${escapeHtml(booking.status === "Completed" ? "Service completed" : "Staff update shared")}</strong>
+      <p>${escapeHtml(booking.staffNote || "Open the link to view the shared photo, video, report, delivery or completion update.")}</p>
+      <a class="btn btn-primary" href="${escapeHtml(safeExternalUrl(booking.proofUrl))}" target="_blank" rel="noopener">Open Proof / Update</a>
+    </div>
+  `;
+}
+
 async function getCurrentUser() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getUser();
@@ -2486,6 +2505,7 @@ function renderOrderConfirmationPage(booking) {
           <button class="btn btn-secondary" type="button" data-copy-confirmation-id="${escapeHtml(booking.id)}">Copy Booking ID</button>
         </div>
         ${renderCompactStatusRail(booking, "compact-status-rail checkout-status-rail")}
+        ${renderCustomerProofCard(booking)}
         ${renderCustomerStageBoard(booking, "customer-stage-board checkout-stage-board")}
       </article>
       <aside class="checkout-side-card">
@@ -2559,7 +2579,7 @@ function renderStatusPanel(booking) {
     `;
   }
   if (statusStageBoard) {
-    statusStageBoard.innerHTML = renderCustomerStageBoard(booking);
+    statusStageBoard.innerHTML = `${renderCustomerProofCard(booking)}${renderCustomerStageBoard(booking)}`;
   }
   if (statusPaymentAction) {
     statusPaymentAction.innerHTML = renderPaymentReadyPanel(booking);
@@ -3130,6 +3150,47 @@ function applyQuoteApprovalAction(booking, actionKey) {
   return false;
 }
 
+function renderProofCompletionPanel(booking, scope = "admin") {
+  const fieldAttr = scope === "backoffice" ? "data-backoffice-field" : "data-field";
+  const actionAttr = scope === "backoffice" ? "data-backoffice-proof-action" : "data-admin-proof-action";
+  const bookingAttr = scope === "backoffice" ? "data-backoffice-id" : "data-booking-id";
+  const hasProof = Boolean(booking.proofUrl);
+  return `
+    <div class="proof-completion-panel" aria-label="Proof and completion workflow">
+      <div class="proof-completion-head">
+        <div>
+          <p class="eyebrow">Proof and completion</p>
+          <h4>${hasProof ? "Proof link ready" : "Add proof before closing"}</h4>
+          <p>Paste photo, video, report, courier or completion link, then mark the order completed.</p>
+        </div>
+        <span class="${hasProof ? "is-ready" : "is-pending"}">${hasProof ? "Ready" : "Pending"}</span>
+      </div>
+      <label>Proof / update link<input ${fieldAttr}="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="https://..." /></label>
+      <label>Completion note<textarea ${fieldAttr}="staffNote" rows="3" placeholder="What was completed, proof shared, next follow-up">${escapeHtml(booking.staffNote || "")}</textarea></label>
+      <div class="proof-completion-actions">
+        <button class="btn btn-secondary" type="button" ${actionAttr}="proof-pending" ${bookingAttr}="${escapeHtml(booking.id)}">Save Proof Pending</button>
+        <button class="btn btn-primary" type="button" ${actionAttr}="completed" ${bookingAttr}="${escapeHtml(booking.id)}">Mark Completed</button>
+      </div>
+    </div>
+  `;
+}
+
+function applyProofCompletionAction(booking, actionKey) {
+  if (actionKey === "proof-pending") {
+    booking.status = "Pooja Scheduled";
+    booking.paymentStatus = booking.paymentStatus === "Payment Received" ? "Payment Received" : booking.paymentStatus;
+    booking.staffNote = booking.staffNote || "Proof or completion update is pending.";
+    return true;
+  }
+  if (actionKey === "completed") {
+    booking.status = "Completed";
+    booking.paymentStatus = booking.paymentStatus === "Payment Received" ? "Payment Received" : booking.paymentStatus;
+    booking.staffNote = booking.staffNote || (booking.proofUrl ? "Service completed and proof/update link shared." : "Service completed. Proof/update will be shared if applicable.");
+    return true;
+  }
+  return false;
+}
+
 function renderAdminDashboard() {
   if (!adminBookingList) return;
   initAdminStatusFilter();
@@ -3197,6 +3258,7 @@ function renderAdminDashboard() {
         ${renderQuoteApprovalPanel(booking, "admin")}
         <label>Proof link<input data-field="proofUrl" type="url" value="${escapeHtml(booking.proofUrl || "")}" placeholder="Photo/video proof URL" /></label>
         <label>Customer update note<textarea data-field="staffNote" rows="3" placeholder="This note appears in customer tracking">${escapeHtml(booking.staffNote || "")}</textarea></label>
+        ${renderProofCompletionPanel(booking, "admin")}
         <div class="admin-service-hints">
           <div><span>Proof plan</span><strong>${escapeHtml(serviceProfile.proof)}</strong></div>
           <div><span>Details needed</span><strong>${escapeHtml(serviceProfile.details)}</strong></div>
@@ -3683,6 +3745,7 @@ function renderBackofficeOperations(bookings) {
         ${renderQuoteApprovalPanel(booking, "backoffice")}
         ${renderPaymentReadyPanel(booking, "payment-ready-panel backoffice-payment-ready-panel")}
         <label class="backoffice-note-field">Staff work note<textarea data-backoffice-field="staffNote" rows="4" placeholder="Record Kundali birth details, sankalp, samagri, gemstone quote or client update">${escapeHtml(booking.staffNote || "")}</textarea></label>
+        ${renderProofCompletionPanel(booking, "backoffice")}
         <p>${escapeHtml(booking.concern || "No concern added yet.")}</p>
         ${renderBackofficeTemplateLinks(booking)}
         <div class="backoffice-action-row">
@@ -4996,6 +5059,30 @@ if (backofficePanel) {
 }
 
 backofficeOperations?.addEventListener("click", async (event) => {
+  const proofButton = event.target.closest("[data-backoffice-proof-action]");
+  if (proofButton) {
+    const bookingId = proofButton.dataset.backofficeId;
+    const card = proofButton.closest("[data-backoffice-id]");
+    const booking = backofficeBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !card) return;
+
+    collectBookingFieldsFromCard(booking, card.querySelector(".proof-completion-panel") || card, "[data-backoffice-field]");
+    if (!applyProofCompletionAction(booking, proofButton.dataset.backofficeProofAction)) return;
+
+    proofButton.textContent = "Saving...";
+    proofButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setBackofficeStatus(result.savedCloud ? "Proof and completion update saved to secure booking desk." : "Proof and completion update saved locally.");
+      await renderBackofficeBookings();
+    } catch (error) {
+      console.warn("Backoffice proof completion failed", error);
+      setBackofficeStatus(error.message || "Proof completion could not be saved.");
+      proofButton.disabled = false;
+    }
+    return;
+  }
+
   const quoteButton = event.target.closest("[data-backoffice-quote-action]");
   if (quoteButton) {
     const bookingId = quoteButton.dataset.backofficeId;
@@ -5065,6 +5152,30 @@ backofficeOperations?.addEventListener("click", async (event) => {
 });
 
 adminBookingList?.addEventListener("click", async (event) => {
+  const proofButton = event.target.closest("[data-admin-proof-action]");
+  if (proofButton) {
+    const bookingId = proofButton.dataset.bookingId;
+    const card = proofButton.closest("[data-booking-id]");
+    const booking = adminBookingsCache.find((item) => item.id === bookingId);
+    if (!booking || !card) return;
+
+    collectBookingFieldsFromCard(booking, card.querySelector(".proof-completion-panel") || card, "[data-field]");
+    if (!applyProofCompletionAction(booking, proofButton.dataset.adminProofAction)) return;
+
+    proofButton.textContent = "Saving...";
+    proofButton.disabled = true;
+    try {
+      const result = await updateBookingOnline(booking);
+      setAdminStatus(result.savedCloud ? "Proof and completion update saved to secure booking desk." : "Proof and completion update saved locally.");
+      await renderAdminBookings();
+    } catch (error) {
+      console.warn("Admin proof completion failed", error);
+      setAdminStatus(error.message || "Proof completion could not be saved.");
+      proofButton.disabled = false;
+    }
+    return;
+  }
+
   const quoteButton = event.target.closest("[data-admin-quote-action]");
   if (quoteButton) {
     const bookingId = quoteButton.dataset.bookingId;

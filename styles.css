@@ -3619,6 +3619,47 @@ details p {
   line-height: 1.55;
 }
 
+.customer-proof-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.28);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.11), rgba(245, 184, 75, 0.11)),
+    #ffffff;
+}
+
+.customer-proof-card span,
+.customer-proof-card strong,
+.customer-proof-card p {
+  display: block;
+}
+
+.customer-proof-card span {
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.customer-proof-card strong {
+  color: var(--maroon);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.customer-proof-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.customer-proof-card .btn {
+  justify-content: center;
+  width: fit-content;
+}
+
 .checkout-actions {
   margin-top: 0;
 }
@@ -5044,6 +5085,10 @@ details p {
     display: grid;
   }
 
+  .proof-completion-head {
+    display: grid;
+  }
+
   .package-pricing-actions {
     justify-content: flex-start;
   }
@@ -5265,6 +5310,68 @@ details p {
 }
 
 .quote-approval-actions .btn {
+  justify-content: center;
+  width: 100%;
+}
+
+.proof-completion-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0.95)),
+    #ffffff;
+}
+
+.proof-completion-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+
+.proof-completion-head h4 {
+  margin: 0;
+  color: var(--maroon);
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.proof-completion-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.proof-completion-head > span {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.proof-completion-head > span.is-ready {
+  color: #ffffff;
+  background: var(--teal);
+}
+
+.proof-completion-head > span.is-pending {
+  color: var(--maroon);
+  background: rgba(245, 184, 75, 0.24);
+}
+
+.proof-completion-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.proof-completion-actions .btn {
   justify-content: center;
   width: 100%;
 }
@@ -6554,6 +6661,7 @@ details p {
   .admin-edit-grid,
   .quote-approval-grid,
   .quote-approval-actions,
+  .proof-completion-actions,
   .service-preview,
   .service-preview-meta,
   .portal-intake-fields,
