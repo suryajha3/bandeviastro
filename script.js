@@ -1502,25 +1502,32 @@ function renderPaymentReadyPanel(booking, className = "payment-ready-panel") {
   const paymentLink = getVisiblePaymentLink(booking);
   const razorpayButton = renderRazorpayButton(booking);
   const isPending = isPaymentPendingStage(booking);
-  const stateLabel = isPending
+  const isPaid = booking.paymentStatus === "Payment Received";
+  const stateLabel = isPaid
+    ? "Payment received"
+    : isPending
     ? paymentLink || razorpayButton ? "Payment ready" : "Payment link pending"
     : "Locked until quote approval";
-  const pendingActionLabel = isPending
+  const pendingActionLabel = isPaid
+    ? "Receipt ready"
+    : isPending
     ? razorpayKeyId ? "Exact INR quote needed" : "Gateway setup pending"
     : "Payment locked";
-  const action = paymentLink
+  const action = isPaid
+    ? `<a class="btn btn-primary" href="${escapeHtml(paymentReceiptWhatsAppUrl(booking))}">WhatsApp Receipt</a>`
+    : paymentLink
     ? `<a class="btn btn-primary" href="${escapeHtml(paymentLink)}" target="_blank" rel="noopener">Pay Now</a>`
     : razorpayButton
       ? razorpayButton
-    : `<span class="payment-pending-chip">${escapeHtml(pendingActionLabel)}</span>`;
+      : `<span class="payment-pending-chip">${escapeHtml(pendingActionLabel)}</span>`;
 
   return `
-    <div class="${escapeHtml(className)} ${isPending ? "is-payment-open" : "is-payment-locked"}" aria-label="Payment readiness">
+    <div class="${escapeHtml(className)} ${isPaid ? "is-payment-paid" : isPending ? "is-payment-open" : "is-payment-locked"}" aria-label="Payment readiness">
       <div>
         <span>${escapeHtml(stateLabel)}</span>
         <strong>${escapeHtml(amount)}</strong>
         ${hasPriceBreakdown(booking) ? renderBookingPriceBreakdown(booking, "payment-price-breakdown") : ""}
-        <p>Payment opens only after staff confirms the quote. Razorpay appears for exact INR quotes marked Payment Pending.</p>
+        <p>${isPaid ? "Payment is verified. Staff can now confirm schedule, receipt and proof updates." : "Payment opens only after staff confirms the quote. Razorpay appears for exact INR quotes marked Payment Pending."}</p>
       </div>
       <div class="payment-ready-actions">
         ${action}
@@ -1615,6 +1622,57 @@ async function verifyRazorpayPayment(responsePayload, payment) {
   return result;
 }
 
+function paymentReceiptWhatsAppUrl(booking) {
+  const message = [
+    "Namaste Bandevi Astro team,",
+    "",
+    "Payment has been completed on bandeviastro.com.",
+    `Booking ID: ${booking.id}`,
+    `Name: ${booking.name}`,
+    `Service: ${booking.service}`,
+    `Amount: ${booking.amount || booking.offerPrice || "Paid amount as per Razorpay"}`,
+    `Payment status: ${booking.paymentStatus || "Payment Received"}`,
+    "",
+    "Please confirm receipt and next schedule/proof update."
+  ].join("\n");
+  return `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
+}
+
+async function markRazorpayBookingPaid(payment, verified) {
+  const booking = findBooking(payment.bookingId, "") || {
+    id: payment.bookingId,
+    name: payment.name || "Customer",
+    phone: payment.phone || "",
+    email: payment.email || "",
+    service: payment.service || "Bandevi Astro service",
+    mode: "Online",
+    status: "Payment Pending",
+    paymentStatus: "Payment Pending",
+    paymentMethod: "Razorpay online payment",
+    amount: payment.amountDisplay || "",
+    createdAt: new Date().toISOString()
+  };
+  const paymentId = verified?.paymentId || "";
+  booking.status = "Confirmed";
+  booking.paymentStatus = "Payment Received";
+  booking.paymentMethod = "Razorpay online payment";
+  booking.amount = booking.amount || payment.amountDisplay || "";
+  booking.staffNote = [
+    booking.staffNote || "",
+    `Razorpay payment verified${paymentId ? `: ${paymentId}` : ""}. Confirm schedule and next proof/update.`
+  ].filter(Boolean).join("\n");
+
+  try {
+    await updateBookingOnline(booking);
+  } catch (error) {
+    console.warn("Paid booking cloud update failed", error);
+    booking.updatedAt = new Date().toISOString();
+    saveBooking(booking);
+  }
+  rememberCheckoutBooking(booking);
+  return booking;
+}
+
 function openRazorpayCheckout(order, payment, button) {
   const checkout = new window.Razorpay({
     key: razorpayKeyId,
@@ -1640,8 +1698,10 @@ function openRazorpayCheckout(order, payment, button) {
       try {
         setRazorpayButtonState(button, "Verifying payment...", true);
         const verified = await verifyRazorpayPayment(razorpayResponse, payment);
+        const paidBooking = await markRazorpayBookingPaid(payment, verified);
         button.textContent = "Payment verified";
-        setRazorpayButtonState(button, `Payment verified. ID: ${verified.paymentId}`, true);
+        setRazorpayButtonState(button, `Payment verified. ID: ${verified.paymentId || "received"}`, true);
+        window.location.href = checkoutPageUrl("order-confirmation.html", paidBooking);
       } catch (error) {
         setRazorpayButtonState(button, error.message || "Payment verification failed.", false);
       }
@@ -2391,12 +2451,20 @@ function renderCheckoutPaymentPage(booking) {
 }
 
 function renderOrderConfirmationPage(booking) {
+  const isPaid = booking.paymentStatus === "Payment Received";
   orderConfirmationPanel.innerHTML = `
     <div class="checkout-layout">
       <article class="checkout-main-card">
         <p class="eyebrow">Step 3 of 3</p>
-        <h2>Booking request created</h2>
-        <p>Your Booking ID is ready. This is the result page only; cart and payment are now on separate pages.</p>
+        <h2>${isPaid ? "Payment received" : "Booking request created"}</h2>
+        <p>${isPaid ? "Your payment is verified and the booking is now confirmed. Staff will share schedule, receipt or proof update next." : "Your Booking ID is ready. This is the result page only; cart and payment are now on separate pages."}</p>
+        ${isPaid ? `
+          <div class="payment-success-card">
+            <span>Payment success</span>
+            <strong>${escapeHtml(booking.amount || booking.offerPrice || "Payment received")}</strong>
+            <p>Booking status moved to Confirmed and payment status moved to Payment Received.</p>
+          </div>
+        ` : ""}
         <div class="confirmation-id-card">
           <span>Booking ID</span>
           <strong>${escapeHtml(booking.id)}</strong>
@@ -2411,7 +2479,7 @@ function renderOrderConfirmationPage(booking) {
         <p>${escapeHtml(getStatusGuidance(booking))}</p>
         ${renderCheckoutSummaryCards(booking)}
         <div class="ticket-actions checkout-actions">
-          <a class="btn btn-primary" href="${escapeHtml(bookingWhatsAppUrl(booking))}">Send on WhatsApp</a>
+          <a class="btn btn-primary" href="${escapeHtml(isPaid ? paymentReceiptWhatsAppUrl(booking) : bookingWhatsAppUrl(booking))}">${isPaid ? "WhatsApp Receipt" : "Send on WhatsApp"}</a>
           <a class="btn btn-secondary" href="track-booking.html?id=${encodeURIComponent(booking.id)}">Track Booking</a>
           <a class="btn btn-secondary" href="${escapeHtml(checkoutPageUrl("payment.html", booking))}">Open Payment Page</a>
         </div>

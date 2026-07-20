@@ -3584,6 +3584,41 @@ details p {
   overflow-wrap: anywhere;
 }
 
+.payment-success-card {
+  border: 1px solid rgba(15, 118, 110, 0.28);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(245, 184, 75, 0.14)),
+    #ffffff;
+}
+
+.payment-success-card span,
+.payment-success-card strong,
+.payment-success-card p {
+  display: block;
+}
+
+.payment-success-card span {
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.payment-success-card strong {
+  margin-top: 7px;
+  color: var(--maroon);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.05;
+}
+
+.payment-success-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .checkout-actions {
   margin-top: 0;
 }
@@ -3772,6 +3807,13 @@ details p {
   border-color: rgba(91, 18, 32, 0.12);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 238, 0.9)),
+    #ffffff;
+}
+
+.payment-ready-panel.is-payment-paid {
+  border-color: rgba(15, 118, 110, 0.34);
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(245, 184, 75, 0.12)),
     #ffffff;
 }
 
