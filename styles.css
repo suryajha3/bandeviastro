@@ -588,6 +588,60 @@ h3 {
   line-height: 1.65;
 }
 
+.chairman-image-seo-section {
+  background: #fffdf8;
+}
+
+.chairman-seo-card {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) minmax(260px, 0.8fr);
+  gap: 28px;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 22px;
+  border: 1px solid rgba(92, 25, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.chairman-seo-card img {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  border: 1px solid rgba(92, 25, 42, 0.12);
+  border-radius: 6px;
+  display: block;
+}
+
+.chairman-seo-card figcaption {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chairman-seo-card figcaption span {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.chairman-seo-card figcaption strong {
+  color: var(--maroon);
+  font-family: var(--serif);
+  font-size: clamp(1.65rem, 3vw, 2.6rem);
+  line-height: 1.08;
+}
+
+.chairman-seo-card figcaption p {
+  color: var(--muted);
+  line-height: 1.75;
+  margin: 0;
+}
+
 .global-offices-hero {
   min-height: min(690px, calc(100svh - 118px));
 }
@@ -11192,6 +11246,15 @@ body {
   .backoffice-panel-head,
   .backoffice-shell-footer {
     display: grid;
+  }
+
+  .chairman-seo-card {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .chairman-seo-card figcaption strong {
+    font-size: 1.55rem;
   }
 }
 
