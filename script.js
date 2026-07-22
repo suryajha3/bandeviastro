@@ -82,7 +82,6 @@ const checkoutSessionKey = "bandeviAstroCheckoutBookingId";
 const adminAccessKey = "bandeviAstroAdminUnlocked";
 const backofficeAccessKey = "bandeviAstroBackofficeUnlocked";
 const packagePricingStorageKey = "bandeviAstroPackagePricing";
-const adminAccessCode = "BA-ADMIN-2026";
 const headerPreferenceKeys = {
   currency: "bandeviAstroDisplayCurrency",
   language: "bandeviAstroDisplayLanguage"
@@ -4899,16 +4898,14 @@ function setAdminStatus(message) {
 }
 
 function updateAdminAccessMode() {
-  const codeField = document.querySelector("#adminCodeField");
   const cloudFields = document.querySelector("#adminCloudFields");
 
   if (isCloudEnabled()) {
-    codeField?.classList.add("is-hidden");
     cloudFields?.classList.remove("is-hidden");
     setAdminStatus("Secure staff login is active. Use the admin email and password created in the staff system.");
   } else {
     cloudFields?.classList.add("is-hidden");
-    codeField?.classList.remove("is-hidden");
+    setAdminStatus("Secure staff login is not configured yet. Add Supabase settings before launch.");
   }
 }
 
@@ -4918,16 +4915,14 @@ function setBackofficeStatus(message) {
 }
 
 function updateBackofficeAccessMode() {
-  const codeField = document.querySelector("#backofficeCodeField");
   const cloudFields = document.querySelector("#backofficeCloudFields");
 
   if (isCloudEnabled()) {
-    codeField?.classList.add("is-hidden");
     cloudFields?.classList.remove("is-hidden");
     setBackofficeStatus("Secure backoffice login is active. Use the admin staff email and password.");
   } else {
     cloudFields?.classList.add("is-hidden");
-    codeField?.classList.remove("is-hidden");
+    setBackofficeStatus("Secure staff login is not configured yet. Add Supabase settings before launch.");
   }
 }
 
@@ -4991,12 +4986,7 @@ adminAccessForm?.addEventListener("submit", async (event) => {
     return;
   }
 
-  const code = document.querySelector("#adminCode").value.trim();
-  if (code === adminAccessCode) {
-    await openAdminPanel("Staff dashboard opened in local mode.");
-  } else {
-    setAdminStatus("Access code not accepted.");
-  }
+  setAdminStatus("Secure staff login is required. Supabase settings must be connected before launch.");
 });
 
 updateAdminAccessMode();
@@ -5007,8 +4997,6 @@ if (adminPanel) {
     currentUserIsAdmin().then((isAdmin) => {
       if (isAdmin) openAdminPanel("Secure staff dashboard opened.");
     });
-  } else if (sessionStorage.getItem(adminAccessKey) === "true") {
-    openAdminPanel("Staff dashboard opened in local mode.");
   }
 }
 
@@ -5040,12 +5028,7 @@ backofficeAccessForm?.addEventListener("submit", async (event) => {
     return;
   }
 
-  const code = document.querySelector("#backofficeCode").value.trim();
-  if (code === adminAccessCode) {
-    await openBackofficePanel("Backoffice opened in local mode.");
-  } else {
-    setBackofficeStatus("Access code not accepted.");
-  }
+  setBackofficeStatus("Secure staff login is required. Supabase settings must be connected before launch.");
 });
 
 if (backofficePanel) {
@@ -5053,8 +5036,6 @@ if (backofficePanel) {
     currentUserIsAdmin().then((isAdmin) => {
       if (isAdmin) openBackofficePanel("Secure backoffice opened.");
     });
-  } else if (sessionStorage.getItem(backofficeAccessKey) === "true") {
-    openBackofficePanel("Backoffice opened in local mode.");
   }
 }
 
