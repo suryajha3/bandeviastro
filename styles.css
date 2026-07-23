@@ -642,6 +642,51 @@ h3 {
   margin: 0;
 }
 
+.chairman-gallery-section {
+  background: #ffffff;
+}
+
+.chairman-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.chairman-gallery-grid figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(128, 0, 0, 0.12);
+  border-radius: 8px;
+  background: #fffdf8;
+  box-shadow: var(--shadow-soft);
+}
+
+.chairman-gallery-grid img {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  display: block;
+}
+
+.chairman-gallery-grid figcaption {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+}
+
+.chairman-gallery-grid strong {
+  color: var(--maroon);
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.chairman-gallery-grid span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .global-offices-hero {
   min-height: min(690px, calc(100svh - 118px));
 }
@@ -2324,6 +2369,12 @@ details p {
 @media (max-width: 980px) {
   .credential-service-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .chairman-gallery-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -11256,9 +11307,17 @@ body {
   .chairman-seo-card figcaption strong {
     font-size: 1.55rem;
   }
+
+  .chairman-gallery-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 980px) {
+  .chairman-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .gemstone-curated-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -11421,5 +11480,11 @@ body {
     max-width: 100% !important;
     white-space: normal !important;
     overflow-wrap: break-word !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .chairman-gallery-grid {
+    grid-template-columns: 1fr;
   }
 }
